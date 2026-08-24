@@ -113,14 +113,27 @@ namespace CoH.Presentation
                 return;
             }
 
-            Ray ray = matchCamera.ScreenPointToRay(screenPosition);
+            HandleClick(matchCamera.ScreenPointToRay(screenPosition));
+        }
 
+        /// <summary>
+        /// The whole click path, from a ray onwards.
+        ///
+        /// Split out from the mouse so tests can drive exactly what a click
+        /// drives. A pointer device does not exist in batch mode, and testing
+        /// the pieces around the routing rather than the routing itself is what
+        /// let a completely unplayable build pass its tests once already.
+        /// </summary>
+        internal void HandleClick(Ray ray)
+        {
             if (!Physics.Raycast(ray, out RaycastHit hit, 200f, clickMask))
             {
                 ClearSelection();
-                SetHint("");
+                SetHint(string.Empty);
                 return;
             }
+
+            LastHit = hit.collider != null ? hit.collider.name : "nothing";
 
             switch (_mode)
             {
@@ -137,6 +150,13 @@ namespace CoH.Presentation
                     break;
             }
         }
+
+        /// <summary>What the last click landed on. Diagnostics only.</summary>
+        internal string LastHit { get; private set; } = "none";
+
+        internal bool HasSelection => _mode != Mode.Idle;
+
+        internal EntityId SelectedEntity => _selected;
 
         private void BeginSelection(RaycastHit hit)
         {

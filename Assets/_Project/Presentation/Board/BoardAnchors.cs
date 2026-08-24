@@ -33,19 +33,4 @@ namespace CoH.Presentation
 
         public Transform Hero(bool near) => near ? nearHero : farHero;
     }
-
-    /// <summary>
-    /// The area a player drops a card onto to play it.
-    ///
-    /// Marked by side rather than by seat, for the same reason as the anchors:
-    /// the acting player always plays onto the near half.
-    /// </summary>
-    public sealed class BoardDropZone : MonoBehaviour
-    {
-        [SerializeField] private bool isNearSide = true;
-
-        public bool IsNearSide => isNearSide;
-
-        public void SetNearSide(bool near) => isNearSide = near;
-    }
 }
