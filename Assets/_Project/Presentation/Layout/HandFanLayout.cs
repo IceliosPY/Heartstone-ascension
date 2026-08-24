@@ -22,34 +22,39 @@ namespace CoH.Presentation
     [System.Serializable]
     public sealed class HandFanSettings
     {
-        [Tooltip("Distance between the leftmost and rightmost card when the hand is full.")]
-        public float MaxWidth = 5.5f;
+        [Tooltip("Radius of the circle the cards sit on. Larger means a flatter fan.")]
+        public float PivotDistance = 7f;
 
-        [Tooltip("Spacing between two neighbours before the hand starts overlapping.")]
-        public float PreferredSpacing = 0.95f;
+        [Tooltip("Degrees between two neighbours before the fan reaches its limit.")]
+        public float AnglePerCard = 6.5f;
 
-        [Tooltip("Total rotation across the fan, in degrees.")]
-        public float SpreadAngle = 16f;
+        [Tooltip("Total spread the fan never exceeds, so a full hand stays on screen.")]
+        public float MaxSpreadAngle = 38f;
 
-        [Tooltip("How far the outer cards drop below the middle one.")]
-        public float ArcDrop = 0.35f;
+        [Tooltip("Gap along the view direction, so overlapping cards stack predictably.")]
+        public float DepthStep = 0.035f;
 
-        [Tooltip("Gap between cards along the view direction, so they overlap predictably.")]
-        public float DepthStep = 0.02f;
+        public float Scale = 0.9f;
 
-        public float Scale = 1f;
+        [Tooltip("How far a selected card lifts out of the hand.")]
+        public float SelectionLift = 0.35f;
     }
 
     /// <summary>
     /// Works out where each card of a hand belongs.
     ///
-    /// Pure geometry, and pure on purpose: it takes an index and a count and
-    /// returns a pose. It touches no scene object, so the same maths will drive
-    /// a card sliding smoothly into place once easing arrives, without a line of
-    /// it changing.
+    /// The cards sit on an arc rather than a straight line: each one is rotated
+    /// a little further round a pivot well below the hand, so the middle card
+    /// stands upright and the outer ones lean away. That single construction
+    /// gives the position, the tilt and the vertical drop at once, and it is
+    /// what makes a row of rectangles read as a hand of cards.
     ///
-    /// The fan narrows as the hand grows rather than stretching past the board,
-    /// which is what keeps a hand of ten readable.
+    /// The fan stops widening once it reaches its maximum spread, so a hand of
+    /// ten overlaps rather than sliding off the table.
+    ///
+    /// Pure geometry, on purpose: it takes an index and a count and returns a
+    /// pose, touching no scene object. The same maths will drive a card easing
+    /// into place later without a line of it changing.
     /// </summary>
     public static class HandFanLayout
     {
@@ -60,20 +65,23 @@ namespace CoH.Presentation
                 return new CardPose(Vector3.zero, Quaternion.identity, settings.Scale);
             }
 
-            // -0.5 for the leftmost card, +0.5 for the rightmost, 0 for a single one.
+            // -0.5 for the leftmost card, +0.5 for the rightmost, 0 for one card.
             float centered = count == 1 ? 0f : (index / (float)(count - 1)) - 0.5f;
 
-            float width = Mathf.Min(settings.MaxWidth, settings.PreferredSpacing * (count - 1));
+            float spread = Mathf.Min(settings.MaxSpreadAngle, settings.AnglePerCard * (count - 1));
+            float angle = centered * spread;
+            float radians = angle * Mathf.Deg2Rad;
 
-            float x = centered * width;
-            float y = -Mathf.Abs(centered) * settings.ArcDrop;
+            float x = Mathf.Sin(radians) * settings.PivotDistance;
+
+            // Measured from the middle card, so the centre of the hand stays put
+            // whatever the hand size.
+            float y = (Mathf.Cos(radians) - 1f) * settings.PivotDistance;
             float z = index * settings.DepthStep;
-
-            float roll = -centered * settings.SpreadAngle;
 
             return new CardPose(
                 new Vector3(x, y, z),
-                Quaternion.Euler(0f, 0f, roll),
+                Quaternion.Euler(0f, 0f, -angle),
                 settings.Scale);
         }
     }
@@ -83,7 +91,10 @@ namespace CoH.Presentation
     ///
     /// The index handed in is the index in the engine's board zone, so what a
     /// player sees left to right is exactly the order the rules use. Unity holds
-    /// no second opinion about board order.
+    /// no second opinion about board order, and nothing about gameplay is
+    /// decided here: this only turns an order into positions.
+    ///
+    /// The row stays centred at every size, from one minion to seven.
     /// </summary>
     public static class BoardRowLayout
     {
@@ -95,9 +106,8 @@ namespace CoH.Presentation
             }
 
             float centered = count == 1 ? 0f : (index / (float)(count - 1)) - 0.5f;
-            float width = spacing * (count - 1);
 
-            return new Vector3(centered * width, 0f, 0f);
+            return new Vector3(centered * spacing * (count - 1), 0f, 0f);
         }
     }
 }

@@ -6,42 +6,54 @@ using UnityEngine;
 namespace CoH.Presentation
 {
     /// <summary>
-    /// One player's hero: health, armour when there is any, and a collider so it
-    /// can be attacked like anything else on the board.
+    /// One player's hero: a portrait plate, their name, their health, their
+    /// armour when they have any, and the counters that used to clutter the HUD.
+    ///
+    /// Bound by side rather than owned by a seat. In hotseat the near hero is
+    /// whoever is acting, so the same view object shows player one on one turn
+    /// and player two on the next; <see cref="PlayerId"/> and
+    /// <see cref="EntityId"/> come from whatever it was last given.
     /// </summary>
     public sealed class HeroView : MonoBehaviour
     {
-        [SerializeField] private Renderer body;
+        [Header("Parts")]
+        [SerializeField] private Renderer plate;
+        [SerializeField] private Renderer portrait;
+        [SerializeField] private Renderer healthPlate;
+        [SerializeField] private Renderer armorPlate;
+        [SerializeField] private GameObject armorBadge;
+        [SerializeField] private GameObject targetRing;
+
+        [Header("Text")]
         [SerializeField] private TextMeshPro nameText;
         [SerializeField] private TextMeshPro healthText;
         [SerializeField] private TextMeshPro armorText;
-        [SerializeField] private GameObject armorBadge;
+        [SerializeField] private TextMeshPro countersText;
 
-        [Header("Feedback")]
-        [SerializeField] private Color baseColor = new Color(0.28f, 0.30f, 0.44f, 1f);
-        [SerializeField] private Color targetableColor = new Color(0.85f, 0.35f, 0.35f, 1f);
+        [Header("Palette")]
+        [SerializeField] private Color nearColor = new Color(0.24f, 0.32f, 0.52f);
+        [SerializeField] private Color farColor = new Color(0.50f, 0.27f, 0.27f);
+        [SerializeField] private Color portraitColor = new Color(0.30f, 0.28f, 0.34f);
+        [SerializeField] private Color healthColor = new Color(0.74f, 0.18f, 0.18f);
+        [SerializeField] private Color armorColor = new Color(0.36f, 0.55f, 0.80f);
 
         private MaterialPropertyBlock _block;
-        private bool _isTargetable;
 
         public EntityId EntityId { get; private set; }
 
         public PlayerId PlayerId { get; private set; }
 
-        public void Bind(Hero hero, string label)
+        /// <param name="isNear">True when this is the acting player's hero.</param>
+        public void Bind(Player player, string label, bool isNear)
         {
+            Hero hero = player.Hero;
+
             EntityId = hero.Id;
-            PlayerId = hero.Owner;
+            PlayerId = player.Id;
 
-            if (nameText != null)
-            {
-                nameText.text = label;
-            }
-
-            if (healthText != null)
-            {
-                healthText.text = hero.CurrentHealth.ToString();
-            }
+            SetText(nameText, label);
+            SetText(healthText, hero.CurrentHealth.ToString());
+            SetText(countersText, "deck " + player.Deck.Count + "   hand " + player.Hand.Count);
 
             bool hasArmor = hero.Armor > 0;
 
@@ -50,31 +62,41 @@ namespace CoH.Presentation
                 armorBadge.SetActive(hasArmor);
             }
 
-            if (armorText != null)
-            {
-                armorText.text = hero.Armor.ToString();
-            }
+            SetText(armorText, hero.Armor.ToString());
 
-            ApplyTint();
+            Tint(plate, isNear ? nearColor : farColor);
+            Tint(portrait, portraitColor);
+            Tint(healthPlate, healthColor);
+            Tint(armorPlate, armorColor);
         }
 
         public void SetTargetable(bool targetable)
         {
-            _isTargetable = targetable;
-            ApplyTint();
+            if (targetRing != null)
+            {
+                targetRing.SetActive(targetable);
+            }
         }
 
-        private void ApplyTint()
+        private void Tint(Renderer target, Color colour)
         {
-            if (body == null)
+            if (target == null)
             {
                 return;
             }
 
             _block ??= new MaterialPropertyBlock();
-            body.GetPropertyBlock(_block);
-            _block.SetColor(ShaderIds.BaseColor, _isTargetable ? targetableColor : baseColor);
-            body.SetPropertyBlock(_block);
+            target.GetPropertyBlock(_block);
+            _block.SetColor(ShaderIds.BaseColor, colour);
+            target.SetPropertyBlock(_block);
+        }
+
+        private static void SetText(TextMeshPro target, string value)
+        {
+            if (target != null)
+            {
+                target.text = value;
+            }
         }
     }
 }

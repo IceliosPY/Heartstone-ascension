@@ -43,11 +43,16 @@ namespace CoH.Editor
             GameObject card = AssetDatabase.LoadAssetAtPath<GameObject>(CardPrefab);
             GameObject minion = AssetDatabase.LoadAssetAtPath<GameObject>(MinionPrefab);
 
-            PopulateHand(anchors.HandOf(Core.Identifiers.PlayerId.One), card, 5, "Test Soldier", "2", "2", "3");
-            PopulateHand(anchors.HandOf(Core.Identifiers.PlayerId.Two), card, 4, null, null, null, null);
+            // The near side belongs to whoever is acting, so the preview shows a
+            // readable hand there and card backs on the far side.
+            PopulateHand(anchors.Hand(true), card, 6, 1f, "Test Soldier", "2", "2", "3");
+            PopulateHand(anchors.Hand(false), card, 5, 0.55f, null, null, null, null);
 
-            PopulateBoard(anchors.BoardOf(Core.Identifiers.PlayerId.One), minion, 3);
-            PopulateBoard(anchors.BoardOf(Core.Identifiers.PlayerId.Two), minion, 2);
+            PopulateBoard(anchors.Board(true), minion, 4);
+            PopulateBoard(anchors.Board(false), minion, 7);
+
+            PopulateHero("NearHeroView", "PLAYER 1", "30", "deck 22   hand 6", null);
+            PopulateHero("FarHeroView", "PLAYER 2", "24", "deck 21   hand 5", "5");
 
             RenderTexture target = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
             target.antiAliasing = 2;
@@ -93,18 +98,17 @@ namespace CoH.Editor
         }
 
         private static void PopulateHand(
-            Transform anchor, GameObject prefab, int count,
+            Transform anchor, GameObject prefab, int count, float sideScale,
             string name, string mana, string attack, string health)
         {
             // Same numbers the scene wires into the presenter.
             HandFanSettings settings = new HandFanSettings
             {
-                Scale = 0.62f,
-                MaxWidth = 5.4f,
-                PreferredSpacing = 0.72f,
-                SpreadAngle = 14f,
-                ArcDrop = 0.16f,
-                DepthStep = 0.03f
+                PivotDistance = 7f,
+                AnglePerCard = 6.5f,
+                MaxSpreadAngle = 38f,
+                DepthStep = 0.035f,
+                Scale = 0.9f
             };
 
             for (int index = 0; index < count; index++)
@@ -114,7 +118,7 @@ namespace CoH.Editor
 
                 instance.transform.localPosition = pose.LocalPosition;
                 instance.transform.localRotation = pose.LocalRotation;
-                instance.transform.localScale = Vector3.one * pose.Scale;
+                instance.transform.localScale = Vector3.one * pose.Scale * sideScale;
 
                 bool faceUp = name != null;
                 Transform cover = instance.transform.Find("FaceDownCover");
@@ -125,6 +129,13 @@ namespace CoH.Editor
 
                 if (!faceUp)
                 {
+                    Hide(instance, "ArtworkArea/Artwork");
+                    Hide(instance, "RarityGem");
+                    Hide(instance, "ManaGem");
+                    Hide(instance, "Statistics");
+                    Hide(instance, "TribeBanner");
+                    Hide(instance, "NameBanner/NameText");
+                    Hide(instance, "RulesBox/RulesText");
                     continue;
                 }
 
@@ -134,11 +145,7 @@ namespace CoH.Editor
                 SetText(instance, "Statistics/HealthGem/HealthText", health);
                 SetText(instance, "RulesBox/RulesText", string.Empty);
 
-                Transform tribe = instance.transform.Find("TribeBanner");
-                if (tribe != null)
-                {
-                    tribe.gameObject.SetActive(false);
-                }
+                Hide(instance, "TribeBanner");
             }
         }
 
@@ -147,11 +154,45 @@ namespace CoH.Editor
             for (int index = 0; index < count; index++)
             {
                 GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, anchor);
-                instance.transform.localPosition = BoardRowLayout.GetPosition(index, count, 1.15f);
+                instance.transform.localPosition = BoardRowLayout.GetPosition(index, count, 1.2f);
 
                 SetText(instance, "NameText", "Test Soldier");
-                SetText(instance, "AttackText", "2");
-                SetText(instance, "HealthText", "3");
+                SetText(instance, "AttackPlate/AttackText", "2");
+                SetText(instance, "HealthPlate/HealthText", "3");
+            }
+        }
+
+        private static void PopulateHero(string objectName, string label, string health, string counters, string armor)
+        {
+            GameObject hero = GameObject.Find(objectName);
+            if (hero == null)
+            {
+                Debug.LogWarning("No hero view named " + objectName);
+                return;
+            }
+
+            SetText(hero, "NameText", label);
+            SetText(hero, "HealthText", health);
+            SetText(hero, "CountersText", counters);
+
+            Transform badge = hero.transform.Find("ArmorBadge");
+            if (badge != null)
+            {
+                badge.gameObject.SetActive(armor != null);
+
+                if (armor != null)
+                {
+                    SetText(hero, "ArmorBadge/ArmorText", armor);
+                }
+            }
+        }
+
+        private static void Hide(GameObject root, string path)
+        {
+            Transform found = root.transform.Find(path);
+            if (found != null)
+            {
+                found.gameObject.SetActive(false);
             }
         }
 

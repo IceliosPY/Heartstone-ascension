@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_HeroTwo
+  m_Name: M_TargetRing
   m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -51,11 +51,11 @@ Material:
     - _Surface: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.47, g: 0.26, b: 0.26, a: 1}
-    - _Color: {r: 0.4699999, g: 0.25999996, b: 0.25999996, a: 1}
+    - _BaseColor: {r: 0.92, g: 0.3, b: 0.26, a: 1}
+    - _Color: {r: 0.92, g: 0.29999998, b: 0.25999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &4159759219314008627
+--- !u!114 &4947730582552311763
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

@@ -23,6 +23,7 @@ namespace CoH.Presentation
         [Header("Layers")]
         [SerializeField] private Renderer frame;
         [SerializeField] private Renderer artwork;
+        [SerializeField] private Renderer manaGem;
         [SerializeField] private Renderer rarityGem;
         [SerializeField] private GameObject tribeBanner;
         [SerializeField] private GameObject statistics;
@@ -36,19 +37,45 @@ namespace CoH.Presentation
         [SerializeField] private TextMeshPro rulesText;
         [SerializeField] private TextMeshPro tribeText;
 
-        [Header("Feedback")]
-        [SerializeField] private Color playableTint = Color.white;
-        [SerializeField] private Color unplayableTint = new Color(0.45f, 0.45f, 0.5f, 1f);
-        [SerializeField] private Color selectedTint = new Color(1f, 0.92f, 0.45f, 1f);
+        [Header("Palette")]
+        [SerializeField] private Color frameColor = new Color(0.55f, 0.38f, 0.21f);
+        [SerializeField] private Color artworkColor = new Color(0.26f, 0.33f, 0.42f);
+        [SerializeField] private Color manaColor = new Color(0.16f, 0.42f, 0.85f);
+        [SerializeField] private Color selectedFrameColor = new Color(1f, 0.84f, 0.38f);
+
+        [Tooltip("How much an unplayable card is dimmed. Zero is untouched, one is black.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float dimStrength = 0.55f;
 
         private MaterialPropertyBlock _block;
         private bool _isSelected;
         private bool _isPlayable;
+        private bool _isFaceDown;
+        private Vector3 _restingPosition;
+        private float _selectionLift;
 
         /// <summary>Which card instance in the engine this view stands for.</summary>
         public EntityId EntityId { get; private set; }
 
+        /// <summary>Whether the engine says this card can be played right now.</summary>
         public bool IsPlayable => _isPlayable;
+
+        public bool IsFaceDown => _isFaceDown;
+
+        /// <summary>
+        /// Records where the layout wants this card, so a selected card can lift
+        /// out of the hand and drop back without the layout being consulted.
+        /// </summary>
+        public void SetRestingPose(Vector3 localPosition, Quaternion localRotation, float scale, float selectionLift)
+        {
+            _restingPosition = localPosition;
+            _selectionLift = selectionLift;
+
+            transform.localRotation = localRotation;
+            transform.localScale = Vector3.one * scale;
+
+            ApplyLift();
+        }
 
         /// <summary>Shows a card, face up, from a snapshot the presenter built.</summary>
         public void Bind(CardViewModel model)
@@ -71,6 +98,7 @@ namespace CoH.Presentation
             SetText(healthText, model.Health.ToString());
 
             bool hasTribe = model.Tribe != Core.Cards.Tribe.None;
+
             if (tribeBanner != null)
             {
                 tribeBanner.SetActive(hasTribe);
@@ -78,12 +106,12 @@ namespace CoH.Presentation
 
             SetText(tribeText, hasTribe ? model.Tribe.ToString().ToUpperInvariant() : string.Empty);
 
-            ApplyTint();
+            Repaint();
         }
 
         /// <summary>
-        /// Shows the back of a card. Used for the opponent's hand, where the
-        /// count matters and the contents do not.
+        /// Shows the back of a card. Used for the waiting player's hand, where
+        /// the count matters and the contents do not.
         /// </summary>
         public void BindFaceDown()
         {
@@ -91,16 +119,27 @@ namespace CoH.Presentation
             _isPlayable = false;
             _isSelected = false;
             SetFaceDown(true);
+            ApplyLift();
         }
 
         public void SetSelected(bool selected)
         {
             _isSelected = selected;
-            ApplyTint();
+            ApplyLift();
+            Repaint();
+        }
+
+        private void ApplyLift()
+        {
+            transform.localPosition = _isSelected
+                ? _restingPosition + Vector3.up * _selectionLift
+                : _restingPosition;
         }
 
         private void SetFaceDown(bool faceDown)
         {
+            _isFaceDown = faceDown;
+
             if (faceDownCover != null)
             {
                 faceDownCover.SetActive(faceDown);
@@ -108,37 +147,76 @@ namespace CoH.Presentation
 
             SetVisible(artwork, !faceDown);
             SetVisible(rarityGem, !faceDown);
+            SetVisible(manaGem, !faceDown);
             SetActive(nameText, !faceDown);
             SetActive(manaText, !faceDown);
             SetActive(rulesText, !faceDown);
 
-            if (statistics != null && faceDown)
+            if (faceDown)
             {
-                statistics.SetActive(false);
-            }
+                if (statistics != null)
+                {
+                    statistics.SetActive(false);
+                }
 
-            if (tribeBanner != null && faceDown)
-            {
-                tribeBanner.SetActive(false);
+                if (tribeBanner != null)
+                {
+                    tribeBanner.SetActive(false);
+                }
             }
         }
 
-        private void ApplyTint()
+        /// <summary>
+        /// Paints the card for its current state.
+        ///
+        /// An unplayable card is dimmed rather than merely refused on click, so
+        /// a player can tell at a glance what they can afford. The judgement
+        /// itself is never made here: it arrives already decided in the model.
+        /// </summary>
+        private void Repaint()
         {
-            if (frame == null)
+            if (_isFaceDown)
             {
                 return;
             }
 
-            Color tint = _isSelected ? selectedTint : (_isPlayable ? playableTint : unplayableTint);
+            float dim = _isPlayable || _isSelected ? 0f : dimStrength;
 
-            _block ??= new MaterialPropertyBlock();
-            frame.GetPropertyBlock(_block);
-            _block.SetColor(ShaderIds.BaseColor, tint * frameBaseColor);
-            frame.SetPropertyBlock(_block);
+            Tint(frame, _isSelected ? selectedFrameColor : Dimmed(frameColor, dim));
+            Tint(artwork, Dimmed(artworkColor, dim));
+            Tint(manaGem, Dimmed(manaColor, dim));
+
+            Color textTint = _isPlayable || _isSelected ? Color.white : new Color(0.62f, 0.62f, 0.66f);
+
+            Fade(nameText, textTint);
+            Fade(manaText, textTint);
+            Fade(attackText, textTint);
+            Fade(healthText, textTint);
         }
 
-        [SerializeField] private Color frameBaseColor = new Color(0.52f, 0.36f, 0.20f, 1f);
+        private static Color Dimmed(Color colour, float amount) =>
+            Color.Lerp(colour, new Color(0.07f, 0.07f, 0.09f), amount);
+
+        private void Tint(Renderer target, Color colour)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            _block ??= new MaterialPropertyBlock();
+            target.GetPropertyBlock(_block);
+            _block.SetColor(ShaderIds.BaseColor, colour);
+            target.SetPropertyBlock(_block);
+        }
+
+        private static void Fade(TextMeshPro target, Color colour)
+        {
+            if (target != null)
+            {
+                target.color = colour;
+            }
+        }
 
         private static void SetText(TextMeshPro target, string value)
         {

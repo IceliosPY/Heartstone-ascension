@@ -1,49 +1,51 @@
-using CoH.Core.Identifiers;
 using UnityEngine;
 
 namespace CoH.Presentation
 {
     /// <summary>
-    /// Where things belong in the world: one hand, one board row and one hero
-    /// spot per side.
+    /// Where things belong on screen: a near side and a far side.
     ///
-    /// Deliberately nothing but empty transforms. Re-theming the board later,
-    /// crypt, workshop or anything else, means swapping the decorative meshes
-    /// around these anchors while every position the layout code computes stays
-    /// exactly where it was.
+    /// Deliberately not "player one" and "player two". In hotseat the person
+    /// holding the mouse is whoever has the turn, so the comfortable half of
+    /// the screen, the big readable hand at the bottom, has to follow the turn
+    /// rather than belong to a seat. Naming these near and far is what stops
+    /// anything quietly treating seat one as the permanent human.
+    ///
+    /// Nothing here but empty transforms. Re-theming the board later means
+    /// swapping decorative meshes around these anchors while every computed
+    /// position stays exactly where it was.
     /// </summary>
     public sealed class BoardAnchors : MonoBehaviour
     {
-        [Header("Seat one, near side")]
-        [SerializeField] private Transform playerOneHand;
-        [SerializeField] private Transform playerOneBoard;
-        [SerializeField] private Transform playerOneHero;
+        [Header("Near side, the player currently acting")]
+        [SerializeField] private Transform nearHand;
+        [SerializeField] private Transform nearBoard;
+        [SerializeField] private Transform nearHero;
 
-        [Header("Seat two, far side")]
-        [SerializeField] private Transform playerTwoHand;
-        [SerializeField] private Transform playerTwoBoard;
-        [SerializeField] private Transform playerTwoHero;
+        [Header("Far side, their opponent")]
+        [SerializeField] private Transform farHand;
+        [SerializeField] private Transform farBoard;
+        [SerializeField] private Transform farHero;
 
-        public Transform HandOf(PlayerId player) =>
-            player == PlayerId.One ? playerOneHand : playerTwoHand;
+        public Transform Hand(bool near) => near ? nearHand : farHand;
 
-        public Transform BoardOf(PlayerId player) =>
-            player == PlayerId.One ? playerOneBoard : playerTwoBoard;
+        public Transform Board(bool near) => near ? nearBoard : farBoard;
 
-        public Transform HeroOf(PlayerId player) =>
-            player == PlayerId.One ? playerOneHero : playerTwoHero;
+        public Transform Hero(bool near) => near ? nearHero : farHero;
     }
 
     /// <summary>
-    /// The area a player drops a card onto to play it. Nothing but a collider
-    /// with a seat written on it.
+    /// The area a player drops a card onto to play it.
+    ///
+    /// Marked by side rather than by seat, for the same reason as the anchors:
+    /// the acting player always plays onto the near half.
     /// </summary>
     public sealed class BoardDropZone : MonoBehaviour
     {
-        [SerializeField] private bool isSeatOne = true;
+        [SerializeField] private bool isNearSide = true;
 
-        public PlayerId Owner => isSeatOne ? PlayerId.One : PlayerId.Two;
+        public bool IsNearSide => isNearSide;
 
-        public void SetOwner(PlayerId player) => isSeatOne = player == PlayerId.One;
+        public void SetNearSide(bool near) => isNearSide = near;
     }
 }

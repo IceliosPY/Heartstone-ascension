@@ -154,7 +154,7 @@ namespace CoH.Presentation
                 _mode = Mode.CardSelected;
                 _selected = card.EntityId;
                 card.SetSelected(true);
-                SetHint("Click your side of the board to play it.");
+                SetHint("Click your half of the board to play it.");
                 return;
             }
 
@@ -173,8 +173,10 @@ namespace CoH.Presentation
         {
             PlayerId active = session.State.CurrentPlayer;
 
+            // The acting player always plays onto the near half of the screen,
+            // whichever seat they hold.
             BoardDropZone zone = hit.collider.GetComponentInParent<BoardDropZone>();
-            bool ownBoard = zone != null && zone.Owner == active;
+            bool ownBoard = zone != null && zone.IsNearSide;
 
             if (!ownBoard)
             {
@@ -237,18 +239,8 @@ namespace CoH.Presentation
                 if (presenter.TryGetMinionView(id, out MinionView minion))
                 {
                     minion.SetTargetable(true);
-                    continue;
                 }
-
-                HeroView hero = presenter.HeroOf(PlayerId.One);
-                if (hero != null && hero.EntityId == id)
-                {
-                    hero.SetTargetable(true);
-                    continue;
-                }
-
-                hero = presenter.HeroOf(PlayerId.Two);
-                if (hero != null && hero.EntityId == id)
+                else if (presenter.TryGetHeroView(id, out HeroView hero))
                 {
                     hero.SetTargetable(true);
                 }
@@ -276,17 +268,14 @@ namespace CoH.Presentation
                     }
                 }
 
-                HeroView one = presenter.HeroOf(PlayerId.One);
-                HeroView two = presenter.HeroOf(PlayerId.Two);
-
-                if (one != null)
+                if (presenter.NearHero != null)
                 {
-                    one.SetTargetable(false);
+                    presenter.NearHero.SetTargetable(false);
                 }
 
-                if (two != null)
+                if (presenter.FarHero != null)
                 {
-                    two.SetTargetable(false);
+                    presenter.FarHero.SetTargetable(false);
                 }
             }
 

@@ -11,11 +11,16 @@ namespace CoH.Presentation
     /// <summary>
     /// Keeps the scene showing what the engine says.
     ///
-    /// It listens to the event queue and, once a batch has been replayed,
-    /// reconciles the views against the state: spawn what appeared, remove what
-    /// died, and refresh every number. Reconciling rather than mutating blindly
-    /// means the scene cannot drift out of step with the rules, which is the one
-    /// failure that would be genuinely hard to debug later.
+    /// The screen has a near side and a far side, and the near side belongs to
+    /// whoever is acting. That is the whole hotseat model: there is no permanent
+    /// human seat, so the comfortable half of the screen follows the turn rather
+    /// than a player number. Both players therefore see their hand in the same
+    /// place, at the same size, reachable by the same click.
+    ///
+    /// After each batch of events it reconciles the views against the state:
+    /// spawn what appeared, remove what died, refresh every number, re-place
+    /// everything. Reconciling rather than mutating blindly means the scene
+    /// cannot drift out of step with the rules.
     ///
     /// It is also the only <see cref="IEventVisualizer"/> for now. When
     /// animations arrive, this splits into one visualizer per event and the
@@ -33,21 +38,26 @@ namespace CoH.Presentation
         [SerializeField] private MinionView minionPrefab;
 
         [Header("Heroes")]
-        [SerializeField] private HeroView playerOneHero;
-        [SerializeField] private HeroView playerTwoHero;
+        [SerializeField] private HeroView nearHero;
+        [SerializeField] private HeroView farHero;
 
         [Header("Layout")]
         [SerializeField] private HandFanSettings handLayout = new HandFanSettings();
-        [SerializeField] private float boardSpacing = 1.15f;
+        [SerializeField] private float boardSpacing = 1.2f;
+
+        [Tooltip("How much smaller the waiting player's hand is drawn.")]
+        [SerializeField] private float farHandScale = 0.55f;
 
         private readonly Dictionary<EntityId, CardView> _cardViews = new Dictionary<EntityId, CardView>();
         private readonly Dictionary<EntityId, MinionView> _minionViews = new Dictionary<EntityId, MinionView>();
-        private readonly List<CardView> _faceDownPool = new List<CardView>();
         private readonly List<EntityId> _scratch = new List<EntityId>();
+
+        private PlayerId _viewpoint = PlayerId.None;
 
         public GameSession Session => session;
 
-        public HeroView HeroOf(PlayerId player) => player == PlayerId.One ? playerOneHero : playerTwoHero;
+        /// <summary>Whose side of the screen is the near one right now.</summary>
+        public PlayerId Viewpoint => _viewpoint;
 
         public bool TryGetCardView(EntityId id, out CardView view) => _cardViews.TryGetValue(id, out view);
 
@@ -56,6 +66,29 @@ namespace CoH.Presentation
         public IReadOnlyDictionary<EntityId, MinionView> MinionViews => _minionViews;
 
         public IReadOnlyDictionary<EntityId, CardView> CardViews => _cardViews;
+
+        /// <summary>Finds the hero view currently showing the given entity, if any.</summary>
+        public bool TryGetHeroView(EntityId id, out HeroView view)
+        {
+            if (nearHero != null && nearHero.EntityId == id)
+            {
+                view = nearHero;
+                return true;
+            }
+
+            if (farHero != null && farHero.EntityId == id)
+            {
+                view = farHero;
+                return true;
+            }
+
+            view = null;
+            return false;
+        }
+
+        public HeroView NearHero => nearHero;
+
+        public HeroView FarHero => farHero;
 
         private void OnEnable()
         {
@@ -120,37 +153,56 @@ namespace CoH.Presentation
 
             GameState state = session.State;
 
-            RebuildBoard(state, PlayerId.One);
-            RebuildBoard(state, PlayerId.Two);
+            // The acting player owns the near side. When the match is over there
+            // is no acting player, so the last point of view is kept rather than
+            // snapping the board around at the final moment.
+            if (!state.CurrentPlayer.IsNone)
+            {
+                _viewpoint = state.CurrentPlayer;
+            }
+            else if (_viewpoint.IsNone)
+            {
+                _viewpoint = PlayerId.One;
+            }
 
-            RebuildHand(state, PlayerId.One);
-            RebuildHand(state, PlayerId.Two);
+            PlayerId near = _viewpoint;
+            PlayerId far = near.Opponent;
 
-            RefreshHeroes(state);
+            RebuildBoard(state, near, true);
+            RebuildBoard(state, far, false);
+
+            RebuildHand(state, near, true);
+            RebuildHand(state, far, false);
+
+            DespawnMissingMinions(state);
+            DespawnMissingCards(state);
+
+            if (nearHero != null)
+            {
+                nearHero.Bind(state.GetPlayer(near), MatchHud.Describe(near), true);
+            }
+
+            if (farHero != null)
+            {
+                farHero.Bind(state.GetPlayer(far), MatchHud.Describe(far), false);
+            }
 
             if (hud != null)
             {
                 hud.Refresh(state);
             }
+
+            // Everything above moved colliders, and clicking raycasts against
+            // them. Unity does not push transform changes into the physics
+            // scene on its own, so without this the first click after a turn
+            // change would test against where the cards used to be, and miss.
+            Physics.SyncTransforms();
         }
 
-        private void RefreshHeroes(GameState state)
-        {
-            if (playerOneHero != null)
-            {
-                playerOneHero.Bind(state.GetPlayer(PlayerId.One).Hero, "PLAYER 1");
-            }
-
-            if (playerTwoHero != null)
-            {
-                playerTwoHero.Bind(state.GetPlayer(PlayerId.Two).Hero, "PLAYER 2");
-            }
-        }
-
-        private void RebuildBoard(GameState state, PlayerId seat)
+        private void RebuildBoard(GameState state, PlayerId seat, bool near)
         {
             Player player = state.GetPlayer(seat);
-            Transform anchor = anchors.BoardOf(seat);
+            Transform anchor = anchors.Board(near);
 
             for (int slot = 0; slot < player.Board.Count; slot++)
             {
@@ -165,22 +217,21 @@ namespace CoH.Presentation
                 view.transform.SetParent(anchor, false);
                 view.transform.localPosition = BoardRowLayout.GetPosition(slot, player.Board.Count, boardSpacing);
                 view.transform.localRotation = Quaternion.identity;
+                view.transform.localScale = Vector3.one;
 
                 view.Bind(BuildMinionModel(state, minion));
             }
-
-            DespawnMissing(_minionViews, state);
         }
 
-        private void RebuildHand(GameState state, PlayerId seat)
+        private void RebuildHand(GameState state, PlayerId seat, bool near)
         {
             Player player = state.GetPlayer(seat);
-            Transform anchor = anchors.HandOf(seat);
+            Transform anchor = anchors.Hand(near);
 
-            // The player whose turn it is sees their cards; the other hand is
-            // shown as backs, so both hands are visible without either being
-            // mistaken for the one that can act.
-            bool faceUp = state.CurrentPlayer == seat;
+            // Only the acting player's cards are turned face up. The other hand
+            // stays readable as a count without pretending to be playable.
+            bool faceUp = near;
+            float scale = handLayout.Scale * (near ? 1f : farHandScale);
 
             for (int index = 0; index < player.Hand.Count; index++)
             {
@@ -195,9 +246,7 @@ namespace CoH.Presentation
                 view.transform.SetParent(anchor, false);
 
                 CardPose pose = HandFanLayout.GetPose(index, player.Hand.Count, handLayout);
-                view.transform.localPosition = pose.LocalPosition;
-                view.transform.localRotation = pose.LocalRotation;
-                view.transform.localScale = Vector3.one * pose.Scale;
+                view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, scale, handLayout.SelectionLift);
 
                 if (faceUp)
                 {
@@ -208,15 +257,14 @@ namespace CoH.Presentation
                     view.BindFaceDown();
                 }
             }
-
-            DespawnMissingCards(state);
         }
 
         private CardViewModel BuildCardModel(GameState state, CardInstance card, PlayerId owner)
         {
             CardDefinition definition = state.Catalog.Get(card.CardId);
 
-            // The engine answers whether it is playable. The view never guesses.
+            // The engine answers whether it is playable. The view never guesses,
+            // and the command it would send is exactly the one asked about here.
             bool playable = session.CanSubmit(new PlayCardCommand(owner, card.Id));
 
             return new CardViewModel(
@@ -275,13 +323,15 @@ namespace CoH.Presentation
             }
         }
 
-        private void DespawnMissing(Dictionary<EntityId, MinionView> views, GameState state)
+        private void DespawnMissingMinions(GameState state)
         {
             _scratch.Clear();
 
-            foreach (KeyValuePair<EntityId, MinionView> pair in views)
+            foreach (KeyValuePair<EntityId, MinionView> pair in _minionViews)
             {
-                if (!state.TryGetEntity(pair.Key, out Entity entity) || !(entity is Minion minion) || !minion.IsInPlay)
+                if (!state.TryGetEntity(pair.Key, out Entity entity) ||
+                    !(entity is Minion minion) ||
+                    !minion.IsInPlay)
                 {
                     _scratch.Add(pair.Key);
                 }

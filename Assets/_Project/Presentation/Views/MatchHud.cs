@@ -8,8 +8,13 @@ using UnityEngine.UI;
 namespace CoH.Presentation
 {
     /// <summary>
-    /// The screen-space readout: whose turn it is, what everybody's health and
-    /// mana look like, and the button that ends a turn.
+    /// The screen-space readout.
+    ///
+    /// Split in two on purpose. The player panel carries the three things
+    /// somebody actually plays from, whose turn it is, which turn, and how much
+    /// mana is left; everything else, health, deck and hand counts, now lives on
+    /// the hero views where it belongs. The developer overlay keeps phase, seed
+    /// and entity count, small and out of the way.
     ///
     /// It reads the state and prints it. It decides nothing, and the End Turn
     /// button does not end a turn: it raises an intent that the input layer
@@ -17,17 +22,18 @@ namespace CoH.Presentation
     /// </summary>
     public sealed class MatchHud : MonoBehaviour
     {
-        [Header("Readout")]
+        [Header("Player panel")]
         [SerializeField] private TextMeshProUGUI turnText;
         [SerializeField] private TextMeshProUGUI activePlayerText;
         [SerializeField] private TextMeshProUGUI manaText;
-        [SerializeField] private TextMeshProUGUI playerOneText;
-        [SerializeField] private TextMeshProUGUI playerTwoText;
         [SerializeField] private TextMeshProUGUI hintText;
+
+        [Header("Developer overlay")]
         [SerializeField] private TextMeshProUGUI debugText;
 
         [Header("Controls")]
         [SerializeField] private Button endTurnButton;
+        [SerializeField] private TextMeshProUGUI endTurnLabel;
 
         [Header("Result")]
         [SerializeField] private GameObject resultPanel;
@@ -67,27 +73,23 @@ namespace CoH.Presentation
 
         public void Refresh(GameState state)
         {
-            Player one = state.GetPlayer(PlayerId.One);
-            Player two = state.GetPlayer(PlayerId.Two);
-
             Set(turnText, "TURN " + state.TurnNumber);
-
-            Set(activePlayerText, state.CurrentPlayer.IsNone
-                ? "-"
-                : Describe(state.CurrentPlayer) + " TO PLAY");
 
             if (state.CurrentPlayer.IsNone)
             {
-                Set(manaText, "MANA -/-");
-            }
-            else
-            {
-                Player active = state.GetPlayer(state.CurrentPlayer);
-                Set(manaText, "MANA " + active.AvailableMana + " / " + active.MaxMana);
+                Set(activePlayerText, "MATCH OVER");
+                Set(manaText, "-");
+                Set(endTurnLabel, "END TURN");
+                return;
             }
 
-            Set(playerOneText, Line(one, state.CurrentPlayer == PlayerId.One));
-            Set(playerTwoText, Line(two, state.CurrentPlayer == PlayerId.Two));
+            Player active = state.GetPlayer(state.CurrentPlayer);
+
+            // The button says whose turn it is ending, so nobody passes for the
+            // wrong player on a shared screen.
+            Set(activePlayerText, Describe(state.CurrentPlayer) + " TO PLAY");
+            Set(manaText, active.AvailableMana + " / " + active.MaxMana + "  MANA");
+            Set(endTurnLabel, "END " + Describe(state.CurrentPlayer) + " TURN");
 
             Set(debugText,
                 "phase " + state.Phase +
@@ -102,30 +104,17 @@ namespace CoH.Presentation
                 resultPanel.SetActive(true);
             }
 
-            string message = result switch
+            Set(resultText, result switch
             {
                 GameResult.PlayerOneWins => "PLAYER 1 WINS",
                 GameResult.PlayerTwoWins => "PLAYER 2 WINS",
                 GameResult.Draw => "DRAW",
                 _ => string.Empty
-            };
-
-            Set(resultText, message);
+            });
         }
 
-        private static string Describe(PlayerId player) =>
+        public static string Describe(PlayerId player) =>
             player == PlayerId.One ? "PLAYER 1" : "PLAYER 2";
-
-        private static string Line(Player player, bool isActive)
-        {
-            string armour = player.Hero.Armor > 0 ? "  +" + player.Hero.Armor + " armor" : string.Empty;
-
-            return (isActive ? "> " : "  ")
-                   + Describe(player.Id)
-                   + "   " + player.Hero.CurrentHealth + " HP" + armour
-                   + "   hand " + player.Hand.Count
-                   + "   deck " + player.Deck.Count;
-        }
 
         private static void Set(TextMeshProUGUI target, string value)
         {
