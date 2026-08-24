@@ -3,7 +3,12 @@
     "rootNamespace": "CoH.Editor",
     "references": [
         "CoH.Core",
-        "CoH.Data"
+        "CoH.Data",
+        "CoH.Presentation",
+        "CoH.App",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"

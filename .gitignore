@@ -55,3 +55,6 @@ sysinfo.txt
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# --- Generated previews ---------------------------------------
+match-preview.png
