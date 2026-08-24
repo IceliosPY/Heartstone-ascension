@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CoH.Core.Identifiers;
 using CoH.Core.Setup;
 
@@ -27,7 +28,11 @@ namespace CoH.Core.State
             Hand = new Zone<CardInstance>(ZoneType.Hand, config.MaxHandSize);
             Board = new Zone<Minion>(ZoneType.Play, config.MaxBoardSize);
             Graveyard = new Zone<CardInstance>(ZoneType.Graveyard);
+
+            _mulliganSelection = new List<EntityId>();
         }
+
+        private readonly List<EntityId> _mulliganSelection;
 
         public PlayerId Id { get; }
 
@@ -69,6 +74,34 @@ namespace CoH.Core.State
         public int FatigueCounter { get; internal set; }
 
         public bool HasUsedHeroPowerThisTurn { get; internal set; }
+
+        /// <summary>
+        /// How many turns this player has begun.
+        ///
+        /// Distinct from GameState.TurnNumber, which counts turns across the
+        /// whole match. Keeping the two apart avoids the classic bug where one
+        /// system reads a turn counter as "the match's third turn" and another
+        /// as "this player's third turn".
+        /// </summary>
+        public int TurnsTaken { get; internal set; }
+
+        /// <summary>Whether this player has already submitted their mulligan choice.</summary>
+        public bool HasConfirmedMulligan { get; internal set; }
+
+        /// <summary>
+        /// Cards this player asked to replace, kept between their confirmation
+        /// and the moment both players' mulligans are resolved together.
+        /// Empty outside the mulligan phase.
+        /// </summary>
+        public IReadOnlyList<EntityId> MulliganSelection => _mulliganSelection;
+
+        internal void SetMulliganSelection(IEnumerable<EntityId> selection)
+        {
+            _mulliganSelection.Clear();
+            _mulliganSelection.AddRange(selection);
+        }
+
+        internal void ClearMulliganSelection() => _mulliganSelection.Clear();
 
         public override string ToString() => "Player " + Id;
     }

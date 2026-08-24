@@ -3,22 +3,27 @@ using System;
 namespace CoH.Core.Identifiers
 {
     /// <summary>
-    /// Identifies one of the two players of a match.
+    /// Identifies one of the two players of a match by seat.
     ///
-    /// The backing value is 0 for <see cref="None"/>, 1 for <see cref="First"/>
-    /// and 2 for <see cref="Second"/>, so that default(PlayerId) is safely
-    /// <see cref="None"/> rather than silently meaning "first player".
+    /// Named One and Two rather than First and Second on purpose: which player
+    /// takes the first turn is drawn at random at setup and is held in
+    /// GameState.StartingPlayer. Calling a seat "First" would make
+    /// "the first player" mean two different things.
+    ///
+    /// The backing value is 0 for <see cref="None"/>, 1 for <see cref="One"/>
+    /// and 2 for <see cref="Two"/>, so that default(PlayerId) is safely
+    /// <see cref="None"/> rather than silently meaning a real player.
     /// </summary>
     public readonly struct PlayerId : IEquatable<PlayerId>
     {
         /// <summary>No player. This is also default(PlayerId).</summary>
         public static readonly PlayerId None = default;
 
-        /// <summary>The player seated first. Which one starts the match is a rule, decided later.</summary>
-        public static readonly PlayerId First = new PlayerId(1);
+        /// <summary>The player in seat one.</summary>
+        public static readonly PlayerId One = new PlayerId(1);
 
-        /// <summary>The player seated second.</summary>
-        public static readonly PlayerId Second = new PlayerId(2);
+        /// <summary>The player in seat two.</summary>
+        public static readonly PlayerId Two = new PlayerId(2);
 
         private readonly int _number;
 
@@ -42,12 +47,12 @@ namespace CoH.Core.Identifiers
             {
                 if (_number == 1)
                 {
-                    return Second;
+                    return Two;
                 }
 
                 if (_number == 2)
                 {
-                    return First;
+                    return One;
                 }
 
                 return None;

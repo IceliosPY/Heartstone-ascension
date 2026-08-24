@@ -25,7 +25,8 @@ namespace CoH.Core.Cards
             CardType type,
             int manaCost,
             int attack = 0,
-            int health = 0)
+            int health = 0,
+            bool collectible = true)
         {
             if (id.IsNone)
             {
@@ -43,6 +44,7 @@ namespace CoH.Core.Cards
             ManaCost = manaCost;
             Attack = attack;
             Health = health;
+            Collectible = collectible;
         }
 
         public CardId Id { get; }
@@ -58,6 +60,13 @@ namespace CoH.Core.Cards
 
         /// <summary>Printed health. Meaningful for minions; durability for weapons.</summary>
         public int Health { get; }
+
+        /// <summary>
+        /// Whether the card can be put in a deck by a player. False for cards
+        /// that only ever appear through the game itself, such as The Coin or
+        /// summoned tokens.
+        /// </summary>
+        public bool Collectible { get; }
 
         public override string ToString() =>
             Name + " (" + Id + ", " + Type + " " + ManaCost + " mana)";

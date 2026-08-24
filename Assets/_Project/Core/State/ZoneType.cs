@@ -16,6 +16,14 @@ namespace CoH.Core.State
         /// <summary>On the board, in play.</summary>
         Play = 3,
 
-        Graveyard = 4
+        Graveyard = 4,
+
+        /// <summary>
+        /// Held outside every other zone for the duration of one operation.
+        /// Used by the mulligan, where the cards a player replaces must leave
+        /// the hand before the replacements are drawn, so that a replaced card
+        /// cannot come back as its own replacement.
+        /// </summary>
+        SetAside = 5
     }
 }

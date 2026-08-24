@@ -21,7 +21,7 @@ namespace CoH.Tests.EditMode
             GameState game = TestFactory.Game();
             CardDefinition definition = game.Catalog.Get(MinionId);
 
-            CardInstance card = game.CreateCardInstance(MinionId, PlayerId.First);
+            CardInstance card = game.CreateCardInstance(MinionId, PlayerId.One);
             card.CostModifier = -1;
             card.AttackModifier = 2;
             card.HealthModifier = 2;
@@ -39,8 +39,8 @@ namespace CoH.Tests.EditMode
         {
             GameState game = TestFactory.Game();
 
-            CardInstance discounted = game.CreateCardInstance(MinionId, PlayerId.First);
-            CardInstance untouched = game.CreateCardInstance(MinionId, PlayerId.First);
+            CardInstance discounted = game.CreateCardInstance(MinionId, PlayerId.One);
+            CardInstance untouched = game.CreateCardInstance(MinionId, PlayerId.One);
 
             discounted.CostModifier = -2;
 
@@ -62,7 +62,7 @@ namespace CoH.Tests.EditMode
         {
             GameState game = TestFactory.Game();
 
-            Minion minion = game.CreateMinion(MinionId, PlayerId.First);
+            Minion minion = game.CreateMinion(MinionId, PlayerId.One);
 
             Assert.That(minion.CardId, Is.EqualTo(MinionId));
             Assert.That(minion.BaseAttack, Is.EqualTo(2));
@@ -82,7 +82,7 @@ namespace CoH.Tests.EditMode
 
             // The example from the design brief: a printed 2 mana 2/3 that is a
             // 4/5 on the board having taken 2 damage.
-            Minion minion = game.CreateMinion(MinionId, PlayerId.First);
+            Minion minion = game.CreateMinion(MinionId, PlayerId.One);
             minion.AttackModifier = 2;
             minion.HealthModifier = 2;
             minion.Damage = 2;
@@ -103,7 +103,7 @@ namespace CoH.Tests.EditMode
             GameState game = TestFactory.Game();
 
             // This is exactly why damage is stored instead of current health.
-            Minion minion = game.CreateMinion(MinionId, PlayerId.First);
+            Minion minion = game.CreateMinion(MinionId, PlayerId.One);
             minion.HealthModifier = 2;   // 2/5
             minion.Damage = 4;           // 1 health left
 
@@ -119,7 +119,7 @@ namespace CoH.Tests.EditMode
         public void A_hero_starts_at_full_health_with_no_armor()
         {
             GameState game = TestFactory.Game();
-            Hero hero = game.GetPlayer(PlayerId.First).Hero;
+            Hero hero = game.GetPlayer(PlayerId.One).Hero;
 
             Assert.That(hero.MaxHealth, Is.EqualTo(30));
             Assert.That(hero.CurrentHealth, Is.EqualTo(30));
@@ -132,7 +132,7 @@ namespace CoH.Tests.EditMode
         public void A_hero_tracks_armor_and_damage_separately()
         {
             GameState game = TestFactory.Game();
-            Hero hero = game.GetPlayer(PlayerId.First).Hero;
+            Hero hero = game.GetPlayer(PlayerId.One).Hero;
 
             hero.Armor = 5;
             hero.Damage = 4;
@@ -147,7 +147,7 @@ namespace CoH.Tests.EditMode
         public void A_new_match_starts_with_empty_zones_and_no_current_player()
         {
             GameState game = TestFactory.Game();
-            Player player = game.GetPlayer(PlayerId.First);
+            Player player = game.GetPlayer(PlayerId.One);
 
             Assert.That(player.Deck.Count, Is.EqualTo(0));
             Assert.That(player.Hand.Count, Is.EqualTo(0));
@@ -170,8 +170,8 @@ namespace CoH.Tests.EditMode
             GameState game = TestFactory.Game();
 
             Assert.That(game.Players.Count, Is.EqualTo(2));
-            Assert.That(game.GetOpponentOf(PlayerId.First), Is.SameAs(game.GetPlayer(PlayerId.Second)));
-            Assert.That(game.GetOpponentOf(PlayerId.Second), Is.SameAs(game.GetPlayer(PlayerId.First)));
+            Assert.That(game.GetOpponentOf(PlayerId.One), Is.SameAs(game.GetPlayer(PlayerId.Two)));
+            Assert.That(game.GetOpponentOf(PlayerId.Two), Is.SameAs(game.GetPlayer(PlayerId.One)));
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace CoH.Tests.EditMode
             GameState game = TestFactory.Game();
 
             Assert.Throws<System.ArgumentException>(
-                () => game.CreateMinion(new CardId("does_not_exist"), PlayerId.First));
+                () => game.CreateMinion(new CardId("does_not_exist"), PlayerId.One));
         }
     }
 }

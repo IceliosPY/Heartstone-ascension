@@ -47,19 +47,19 @@ namespace CoH.Tests.EditMode
         public void Default_player_id_is_none_rather_than_first_player()
         {
             Assert.That(default(PlayerId).IsNone, Is.True);
-            Assert.That(PlayerId.First.IsNone, Is.False);
-            Assert.That(PlayerId.First, Is.Not.EqualTo(PlayerId.Second));
+            Assert.That(PlayerId.One.IsNone, Is.False);
+            Assert.That(PlayerId.One, Is.Not.EqualTo(PlayerId.Two));
         }
 
         [Test]
         public void Player_index_and_opponent_are_consistent()
         {
-            Assert.That(PlayerId.First.Index, Is.EqualTo(0));
-            Assert.That(PlayerId.Second.Index, Is.EqualTo(1));
-            Assert.That(PlayerId.FromIndex(0), Is.EqualTo(PlayerId.First));
-            Assert.That(PlayerId.FromIndex(1), Is.EqualTo(PlayerId.Second));
-            Assert.That(PlayerId.First.Opponent, Is.EqualTo(PlayerId.Second));
-            Assert.That(PlayerId.Second.Opponent, Is.EqualTo(PlayerId.First));
+            Assert.That(PlayerId.One.Index, Is.EqualTo(0));
+            Assert.That(PlayerId.Two.Index, Is.EqualTo(1));
+            Assert.That(PlayerId.FromIndex(0), Is.EqualTo(PlayerId.One));
+            Assert.That(PlayerId.FromIndex(1), Is.EqualTo(PlayerId.Two));
+            Assert.That(PlayerId.One.Opponent, Is.EqualTo(PlayerId.Two));
+            Assert.That(PlayerId.Two.Opponent, Is.EqualTo(PlayerId.One));
         }
 
         [Test]
@@ -78,11 +78,11 @@ namespace CoH.Tests.EditMode
 
             // The two heroes are the first entities the match ever creates.
             Assert.That(game.EntityCount, Is.EqualTo(2));
-            Assert.That(game.GetPlayer(PlayerId.First).Hero.Id.Value, Is.EqualTo(1));
-            Assert.That(game.GetPlayer(PlayerId.Second).Hero.Id.Value, Is.EqualTo(2));
+            Assert.That(game.GetPlayer(PlayerId.One).Hero.Id.Value, Is.EqualTo(1));
+            Assert.That(game.GetPlayer(PlayerId.Two).Hero.Id.Value, Is.EqualTo(2));
 
-            CardInstance card = game.CreateCardInstance(new CardId(TestFactory.MinionCardId), PlayerId.First);
-            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.First);
+            CardInstance card = game.CreateCardInstance(new CardId(TestFactory.MinionCardId), PlayerId.One);
+            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.One);
 
             Assert.That(card.Id.Value, Is.EqualTo(3));
             Assert.That(minion.Id.Value, Is.EqualTo(4));
@@ -100,8 +100,8 @@ namespace CoH.Tests.EditMode
 
             for (int step = 0; step < 10; step++)
             {
-                Minion fromLeft = left.CreateMinion(cardId, PlayerId.First);
-                Minion fromRight = right.CreateMinion(cardId, PlayerId.First);
+                Minion fromLeft = left.CreateMinion(cardId, PlayerId.One);
+                Minion fromRight = right.CreateMinion(cardId, PlayerId.One);
                 Assert.That(fromRight.Id, Is.EqualTo(fromLeft.Id), "Divergence at step " + step);
             }
         }
@@ -121,7 +121,7 @@ namespace CoH.Tests.EditMode
         {
             GameState game = TestFactory.Game();
 
-            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.First);
+            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.One);
 
             // Zero means "has not entered play". Stamping happens when a rule
             // actually puts the minion on the board, which does not exist yet.
@@ -133,16 +133,16 @@ namespace CoH.Tests.EditMode
         {
             GameState game = TestFactory.Game();
 
-            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.Second);
+            Minion minion = game.CreateMinion(new CardId(TestFactory.MinionCardId), PlayerId.Two);
 
-            Assert.That(minion.Owner, Is.EqualTo(PlayerId.Second));
-            Assert.That(minion.Controller, Is.EqualTo(PlayerId.Second));
+            Assert.That(minion.Owner, Is.EqualTo(PlayerId.Two));
+            Assert.That(minion.Controller, Is.EqualTo(PlayerId.Two));
 
             // Control can be stolen later; ownership never changes.
-            minion.Controller = PlayerId.First;
+            minion.Controller = PlayerId.One;
 
-            Assert.That(minion.Controller, Is.EqualTo(PlayerId.First));
-            Assert.That(minion.Owner, Is.EqualTo(PlayerId.Second));
+            Assert.That(minion.Controller, Is.EqualTo(PlayerId.One));
+            Assert.That(minion.Owner, Is.EqualTo(PlayerId.Two));
         }
     }
 }

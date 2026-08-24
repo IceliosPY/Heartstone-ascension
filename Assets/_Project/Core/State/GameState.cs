@@ -47,6 +47,9 @@ namespace CoH.Core.State
             }
 
             CurrentPlayer = PlayerId.None;
+            StartingPlayer = PlayerId.None;
+            Winner = PlayerId.None;
+            Phase = GamePhase.Setup;
         }
 
         public GameConfig Config { get; }
@@ -65,11 +68,36 @@ namespace CoH.Core.State
 
         public IReadOnlyList<Player> Players => _players;
 
-        /// <summary>Turn number, starting at zero until the match actually begins.</summary>
+        /// <summary>
+        /// Turns started since the match began, counted across the whole match
+        /// and not per player: the very first turn is 1, the reply is 2, and so
+        /// on. Zero while the match has not reached the playing phase.
+        ///
+        /// For "how many turns has this player had", read Player.TurnsTaken.
+        /// The two are deliberately separate values rather than one integer
+        /// with two meanings.
+        /// </summary>
         public int TurnNumber { get; internal set; }
 
-        /// <summary>Whose turn it is. None until a starting player has been chosen.</summary>
+        /// <summary>Whose turn it is. None outside the playing phase.</summary>
         public PlayerId CurrentPlayer { get; internal set; }
+
+        /// <summary>Which stage the match is in.</summary>
+        public GamePhase Phase { get; internal set; }
+
+        /// <summary>
+        /// The player who takes the first turn, drawn from the match random
+        /// source at setup. Unrelated to PlayerId.One, which is only a seat.
+        /// </summary>
+        public PlayerId StartingPlayer { get; internal set; }
+
+        /// <summary>
+        /// Winner once <see cref="Phase"/> is Ended. None on a draw, which
+        /// happens when both heroes die in the same step.
+        /// </summary>
+        public PlayerId Winner { get; internal set; }
+
+        public bool HasEnded => Phase == GamePhase.Ended;
 
         public Player GetPlayer(PlayerId id)
         {
