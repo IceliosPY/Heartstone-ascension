@@ -1,0 +1,57 @@
+# =============================================================
+#  Conquest of Hearthstone - .gitignore Unity
+# =============================================================
+
+# --- Dossiers generes par Unity (jamais versionnes) ----------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# --- Addressables / bundles (plus tard) ----------------------
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# --- Projets IDE : regeneres par Unity a chaque ouverture -----
+.vs/
+.vscode/
+.idea/
+.gradle/
+ExportedObj/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# --- Builds et artefacts -------------------------------------
+*.apk
+*.aab
+*.app
+*.dmg
+*.ipa
+*.unitypackage
+crashlytics-build.properties
+sysinfo.txt
+
+# --- Resolution de conflits ----------------------------------
+*.orig
+*.tmp
+
+# --- Systeme d'exploitation ----------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

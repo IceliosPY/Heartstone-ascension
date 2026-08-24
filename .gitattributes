@@ -1,0 +1,128 @@
+# =============================================================
+#  Conquest of Hearthstone - .gitattributes
+#
+#  Regle : Git LFS UNIQUEMENT pour les formats reellement
+#  binaires et volumineux. Tout le contenu Unity serialise en
+#  YAML (.unity, .prefab, .asset, .mat, .meta, .asmdef, ...)
+#  reste en Git normal : c'est du texte, il doit rester
+#  diffable et mergeable.
+# =============================================================
+
+# --- Normalisation des fins de ligne pour le texte -----------
+* text=auto
+
+*.cs        text diff=csharp
+*.md        text
+*.xml       text
+*.yml       text
+*.shader    text
+*.hlsl      text
+*.cginc     text
+*.uxml      text
+*.uss       text
+
+# --- Formats serialises par Unity : LF force -----------------
+#  Unity ecrit systematiquement ces fichiers en LF. Sans
+#  eol=lf, Git les rendrait en CRLF sur Windows et Unity les
+#  reecrirait en LF -> diffs parasites permanents.
+*.meta                text eol=lf
+*.unity               text eol=lf
+*.prefab              text eol=lf
+*.asset               text eol=lf
+*.mat                 text eol=lf
+*.anim                text eol=lf
+*.controller          text eol=lf
+*.overrideController  text eol=lf
+*.mask                text eol=lf
+*.playable            text eol=lf
+*.signal              text eol=lf
+*.preset              text eol=lf
+*.spriteatlas         text eol=lf
+*.spriteatlasv2       text eol=lf
+*.renderTexture       text eol=lf
+*.mixer               text eol=lf
+*.terrainlayer        text eol=lf
+*.physicMaterial      text eol=lf
+*.physicsMaterial2D   text eol=lf
+*.shadervariants      text eol=lf
+*.shadergraph         text eol=lf
+*.shadersubgraph      text eol=lf
+*.vfx                 text eol=lf
+*.lighting            text eol=lf
+*.asmdef              text eol=lf
+*.asmref              text eol=lf
+*.json                text eol=lf
+ProjectSettings/ProjectVersion.txt text eol=lf
+
+# Fichiers de configuration du depot
+.gitattributes        text eol=lf
+.gitignore            text eol=lf
+.vsconfig             text eol=lf
+
+# NB : *.inputactions est volontairement absent de la liste
+# ci-dessus. Le package Input System l'ecrit en CRLF sur
+# Windows ; on laisse donc « text=auto » s'en charger.
+
+# =============================================================
+#  Git LFS
+# =============================================================
+
+# --- Modeles 3D ----------------------------------------------
+*.fbx       filter=lfs diff=lfs merge=lfs -text
+*.FBX       filter=lfs diff=lfs merge=lfs -text
+*.obj       filter=lfs diff=lfs merge=lfs -text
+*.blend     filter=lfs diff=lfs merge=lfs -text
+*.blend1    filter=lfs diff=lfs merge=lfs -text
+*.dae       filter=lfs diff=lfs merge=lfs -text
+*.3ds       filter=lfs diff=lfs merge=lfs -text
+*.glb       filter=lfs diff=lfs merge=lfs -text
+*.max       filter=lfs diff=lfs merge=lfs -text
+*.ma        filter=lfs diff=lfs merge=lfs -text
+*.mb        filter=lfs diff=lfs merge=lfs -text
+*.c4d       filter=lfs diff=lfs merge=lfs -text
+
+# --- Images / textures ---------------------------------------
+*.png       filter=lfs diff=lfs merge=lfs -text
+*.jpg       filter=lfs diff=lfs merge=lfs -text
+*.jpeg      filter=lfs diff=lfs merge=lfs -text
+*.gif       filter=lfs diff=lfs merge=lfs -text
+*.bmp       filter=lfs diff=lfs merge=lfs -text
+*.tga       filter=lfs diff=lfs merge=lfs -text
+*.tif       filter=lfs diff=lfs merge=lfs -text
+*.tiff      filter=lfs diff=lfs merge=lfs -text
+*.psd       filter=lfs diff=lfs merge=lfs -text
+*.psb       filter=lfs diff=lfs merge=lfs -text
+*.exr       filter=lfs diff=lfs merge=lfs -text
+*.hdr       filter=lfs diff=lfs merge=lfs -text
+*.webp      filter=lfs diff=lfs merge=lfs -text
+
+# --- Audio ----------------------------------------------------
+*.wav       filter=lfs diff=lfs merge=lfs -text
+*.mp3       filter=lfs diff=lfs merge=lfs -text
+*.ogg       filter=lfs diff=lfs merge=lfs -text
+*.aif       filter=lfs diff=lfs merge=lfs -text
+*.aiff      filter=lfs diff=lfs merge=lfs -text
+*.flac      filter=lfs diff=lfs merge=lfs -text
+
+# --- Video ----------------------------------------------------
+*.mp4       filter=lfs diff=lfs merge=lfs -text
+*.mov       filter=lfs diff=lfs merge=lfs -text
+*.webm      filter=lfs diff=lfs merge=lfs -text
+*.avi       filter=lfs diff=lfs merge=lfs -text
+
+# --- Polices --------------------------------------------------
+*.ttf       filter=lfs diff=lfs merge=lfs -text
+*.otf       filter=lfs diff=lfs merge=lfs -text
+*.woff      filter=lfs diff=lfs merge=lfs -text
+*.woff2     filter=lfs diff=lfs merge=lfs -text
+
+# --- Binaires natifs / archives -------------------------------
+*.dll       filter=lfs diff=lfs merge=lfs -text
+*.so        filter=lfs diff=lfs merge=lfs -text
+*.dylib     filter=lfs diff=lfs merge=lfs -text
+*.a         filter=lfs diff=lfs merge=lfs -text
+*.aar       filter=lfs diff=lfs merge=lfs -text
+*.bundle    filter=lfs diff=lfs merge=lfs -text
+*.zip       filter=lfs diff=lfs merge=lfs -text
+*.7z        filter=lfs diff=lfs merge=lfs -text
+*.rar       filter=lfs diff=lfs merge=lfs -text
