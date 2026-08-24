@@ -1,14 +1,13 @@
 # =============================================================
 #  Conquest of Hearthstone - .gitattributes
 #
-#  Regle : Git LFS UNIQUEMENT pour les formats reellement
-#  binaires et volumineux. Tout le contenu Unity serialise en
-#  YAML (.unity, .prefab, .asset, .mat, .meta, .asmdef, ...)
-#  reste en Git normal : c'est du texte, il doit rester
-#  diffable et mergeable.
+#  Rule: Git LFS ONLY for genuinely binary, heavy formats. Every
+#  Unity file serialized as YAML (.unity, .prefab, .asset, .mat,
+#  .meta, .asmdef, ...) stays in plain Git: it is text, and it
+#  must remain diffable and mergeable.
 # =============================================================
 
-# --- Normalisation des fins de ligne pour le texte -----------
+# --- Line ending normalization for text ----------------------
 * text=auto
 
 *.cs        text diff=csharp
@@ -21,10 +20,10 @@
 *.uxml      text
 *.uss       text
 
-# --- Formats serialises par Unity : LF force -----------------
-#  Unity ecrit systematiquement ces fichiers en LF. Sans
-#  eol=lf, Git les rendrait en CRLF sur Windows et Unity les
-#  reecrirait en LF -> diffs parasites permanents.
+# --- Unity-serialized formats: force LF ----------------------
+#  Unity always writes these files with LF endings. Without
+#  eol=lf, Git would check them out as CRLF on Windows and Unity
+#  would rewrite them as LF -> permanent spurious diffs.
 *.meta                text eol=lf
 *.unity               text eol=lf
 *.prefab              text eol=lf
@@ -54,20 +53,20 @@
 *.json                text eol=lf
 ProjectSettings/ProjectVersion.txt text eol=lf
 
-# Fichiers de configuration du depot
+# Repository configuration files
 .gitattributes        text eol=lf
 .gitignore            text eol=lf
 .vsconfig             text eol=lf
 
-# NB : *.inputactions est volontairement absent de la liste
-# ci-dessus. Le package Input System l'ecrit en CRLF sur
-# Windows ; on laisse donc « text=auto » s'en charger.
+# Note: *.inputactions is deliberately absent from the list
+# above. The Input System package writes it with CRLF on
+# Windows, so we let "text=auto" handle it.
 
 # =============================================================
 #  Git LFS
 # =============================================================
 
-# --- Modeles 3D ----------------------------------------------
+# --- 3D models -----------------------------------------------
 *.fbx       filter=lfs diff=lfs merge=lfs -text
 *.FBX       filter=lfs diff=lfs merge=lfs -text
 *.obj       filter=lfs diff=lfs merge=lfs -text
@@ -110,13 +109,13 @@ ProjectSettings/ProjectVersion.txt text eol=lf
 *.webm      filter=lfs diff=lfs merge=lfs -text
 *.avi       filter=lfs diff=lfs merge=lfs -text
 
-# --- Polices --------------------------------------------------
+# --- Fonts ----------------------------------------------------
 *.ttf       filter=lfs diff=lfs merge=lfs -text
 *.otf       filter=lfs diff=lfs merge=lfs -text
 *.woff      filter=lfs diff=lfs merge=lfs -text
 *.woff2     filter=lfs diff=lfs merge=lfs -text
 
-# --- Binaires natifs / archives -------------------------------
+# --- Native binaries / archives -------------------------------
 *.dll       filter=lfs diff=lfs merge=lfs -text
 *.so        filter=lfs diff=lfs merge=lfs -text
 *.dylib     filter=lfs diff=lfs merge=lfs -text

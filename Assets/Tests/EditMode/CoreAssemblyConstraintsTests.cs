@@ -7,14 +7,14 @@ using NUnit.Framework;
 namespace CoH.Tests.EditMode
 {
     /// <summary>
-    /// Tests d'architecture (Phase 0).
+    /// Architecture tests (Phase 0).
     ///
-    /// Ces tests ne verifient aucune regle de jeu : ils verrouillent la
-    /// contrainte structurelle du projet, a savoir que CoH.Core reste une
-    /// bibliotheque C# pure, compilable hors Unity et testable sans scene.
+    /// These tests verify no game rule. They lock down the project's
+    /// structural constraint: CoH.Core stays a pure C# library, compilable
+    /// outside Unity and testable without loading a scene.
     ///
-    /// Ils servent aussi de garde-fou : si quelqu'un desactive un jour
-    /// noEngineReferences dans CoH.Core.asmdef, ce test echouera.
+    /// They also act as a guard rail: if anyone ever turns off
+    /// noEngineReferences in CoH.Core.asmdef, this test will fail.
     /// </summary>
     public sealed class CoreAssemblyConstraintsTests
     {
@@ -40,8 +40,8 @@ namespace CoH.Tests.EditMode
             Assert.That(
                 unityReferences,
                 Is.Empty,
-                "CoH.Core doit rester du C# pur (moteur de regles decouple de Unity). "
-                + "References Unity detectees : " + string.Join(", ", unityReferences));
+                "CoH.Core must stay pure C# (rules engine decoupled from Unity). "
+                + "Unity references found: " + string.Join(", ", unityReferences));
         }
     }
 }

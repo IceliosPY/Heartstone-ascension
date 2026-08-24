@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------
 //  CoH.Editor
 //
-//  Outillage editeur uniquement : inspecteurs personnalises, validation du
-//  catalogue de cartes, fenetres de debug. Jamais inclus dans un build.
+//  Editor-only tooling: custom inspectors, card catalog validation, debug
+//  windows. Never included in a build.
 //
-//  Dependances autorisees : CoH.Core, CoH.Data, UnityEditor, UnityEngine.
+//  Allowed dependencies: CoH.Core, CoH.Data, UnityEditor, UnityEngine.
 //
-//  Les premiers types arrivent en Phase 6 (validation du catalogue).
+//  First types land in Phase 6 (card catalog validation).
 // -----------------------------------------------------------------------
 
 using CoH.Core;

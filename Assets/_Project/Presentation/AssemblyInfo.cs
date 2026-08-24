@@ -1,18 +1,18 @@
 // -----------------------------------------------------------------------
 //  CoH.Presentation
 //
-//  Couche de presentation Unity : vues, layout, interaction, animations,
-//  VFX, HUD. Elle envoie des commandes au moteur et rejoue les evenements
-//  qu'il retourne. Elle ne decide JAMAIS d'une regle de jeu.
+//  Unity presentation layer: views, layout, interaction, animation, VFX,
+//  HUD. It sends commands to the engine and replays the events the engine
+//  returns. It NEVER decides a game rule.
 //
-//  Dependances autorisees : CoH.Core, UnityEngine, TextMeshPro,
-//  Input System, uGUI.
-//  Interdit : referencer CoH.App (c'est App qui cable Presentation).
+//  Allowed dependencies: CoH.Core, UnityEngine, TextMeshPro, Input System,
+//  uGUI.
+//  Forbidden: referencing CoH.App (App is what wires Presentation up).
 //
-//  Les premiers types arrivent en Phase 7 (CardView, layouts, HUD).
+//  First types land in Phase 7 (CardView, layouts, HUD).
 //
-//  Les directives ci-dessous valident a la compilation que les references
-//  declarees dans CoH.Presentation.asmdef se resolvent reellement.
+//  The using directives below validate at compile time that the references
+//  declared in CoH.Presentation.asmdef actually resolve.
 // -----------------------------------------------------------------------
 
 using CoH.Core;

@@ -1,16 +1,16 @@
 // -----------------------------------------------------------------------
 //  CoH.Data
 //
-//  Couche d'authoring. Contient les ScriptableObjects qui servent a saisir
-//  les donnees dans l'editeur Unity, ainsi que leur conversion vers les
-//  POCO immuables consommes par CoH.Core.
+//  Authoring layer. Holds the ScriptableObjects used to enter data in the
+//  Unity editor, along with their conversion into the immutable POCOs
+//  consumed by CoH.Core.
 //
-//  Dependances autorisees : CoH.Core, UnityEngine.
-//  Interdit : referencer CoH.Presentation ou CoH.App.
+//  Allowed dependencies: CoH.Core, UnityEngine.
+//  Forbidden: referencing CoH.Presentation or CoH.App.
 //
-//  Les premiers types arrivent en Phase 6 (CardDefinitionAsset, catalogue).
-//  Ce fichier existe pour que l'assembly soit reellement compilee des la
-//  Phase 0, ce qui valide ses references.
+//  First types land in Phase 6 (CardDefinitionAsset, card catalog).
+//  This file exists so the assembly is actually compiled from Phase 0
+//  onwards, which validates its references.
 // -----------------------------------------------------------------------
 
 using CoH.Core;

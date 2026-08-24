@@ -1,20 +1,20 @@
 // -----------------------------------------------------------------------
 //  CoH.App
 //
-//  Racine de composition : bootstrap de la scene, cycle de vie de la
-//  partie, cablage entre le moteur (CoH.Core), les donnees (CoH.Data) et
-//  la presentation (CoH.Presentation).
+//  Composition root: scene bootstrap, match lifecycle, and wiring between
+//  the engine (CoH.Core), the data layer (CoH.Data) and the presentation
+//  layer (CoH.Presentation).
 //
-//  C'est la seule assembly autorisee a connaitre les trois autres. Elle
-//  evite ainsi que Presentation ait besoin de dependre de Data.
+//  This is the only assembly allowed to know all three. That is what keeps
+//  Presentation from having to depend on Data.
 //
-//  Les premiers types arrivent en Phase 7 (GameSession, LocalGameServer,
+//  First types land in Phase 7 (GameSession, LocalGameServer,
 //  MatchBootstrap).
 //
-//  NB : CoH.Data et CoH.Presentation sont bien referencees dans
-//  CoH.App.asmdef, mais on ne peut pas encore ecrire « using CoH.Data; »
-//  ici : ces namespaces ne contiennent aucun type avant les Phases 6 et 7,
-//  et un namespace vide ne produit aucune metadonnee.
+//  Note: CoH.Data and CoH.Presentation are indeed referenced in
+//  CoH.App.asmdef, but we cannot write "using CoH.Data;" here yet: those
+//  namespaces hold no type before Phases 6 and 7, and an empty namespace
+//  emits no metadata.
 // -----------------------------------------------------------------------
 
 using CoH.Core;

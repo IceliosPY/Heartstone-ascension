@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
 
-// Les tests EditMode doivent pouvoir atteindre les types internes du moteur
-// sans nous obliger a rendre publique une API plus large que necessaire.
+// EditMode tests need to reach the engine's internal types without forcing us
+// to expose a wider public API than necessary.
 [assembly: InternalsVisibleTo("CoH.Tests.EditMode")]

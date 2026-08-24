@@ -1,29 +1,29 @@
 # LICENSES
 
-Une fiche par pack importe dans `Assets/ThirdParty/`.
+One record per pack imported into `Assets/ThirdParty/`.
 
-## Convention de nommage
+## Naming convention
 
 `<Vendor>-<Pack>.txt`
 
-Exemple : `Kenney-BoardGameIcons.txt`
+Example: `Kenney-BoardGameIcons.txt`
 
-## Contenu attendu
+## Expected content
 
 ```
-Pack        : <nom exact du pack>
-Auteur      : <auteur / studio>
-Source      : <URL exacte de telechargement ou page produit>
-Licence     : <CC0 / CC-BY 4.0 / Unity Asset Store Standard EULA / ...>
-Attribution : <texte d'attribution requis, ou "aucune">
-Date import : <AAAA-MM-JJ>
-Version     : <version du pack si connue>
-Notes       : <restrictions particulieres, contenu retire a l'import, ...>
+Pack        : <exact pack name>
+Author      : <author / studio>
+Source      : <exact download or product page URL>
+License     : <CC0 / CC-BY 4.0 / Unity Asset Store Standard EULA / ...>
+Attribution : <required attribution text, or "none">
+Imported on : <YYYY-MM-DD>
+Version     : <pack version, if known>
+Notes       : <specific restrictions, content stripped at import, ...>
 ```
 
-## Pourquoi
+## Why
 
-Le projet est un fan game non commercial, mais cela ne dispense pas du
-respect des licences. Cette tracabilite permet a tout moment de prouver
-l'origine de chaque asset, de gerer les attributions requises, et de
-retirer proprement un pack dont la licence poserait probleme.
+The project is a non-commercial fan game, which does not exempt it from
+respecting licenses. This traceability lets us prove the origin of every
+asset at any time, handle required attributions, and cleanly remove a pack
+whose license turns out to be a problem.

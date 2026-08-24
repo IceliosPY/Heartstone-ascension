@@ -1,31 +1,30 @@
 # ThirdParty
 
-Assets externes importes dans le projet.
+External assets imported into the project.
 
-## Regles
+## Rules
 
-1. **Un dossier par editeur, puis par pack** :
+1. **One folder per vendor, then per pack**:
    `Assets/ThirdParty/<Vendor>/<Pack>/`
-   Exemple : `Assets/ThirdParty/Kenney/BoardGameIcons/`
+   Example: `Assets/ThirdParty/Kenney/BoardGameIcons/`
 
-2. **Ne jamais melanger** du contenu tiers avec `Assets/_Project/`.
-   Cette separation permet de mettre a jour, remplacer ou supprimer un
-   pack sans toucher a notre propre contenu.
+2. **Never mix** third-party content with `Assets/_Project/`.
+   This separation lets us update, replace or delete a pack without
+   touching our own content.
 
-3. **Toute importation exige une fiche de licence** dans
-   `Assets/ThirdParty/LICENSES/` (voir le README de ce dossier).
+3. **Every import requires a license record** in
+   `Assets/ThirdParty/LICENSES/` (see that folder's README).
 
-4. **Importation selective** : ne pas importer les dossiers `Demo/`,
-   `Examples/`, `Documentation/` et scenes de demonstration des packs.
-   Pour les gros packs, importer d'abord dans un projet bac a sable et
-   ne recopier ici que les prefabs/materiaux reellement utilises.
+4. **Selective import**: do not import a pack's `Demo/`, `Examples/`,
+   `Documentation/` folders or demo scenes. For large packs, import into a
+   scratch project first and copy over only the prefabs and materials we
+   actually use.
 
-5. **Un asset entre dans le projet uniquement quand il est utilise**
-   dans une scene ou un prefab. Pas de stockage "au cas ou".
+5. **An asset enters the project only once it is used** in a scene or a
+   prefab. No "just in case" storage.
 
-## Sources interdites
+## Forbidden sources
 
-Aucun asset extrait des jeux Blizzard (Hearthstone, World of Warcraft) :
-ni texture, ni modele, ni son, ni police, ni illustration. Aucune
-redistribution illegale, aucune ressource dont la licence ne peut pas
-etre determinee.
+No asset extracted from Blizzard games (Hearthstone, World of Warcraft):
+no texture, model, sound, font or artwork. No illegally redistributed
+content, and no resource whose license cannot be determined.

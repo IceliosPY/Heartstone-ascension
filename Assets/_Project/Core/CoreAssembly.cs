@@ -1,21 +1,20 @@
 namespace CoH.Core
 {
     /// <summary>
-    /// Point d'ancrage de l'assembly du moteur de regles.
+    /// Anchor type for the rules engine assembly.
     ///
-    /// Ce type ne contient volontairement aucune logique de jeu. Il existe
-    /// uniquement pour donner aux tests d'architecture une reference stable
-    /// sur l'assembly CoH.Core, sans dependre d'un type de gameplay qui
-    /// n'existe pas encore (Phase 0).
+    /// This type deliberately contains no game logic. It exists only to give
+    /// the architecture tests a stable handle on the CoH.Core assembly,
+    /// without depending on a gameplay type that does not exist yet (Phase 0).
     ///
-    /// Contrainte fondamentale du projet : cette assembly est declaree avec
-    /// noEngineReferences = true. Aucun type UnityEngine ou UnityEditor ne
-    /// peut y etre reference, ce qui garantit mecaniquement la separation
-    /// entre le moteur de regles et la couche de presentation Unity.
+    /// Core project constraint: this assembly is declared with
+    /// noEngineReferences = true. No UnityEngine or UnityEditor type can be
+    /// referenced from it, which mechanically enforces the separation between
+    /// the rules engine and the Unity presentation layer.
     /// </summary>
     public static class CoreAssembly
     {
-        /// <summary>Nom de l'assembly, tel que declare dans CoH.Core.asmdef.</summary>
+        /// <summary>Assembly name, as declared in CoH.Core.asmdef.</summary>
         public const string Name = "CoH.Core";
     }
 }
