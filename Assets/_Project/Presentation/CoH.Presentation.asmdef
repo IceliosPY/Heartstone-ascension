@@ -1,0 +1,19 @@
+{
+    "name": "CoH.Presentation",
+    "rootNamespace": "CoH.Presentation",
+    "references": [
+        "CoH.Core",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

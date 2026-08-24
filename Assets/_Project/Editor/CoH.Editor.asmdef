@@ -1,0 +1,19 @@
+{
+    "name": "CoH.Editor",
+    "rootNamespace": "CoH.Editor",
+    "references": [
+        "CoH.Core",
+        "CoH.Data"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

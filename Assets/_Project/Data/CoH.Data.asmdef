@@ -1,0 +1,16 @@
+{
+    "name": "CoH.Data",
+    "rootNamespace": "CoH.Data",
+    "references": [
+        "CoH.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
