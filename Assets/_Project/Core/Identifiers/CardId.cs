@@ -29,6 +29,62 @@ namespace CoH.Core.Identifiers
 
         public bool IsNone => _value == null;
 
+        /// <summary>
+        /// Whether a string is a well-formed card id: lower_snake_case, opening
+        /// with a letter, made only of lowercase letters, digits and single
+        /// underscores, and not ending on one.
+        ///
+        /// A card id is a permanent gameplay identity, not a display name and
+        /// not an asset file name. Keeping the shape strict means an id can be
+        /// typed into a deck list, dropped in a log or put in save data without
+        /// anyone wondering about capitalisation or spaces.
+        ///
+        /// Enforced by the authoring layer's validation rather than by this
+        /// type's constructor, so that reading unexpected data never throws:
+        /// bad data should be reported, not crash a match.
+        /// </summary>
+        public static bool IsWellFormed(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            if (value[0] < 'a' || value[0] > 'z')
+            {
+                return false;
+            }
+
+            if (value[value.Length - 1] == '_')
+            {
+                return false;
+            }
+
+            for (int index = 0; index < value.Length; index++)
+            {
+                char character = value[index];
+
+                bool isLowerLetter = character >= 'a' && character <= 'z';
+                bool isDigit = character >= '0' && character <= '9';
+                bool isUnderscore = character == '_';
+
+                if (!isLowerLetter && !isDigit && !isUnderscore)
+                {
+                    return false;
+                }
+
+                if (isUnderscore && index > 0 && value[index - 1] == '_')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>Whether this id is well formed. False for <see cref="None"/>.</summary>
+        public bool IsWellFormedId() => IsWellFormed(_value);
+
         public bool Equals(CardId other) => string.Equals(_value, other._value, StringComparison.Ordinal);
 
         public override bool Equals(object obj) => obj is CardId other && Equals(other);

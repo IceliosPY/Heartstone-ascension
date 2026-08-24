@@ -72,6 +72,30 @@ namespace CoH.Tests.EditMode
         }
 
         [Test]
+        public void Card_ids_must_be_lower_snake_case()
+        {
+            // A card id is a permanent gameplay identity that ends up in deck
+            // lists, logs and save data, so its shape is kept strict.
+            Assert.That(CardId.IsWellFormed("test_soldier"), Is.True);
+            Assert.That(CardId.IsWellFormed("the_coin"), Is.True);
+            Assert.That(CardId.IsWellFormed("skeleton"), Is.True);
+            Assert.That(CardId.IsWellFormed("skeleton_2"), Is.True);
+
+            Assert.That(CardId.IsWellFormed(null), Is.False);
+            Assert.That(CardId.IsWellFormed(string.Empty), Is.False);
+            Assert.That(CardId.IsWellFormed("Test_Soldier"), Is.False, "No capitals.");
+            Assert.That(CardId.IsWellFormed("test soldier"), Is.False, "No spaces.");
+            Assert.That(CardId.IsWellFormed("test-soldier"), Is.False, "No dashes.");
+            Assert.That(CardId.IsWellFormed("2soldiers"), Is.False, "Must open with a letter.");
+            Assert.That(CardId.IsWellFormed("_soldier"), Is.False);
+            Assert.That(CardId.IsWellFormed("soldier_"), Is.False, "No trailing underscore.");
+            Assert.That(CardId.IsWellFormed("test__soldier"), Is.False, "No doubled underscore.");
+
+            Assert.That(new CardId("test_soldier").IsWellFormedId(), Is.True);
+            Assert.That(CardId.None.IsWellFormedId(), Is.False);
+        }
+
+        [Test]
         public void Game_state_assigns_incremental_ids_and_registers_entities()
         {
             GameState game = TestFactory.Game();

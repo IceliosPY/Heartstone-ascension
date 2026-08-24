@@ -26,7 +26,11 @@ namespace CoH.Core.Cards
             int manaCost,
             int attack = 0,
             int health = 0,
-            bool collectible = true)
+            bool collectible = true,
+            CardClass cardClass = CardClass.Neutral,
+            Rarity rarity = Rarity.Free,
+            Tribe tribe = Tribe.None,
+            string text = "")
         {
             if (id.IsNone)
             {
@@ -45,6 +49,10 @@ namespace CoH.Core.Cards
             Attack = attack;
             Health = health;
             Collectible = collectible;
+            Class = cardClass;
+            Rarity = rarity;
+            Tribe = tribe;
+            Text = text ?? string.Empty;
         }
 
         public CardId Id { get; }
@@ -67,6 +75,22 @@ namespace CoH.Core.Cards
         /// summoned tokens.
         /// </summary>
         public bool Collectible { get; }
+
+        public CardClass Class { get; }
+
+        public Rarity Rarity { get; }
+
+        /// <summary>Minion family, for tribal synergies. None for anything else.</summary>
+        public Tribe Tribe { get; }
+
+        /// <summary>
+        /// The rules text shown to the player.
+        ///
+        /// Written for a human and never read by the engine. What a card does
+        /// will come from structured effect data; nothing anywhere parses this
+        /// string to work out behaviour, and nothing ever should.
+        /// </summary>
+        public string Text { get; }
 
         public override string ToString() =>
             Name + " (" + Id + ", " + Type + " " + ManaCost + " mana)";
