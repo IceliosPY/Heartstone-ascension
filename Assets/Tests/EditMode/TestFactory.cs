@@ -19,7 +19,9 @@ namespace CoH.Tests.EditMode
     /// </summary>
     internal static class TestFactory
     {
-        public const string MinionCardId = "test_minion";
+        /// <summary>The vanilla 2 mana 2/3 the whole project is bootstrapped on.</summary>
+        public const string MinionCardId = "test_soldier";
+
         public const string SpellCardId = "test_spell";
 
         /// <summary>Id of the extra card the second player receives, as configured by default.</summary>
@@ -27,7 +29,7 @@ namespace CoH.Tests.EditMode
 
         public static CardDefinition MinionDefinition(
             string id = MinionCardId,
-            string name = "Test Minion",
+            string name = "Test Soldier",
             int manaCost = 2,
             int attack = 2,
             int health = 3) =>
@@ -171,6 +173,41 @@ namespace CoH.Tests.EditMode
             GameEngine engine,
             params (EntityId Target, int Amount)[] hits) =>
             engine.Resolve(SimultaneousDamageAction.Against(hits));
+
+        /// <summary>Gives a player crystals and fills their pool, so cards can be afforded.</summary>
+        public static void GiveMana(GameEngine engine, PlayerId playerId, int amount)
+        {
+            Player player = engine.State.GetPlayer(playerId);
+            player.MaxMana = amount;
+            player.AvailableMana = amount;
+        }
+
+        /// <summary>Puts a fresh card straight into a hand, bypassing the deck.</summary>
+        public static CardInstance PutCardInHand(GameEngine engine, PlayerId playerId, string cardId = MinionCardId)
+        {
+            CardInstance card = engine.State.CreateCardInstance(new CardId(cardId), playerId);
+            card.Zone = ZoneType.Hand;
+            engine.State.GetPlayer(playerId).Hand.TryAdd(card);
+            return card;
+        }
+
+        /// <summary>Plays a card from the active player's hand.</summary>
+        public static CommandResult PlayCard(
+            GameEngine engine,
+            EntityId cardInstanceId,
+            int boardPosition = PlayCardCommand.Rightmost) =>
+            engine.Execute(new PlayCardCommand(engine.State.CurrentPlayer, cardInstanceId, boardPosition));
+
+        /// <summary>
+        /// The active player, with the mana and the card in hand needed to play
+        /// one Test Soldier. Returns the card that is ready to be played.
+        /// </summary>
+        public static CardInstance ReadyToPlay(GameEngine engine, int mana = 10)
+        {
+            PlayerId active = engine.State.CurrentPlayer;
+            GiveMana(engine, active, mana);
+            return PutCardInHand(engine, active);
+        }
     }
 
     /// <summary>

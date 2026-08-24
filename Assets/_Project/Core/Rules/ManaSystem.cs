@@ -1,3 +1,4 @@
+using System;
 using CoH.Core.Events;
 using CoH.Core.Rules.Resolution;
 using CoH.Core.Setup;
@@ -35,6 +36,44 @@ namespace CoH.Core.Rules
 
             player.AvailableMana = player.MaxMana - player.OverloadLocked;
             context.Emit(new ManaRefilledEvent(player.Id, player.AvailableMana, player.MaxMana));
+        }
+
+        /// <summary>
+        /// What this particular copy costs to play right now.
+        ///
+        /// The single place a play cost is worked out. Nothing else reads
+        /// CardDefinition.ManaCost to decide what to charge, so when cards start
+        /// costing less or more there is exactly one method to change.
+        ///
+        /// The floor at zero lives here rather than on CardInstance: a negative
+        /// number is a perfectly valid modifier total, and clamping it is a game
+        /// rule, not a property of the data.
+        /// </summary>
+        public static int GetPlayCost(GameState state, CardInstance card)
+        {
+            int cost = card.GetCost(state.Catalog);
+
+            // Extension point (Phase 11): cost-changing auras and enchantments
+            // are folded in here, before the floor is applied.
+
+            return Math.Max(0, cost);
+        }
+
+        public static bool CanPay(Player player, int cost) => player.AvailableMana >= cost;
+
+        /// <summary>
+        /// Spends mana. Free cards emit nothing: there is no such thing as an
+        /// animation for spending zero.
+        /// </summary>
+        public static void Pay(ResolutionContext context, Player player, int cost)
+        {
+            if (cost <= 0)
+            {
+                return;
+            }
+
+            player.AvailableMana -= cost;
+            context.Emit(new ManaSpentEvent(player.Id, cost, player.AvailableMana));
         }
     }
 }

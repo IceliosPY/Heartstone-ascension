@@ -106,6 +106,20 @@ namespace CoH.Core.State
         /// </summary>
         public bool IsPendingDeath => IsInPlay && (IsMarkedForDestruction || CurrentHealth <= 0);
 
+        /// <summary>
+        /// Whether this minion arrived too recently to act.
+        ///
+        /// It compares against the match-wide turn counter, not the player's
+        /// own: a minion summoned on match turn 5 is free on match turn 7, its
+        /// controller's next turn. Turn 6 belongs to the opponent, when the
+        /// minion could not act anyway.
+        ///
+        /// This is the raw state answer only. Whether a sick minion may still
+        /// attack, which Charge and Rush change, is a combat rule and is decided
+        /// elsewhere.
+        /// </summary>
+        public bool IsSummoningSick(int currentTurnNumber) => SummonedOnTurn >= currentTurnNumber;
+
         public override string ToString() =>
             "Minion " + CardId + " (" + Id + ", " + Attack + "/" + CurrentHealth + ")";
     }

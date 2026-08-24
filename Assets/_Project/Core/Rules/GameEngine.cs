@@ -83,6 +83,14 @@ namespace CoH.Core.Rules
                     context.Enqueue(new EndTurnAction(State.CurrentPlayer));
                     break;
 
+                case PlayCardCommand playCard:
+                    context.Enqueue(new PlayCardAction(
+                        playCard.PlayerId,
+                        playCard.CardInstanceId,
+                        playCard.BoardPosition,
+                        playCard.TargetId));
+                    break;
+
                 default:
                     throw new NotSupportedException("Unhandled command type: " + command.GetType().Name);
             }
@@ -139,9 +147,67 @@ namespace CoH.Core.Rules
                 case EndTurnCommand endTurn:
                     return ValidateEndTurn(endTurn);
 
+                case PlayCardCommand playCard:
+                    return ValidatePlayCard(playCard);
+
                 default:
                     return RejectionReason.WrongPhase;
             }
+        }
+
+        /// <summary>
+        /// Checks a card can be played, in the order that gives the most useful
+        /// answer: what the card is before what it costs, and what it costs
+        /// before where it would land.
+        /// </summary>
+        private RejectionReason ValidatePlayCard(PlayCardCommand command)
+        {
+            if (State.Phase != GamePhase.Playing)
+            {
+                return RejectionReason.WrongPhase;
+            }
+
+            if (command.PlayerId != State.CurrentPlayer)
+            {
+                return RejectionReason.NotYourTurn;
+            }
+
+            Player player = State.GetPlayer(command.PlayerId);
+
+            CardInstance card = FindInHand(player, command.CardInstanceId);
+            if (card == null)
+            {
+                return RejectionReason.CardNotInHand;
+            }
+
+            if (!State.Catalog.TryGet(card.CardId, out CardDefinition definition))
+            {
+                return RejectionReason.CardNotInHand;
+            }
+
+            if (definition.Type != CardType.Minion)
+            {
+                return RejectionReason.CardTypeNotPlayable;
+            }
+
+            if (!ManaSystem.CanPay(player, ManaSystem.GetPlayCost(State, card)))
+            {
+                return RejectionReason.NotEnoughMana;
+            }
+
+            if (player.Board.IsFull)
+            {
+                return RejectionReason.BoardFull;
+            }
+
+            // Rightmost is the one negative value that means something.
+            if (command.BoardPosition != PlayCardCommand.Rightmost &&
+                (command.BoardPosition < 0 || command.BoardPosition > player.Board.Count))
+            {
+                return RejectionReason.InvalidBoardPosition;
+            }
+
+            return RejectionReason.None;
         }
 
         private RejectionReason ValidateEndTurn(EndTurnCommand command)
@@ -212,17 +278,20 @@ namespace CoH.Core.Rules
             }
         }
 
-        private static bool IsInHand(Player player, EntityId cardInstanceId)
+        private static bool IsInHand(Player player, EntityId cardInstanceId) =>
+            FindInHand(player, cardInstanceId) != null;
+
+        private static CardInstance FindInHand(Player player, EntityId cardInstanceId)
         {
             for (int index = 0; index < player.Hand.Count; index++)
             {
                 if (player.Hand[index].Id == cardInstanceId)
                 {
-                    return true;
+                    return player.Hand[index];
                 }
             }
 
-            return false;
+            return null;
         }
     }
 }

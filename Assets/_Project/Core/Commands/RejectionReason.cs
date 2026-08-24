@@ -32,6 +32,25 @@ namespace CoH.Core.Commands
         /// The command names no real player. A malformed command has to be
         /// refused rather than throw: on a server, it arrives from a client.
         /// </summary>
-        UnknownPlayer = 6
+        UnknownPlayer = 6,
+
+        /// <summary>No such card in the requesting player's hand.</summary>
+        CardNotInHand = 7,
+
+        /// <summary>
+        /// The card is of a type the engine cannot play yet. Spells, weapons and
+        /// the rest arrive with the effect system; until then only minions can
+        /// be played.
+        /// </summary>
+        CardTypeNotPlayable = 8,
+
+        /// <summary>The player cannot afford the card.</summary>
+        NotEnoughMana = 9,
+
+        /// <summary>The board already holds as many minions as it can.</summary>
+        BoardFull = 10,
+
+        /// <summary>The requested board slot does not exist.</summary>
+        InvalidBoardPosition = 11
     }
 }
