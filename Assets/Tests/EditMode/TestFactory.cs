@@ -131,12 +131,17 @@ namespace CoH.Tests.EditMode
         /// that do not exist yet. Stamps it with a play order like a real
         /// summon would, since death ordering depends on that stamp.
         /// </summary>
+        /// <param name="ready">
+        /// When true the minion is treated as having been in play since before
+        /// this turn, so it is not summoning sick and can attack straight away.
+        /// </param>
         public static Minion PutMinionOnBoard(
             GameEngine engine,
             PlayerId controller,
             int attack = 2,
             int health = 3,
-            int position = -1)
+            int position = -1,
+            bool ready = false)
         {
             GameState state = engine.State;
             Minion minion = state.CreateMinion(new CardId(MinionCardId), controller);
@@ -145,7 +150,7 @@ namespace CoH.Tests.EditMode
             minion.BaseHealth = health;
             minion.Zone = ZoneType.Play;
             minion.Timestamp = state.NextTimestamp();
-            minion.SummonedOnTurn = state.TurnNumber;
+            minion.SummonedOnTurn = ready ? 0 : state.TurnNumber;
 
             Player player = state.GetPlayer(controller);
             if (position < 0)
@@ -208,6 +213,35 @@ namespace CoH.Tests.EditMode
             GiveMana(engine, active, mana);
             return PutCardInHand(engine, active);
         }
+
+        /// <summary>Attacks with a minion belonging to the active player.</summary>
+        public static CommandResult Attack(GameEngine engine, EntityId attackerId, EntityId targetId) =>
+            engine.Execute(new AttackCommand(engine.State.CurrentPlayer, attackerId, targetId));
+
+        /// <summary>
+        /// Ends the current turn and keeps going until it is the given player's
+        /// turn again. Always advances at least one turn, even when it is
+        /// already that player's turn, which is what "their next turn" means.
+        /// </summary>
+        public static void AdvanceToNextTurnOf(GameEngine engine, PlayerId player)
+        {
+            if (engine.State.HasEnded)
+            {
+                return;
+            }
+
+            EndTurn(engine);
+
+            int guard = 0;
+            while (engine.State.CurrentPlayer != player && !engine.State.HasEnded && guard++ < 10)
+            {
+                EndTurn(engine);
+            }
+        }
+
+        /// <summary>The enemy hero of the player currently holding the turn.</summary>
+        public static Hero EnemyHero(GameEngine engine) =>
+            engine.State.GetPlayer(engine.State.CurrentPlayer.Opponent).Hero;
     }
 
     /// <summary>

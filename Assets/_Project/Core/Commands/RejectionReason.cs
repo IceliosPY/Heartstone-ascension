@@ -51,6 +51,24 @@ namespace CoH.Core.Commands
         BoardFull = 10,
 
         /// <summary>The requested board slot does not exist.</summary>
-        InvalidBoardPosition = 11
+        InvalidBoardPosition = 11,
+
+        /// <summary>
+        /// Nothing that can attack answers to that id: it does not exist, it is
+        /// not a minion, it is not on the board, or it belongs to the opponent.
+        /// </summary>
+        InvalidAttacker = 12,
+
+        /// <summary>The chosen target cannot be attacked by that attacker.</summary>
+        InvalidTarget = 13,
+
+        /// <summary>The minion arrived too recently to act.</summary>
+        SummoningSickness = 14,
+
+        /// <summary>The minion has used every attack it gets this turn.</summary>
+        AlreadyAttacked = 15,
+
+        /// <summary>A character with no attack cannot attack.</summary>
+        ZeroAttack = 16
     }
 }

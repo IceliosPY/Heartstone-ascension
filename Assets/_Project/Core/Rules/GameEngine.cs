@@ -91,12 +91,84 @@ namespace CoH.Core.Rules
                         playCard.TargetId));
                     break;
 
+                case AttackCommand attack:
+                    context.Enqueue(new AttackAction(attack.PlayerId, attack.AttackerId, attack.TargetId));
+                    break;
+
                 default:
                     throw new NotSupportedException("Unhandled command type: " + command.GetType().Name);
             }
 
             context.Run();
             return CommandResult.Accepted(context.Events);
+        }
+
+        /// <summary>
+        /// Asks whether a command would be accepted, without doing anything.
+        ///
+        /// This is how the presentation layer greys out a card or refuses to
+        /// draw a targeting arrow: it asks the engine rather than deciding for
+        /// itself. Same code path as Execute, so the two can never disagree.
+        /// </summary>
+        public RejectionReason CanExecute(GameCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
+            return Validate(command);
+        }
+
+        /// <summary>
+        /// Whether this minion is in a state to attack anything at all,
+        /// ignoring targets. None means it can.
+        /// </summary>
+        public RejectionReason CanAttack(PlayerId playerId, EntityId attackerId)
+        {
+            if (State.HasEnded)
+            {
+                return RejectionReason.GameAlreadyEnded;
+            }
+
+            if (State.Phase != GamePhase.Playing)
+            {
+                return RejectionReason.WrongPhase;
+            }
+
+            if (playerId.IsNone)
+            {
+                return RejectionReason.UnknownPlayer;
+            }
+
+            if (playerId != State.CurrentPlayer)
+            {
+                return RejectionReason.NotYourTurn;
+            }
+
+            return CombatRules.ValidateAttacker(State, playerId, attackerId, out Minion _);
+        }
+
+        /// <summary>
+        /// Everything the given minion may attack right now, or an empty list
+        /// when it cannot attack at all.
+        ///
+        /// The engine is the only thing that decides what is a legal target.
+        /// When the presentation highlights a target it will be showing this
+        /// list, never its own idea of one.
+        /// </summary>
+        public IReadOnlyList<EntityId> GetLegalAttackTargets(PlayerId playerId, EntityId attackerId)
+        {
+            List<EntityId> targets = new List<EntityId>();
+
+            if (CanAttack(playerId, attackerId) != RejectionReason.None)
+            {
+                return targets;
+            }
+
+            CombatRules.ValidateAttacker(State, playerId, attackerId, out Minion attacker);
+            CombatRules.CollectLegalTargets(State, attacker, targets);
+            return targets;
         }
 
         /// <summary>
@@ -150,9 +222,35 @@ namespace CoH.Core.Rules
                 case PlayCardCommand playCard:
                     return ValidatePlayCard(playCard);
 
+                case AttackCommand attack:
+                    return ValidateAttack(attack);
+
                 default:
                     return RejectionReason.WrongPhase;
             }
+        }
+
+        private RejectionReason ValidateAttack(AttackCommand command)
+        {
+            if (State.Phase != GamePhase.Playing)
+            {
+                return RejectionReason.WrongPhase;
+            }
+
+            if (command.PlayerId != State.CurrentPlayer)
+            {
+                return RejectionReason.NotYourTurn;
+            }
+
+            RejectionReason attackerProblem = CombatRules.ValidateAttacker(
+                State, command.PlayerId, command.AttackerId, out Minion attacker);
+
+            if (attackerProblem != RejectionReason.None)
+            {
+                return attackerProblem;
+            }
+
+            return CombatRules.ValidateTarget(State, attacker, command.TargetId);
         }
 
         /// <summary>
