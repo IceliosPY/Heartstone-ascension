@@ -23,9 +23,23 @@ namespace CoH.Core.State
             BaseAttack = definition.Attack;
             BaseHealth = definition.Health;
             MaxAttacksPerTurn = 1;
+            Zone = ZoneType.None;
         }
 
         public CardId CardId { get; }
+
+        /// <summary>
+        /// Where this minion currently is. Play while it is on the board,
+        /// Graveyard once a death phase has removed it.
+        /// </summary>
+        public ZoneType Zone { get; internal set; }
+
+        /// <summary>
+        /// Set by effects that destroy a minion outright, whatever its health.
+        /// Kept separate from health so that "destroy" and "reduce to zero" stay
+        /// distinguishable, which they are in Hearthstone.
+        /// </summary>
+        public bool IsMarkedForDestruction { get; internal set; }
 
         /// <summary>Attack copied from the definition at summon time, then possibly overwritten by effects.</summary>
         public int BaseAttack { get; internal set; }
@@ -74,6 +88,23 @@ namespace CoH.Core.State
         public int CurrentHealth => MaxHealth - Damage;
 
         public bool IsDamaged => Damage > 0;
+
+        /// <summary>Still on the board.</summary>
+        public bool IsInPlay => Zone == ZoneType.Play;
+
+        /// <summary>
+        /// This minion is doomed but has not been removed yet.
+        ///
+        /// It stays on the board, keeping its position, until the next death
+        /// phase. That delay is what makes two minions killing each other work:
+        /// both are marked, and neither disappears in the middle of the action
+        /// that killed them.
+        ///
+        /// Health is read here rather than latched at damage time on purpose:
+        /// a minion healed back above zero before the death phase runs is not
+        /// doomed any more.
+        /// </summary>
+        public bool IsPendingDeath => IsInPlay && (IsMarkedForDestruction || CurrentHealth <= 0);
 
         public override string ToString() =>
             "Minion " + CardId + " (" + Id + ", " + Attack + "/" + CurrentHealth + ")";

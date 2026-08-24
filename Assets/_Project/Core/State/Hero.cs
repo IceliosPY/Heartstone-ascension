@@ -38,11 +38,27 @@ namespace CoH.Core.State
 
         public int MaxAttacksPerTurn { get; internal set; }
 
+        /// <summary>
+        /// Set by effects that destroy a hero outright. Present for symmetry
+        /// with <see cref="Minion"/> so the death phase treats every character
+        /// the same way.
+        /// </summary>
+        public bool IsMarkedForDestruction { get; internal set; }
+
+        /// <summary>
+        /// Whether a death phase has already processed this hero's death. Stops
+        /// the same hero being reported dead twice.
+        /// </summary>
+        public bool HasDied { get; internal set; }
+
         public int MaxHealth => BaseHealth + HealthModifier;
 
         public int CurrentHealth => MaxHealth - Damage;
 
         public int Attack => AttackModifier;
+
+        /// <summary>Down but not yet processed by a death phase.</summary>
+        public bool IsPendingDeath => !HasDied && (IsMarkedForDestruction || CurrentHealth <= 0);
 
         public override string ToString() =>
             "Hero " + Id + " (" + CurrentHealth + " hp, " + Armor + " armor)";

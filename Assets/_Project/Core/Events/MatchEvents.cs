@@ -1,4 +1,5 @@
 using CoH.Core.Identifiers;
+using CoH.Core.State;
 
 namespace CoH.Core.Events
 {
@@ -44,22 +45,38 @@ namespace CoH.Core.Events
         public override string ToString() => "MulliganResolved(" + PlayerId + ", " + ReplacedCount + ")";
     }
 
-    /// <summary>The match is over.</summary>
+    /// <summary>The match is over. Emitted exactly once.</summary>
     public sealed class GameEndedEvent : GameEvent
     {
-        public GameEndedEvent(PlayerId winner, bool isDraw)
+        public GameEndedEvent(GameResult result)
         {
-            Winner = winner;
-            IsDraw = isDraw;
+            Result = result;
         }
 
+        public GameResult Result { get; }
+
         /// <summary>The winning player, or None on a draw.</summary>
-        public PlayerId Winner { get; }
+        public PlayerId Winner
+        {
+            get
+            {
+                if (Result == GameResult.PlayerOneWins)
+                {
+                    return PlayerId.One;
+                }
 
-        /// <summary>True when both heroes died in the same step.</summary>
-        public bool IsDraw { get; }
+                if (Result == GameResult.PlayerTwoWins)
+                {
+                    return PlayerId.Two;
+                }
 
-        public override string ToString() =>
-            IsDraw ? "GameEnded(draw)" : "GameEnded(winner=" + Winner + ")";
+                return PlayerId.None;
+            }
+        }
+
+        /// <summary>True when both heroes died in the same death phase.</summary>
+        public bool IsDraw => Result == GameResult.Draw;
+
+        public override string ToString() => "GameEnded(" + Result + ")";
     }
 }

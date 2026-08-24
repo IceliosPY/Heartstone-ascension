@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
 using CoH.Core.Cards;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
+using CoH.Core.Rules;
+using CoH.Core.Rules.Resolution;
 using CoH.Core.State;
 
 namespace CoH.Core.Setup
@@ -26,11 +27,7 @@ namespace CoH.Core.Setup
         /// purpose, so that the two decks are shuffled the same way whichever
         /// player ends up going first.
         /// </summary>
-        public static void Run(
-            GameState state,
-            DeckList deckForSeatOne,
-            DeckList deckForSeatTwo,
-            List<GameEvent> events)
+        public static void Run(ResolutionContext context, DeckList deckForSeatOne, DeckList deckForSeatTwo)
         {
             if (deckForSeatOne == null)
             {
@@ -42,6 +39,8 @@ namespace CoH.Core.Setup
                 throw new ArgumentNullException(nameof(deckForSeatTwo));
             }
 
+            GameState state = context.State;
+
             RequireExtraCardIsKnown(state);
 
             BuildDeck(state, PlayerId.One, deckForSeatOne);
@@ -51,12 +50,12 @@ namespace CoH.Core.Setup
             state.GetPlayer(PlayerId.Two).Deck.Shuffle(state.RandomSource);
 
             state.StartingPlayer = state.RandomSource.NextInt(2) == 0 ? PlayerId.One : PlayerId.Two;
-            events.Add(new GameStartedEvent(state.StartingPlayer, state.Seed));
+            context.Emit(new GameStartedEvent(state.StartingPlayer, state.Seed));
 
-            DealOpeningHands(state, events);
+            DealOpeningHands(context);
 
             state.Phase = GamePhase.Mulligan;
-            events.Add(new MulliganStartedEvent());
+            context.Emit(new MulliganStartedEvent());
         }
 
         private static void BuildDeck(GameState state, PlayerId playerId, DeckList deckList)
@@ -71,22 +70,23 @@ namespace CoH.Core.Setup
             }
         }
 
-        private static void DealOpeningHands(GameState state, List<GameEvent> events)
+        private static void DealOpeningHands(ResolutionContext context)
         {
+            GameState state = context.State;
             Player starting = state.GetPlayer(state.StartingPlayer);
             Player second = state.GetPlayer(state.StartingPlayer.Opponent);
 
-            Deal(starting, state.Config.StartingPlayerHandSize, events);
-            Deal(second, state.Config.SecondPlayerHandSize, events);
+            Deal(context, starting, state.Config.StartingPlayerHandSize);
+            Deal(context, second, state.Config.SecondPlayerHandSize);
         }
 
-        private static void Deal(Player player, int count, List<GameEvent> events)
+        private static void Deal(ResolutionContext context, Player player, int count)
         {
             for (int index = 0; index < count; index++)
             {
                 // Dealing must never inflict fatigue: a deck shorter than an
                 // opening hand is a deck-building problem, not a game event.
-                Rules.DrawSystem.DrawWithoutFatigue(player, events);
+                DrawSystem.DrawWithoutFatigue(context, player);
             }
         }
 

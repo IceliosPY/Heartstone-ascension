@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
+using CoH.Core.Rules.Resolution;
 using CoH.Core.State;
 
 namespace CoH.Core.Rules
@@ -11,23 +12,22 @@ namespace CoH.Core.Rules
     internal static class MulliganSystem
     {
         /// <summary>
-        /// Carries out both players' mulligans, hands the extra card to the
-        /// player going second, and starts the first turn.
+        /// Carries out both players' mulligans and hands the extra card to the
+        /// player going second.
         ///
         /// Resolution always runs seat one then seat two, never in the order
         /// the two confirmations happened to arrive. Both players draw from the
         /// same match random source, so submission order would otherwise change
         /// which replacement cards each player receives.
         /// </summary>
-        public static void ResolveAll(GameState state, List<GameEvent> events)
+        public static void ResolveAll(ResolutionContext context)
         {
-            ResolveFor(state, state.GetPlayer(PlayerId.One), events);
-            ResolveFor(state, state.GetPlayer(PlayerId.Two), events);
+            GameState state = context.State;
 
-            GrantSecondPlayerExtraCard(state, events);
+            ResolveFor(context, state.GetPlayer(PlayerId.One));
+            ResolveFor(context, state.GetPlayer(PlayerId.Two));
 
-            state.Phase = GamePhase.Playing;
-            TurnSystem.StartTurn(state, state.StartingPlayer, events);
+            GrantSecondPlayerExtraCard(context);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace CoH.Core.Rules
         /// player just threw away could be dealt straight back as its own
         /// replacement.
         /// </summary>
-        private static void ResolveFor(GameState state, Player player, List<GameEvent> events)
+        private static void ResolveFor(ResolutionContext context, Player player)
         {
             List<CardInstance> setAside = new List<CardInstance>();
 
@@ -63,7 +63,7 @@ namespace CoH.Core.Rules
             {
                 // No fatigue and no burning here: this happens before the match
                 // has begun, and the deck is far larger than any opening hand.
-                DrawSystem.DrawWithoutFatigue(player, events);
+                DrawSystem.DrawWithoutFatigue(context, player);
             }
 
             for (int index = 0; index < setAside.Count; index++)
@@ -78,16 +78,18 @@ namespace CoH.Core.Rules
                 // Shuffled only when something actually went back. With nothing
                 // returned there is nothing to hide, and reordering the deck
                 // would consume randomness for no reason.
-                player.Deck.Shuffle(state.RandomSource);
+                player.Deck.Shuffle(context.State.RandomSource);
             }
 
             player.ClearMulliganSelection();
-            events.Add(new MulliganResolvedEvent(player.Id, setAside.Count));
+            context.Emit(new MulliganResolvedEvent(player.Id, setAside.Count));
         }
 
-        private static void GrantSecondPlayerExtraCard(GameState state, List<GameEvent> events)
+        private static void GrantSecondPlayerExtraCard(ResolutionContext context)
         {
+            GameState state = context.State;
             CardId extraCard = state.Config.SecondPlayerExtraCard;
+
             if (extraCard.IsNone)
             {
                 return;
@@ -99,7 +101,7 @@ namespace CoH.Core.Rules
             card.Zone = ZoneType.Hand;
             receiver.Hand.TryAdd(card);
 
-            events.Add(new CardGeneratedEvent(receiver.Id, card.Id, card.CardId));
+            context.Emit(new CardGeneratedEvent(receiver.Id, card.Id, card.CardId));
         }
 
         private static CardInstance FindInHand(Player player, EntityId cardInstanceId)

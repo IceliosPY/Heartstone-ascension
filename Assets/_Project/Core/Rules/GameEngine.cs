@@ -4,6 +4,8 @@ using CoH.Core.Cards;
 using CoH.Core.Commands;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
+using CoH.Core.Rules.Actions;
+using CoH.Core.Rules.Resolution;
 using CoH.Core.Setup;
 using CoH.Core.State;
 
@@ -13,10 +15,11 @@ namespace CoH.Core.Rules
     /// The engine: the one door into the rules.
     ///
     /// Everything follows the same shape. A caller hands over an intent, the
-    /// engine validates it against the current state, resolves it immediately,
-    /// and returns an ordered description of what happened. The engine never
-    /// waits for anything, never knows about animation, and never lets a
-    /// caller declare an outcome.
+    /// engine validates it against the current state, turns it into internal
+    /// work, drains that work through a resolution pipeline, and returns an
+    /// ordered description of what happened. The engine never waits for
+    /// anything, never knows about animation, and never lets a caller declare
+    /// an outcome.
     ///
     /// That shape is already the shape a server needs: the day commands arrive
     /// over a network instead of from a local method call, nothing here changes.
@@ -45,9 +48,10 @@ namespace CoH.Core.Rules
                 throw new InvalidOperationException("The match has already been set up.");
             }
 
-            List<GameEvent> events = new List<GameEvent>();
-            MatchSetup.Run(State, deckForSeatOne, deckForSeatTwo, events);
-            return events;
+            ResolutionContext context = new ResolutionContext(State);
+            MatchSetup.Run(context, deckForSeatOne, deckForSeatTwo);
+            context.Run();
+            return context.Events;
         }
 
         /// <summary>
@@ -67,28 +71,57 @@ namespace CoH.Core.Rules
                 return CommandResult.Rejected(reason);
             }
 
-            List<GameEvent> events = new List<GameEvent>();
+            ResolutionContext context = new ResolutionContext(State);
 
             switch (command)
             {
                 case MulliganCommand mulligan:
-                    ApplyMulligan(mulligan, events);
+                    ApplyMulligan(mulligan, context);
                     break;
 
                 case EndTurnCommand _:
-                    TurnSystem.EndTurn(State, events);
+                    context.Enqueue(new EndTurnAction(State.CurrentPlayer));
                     break;
 
                 default:
                     throw new NotSupportedException("Unhandled command type: " + command.GetType().Name);
             }
 
-            return CommandResult.Accepted(events);
+            context.Run();
+            return CommandResult.Accepted(context.Events);
         }
+
+        /// <summary>
+        /// Pushes an internal action through the pipeline.
+        ///
+        /// Used by tests to build board situations that no command can produce
+        /// yet, and by the command handlers above. Internal because a caller
+        /// outside the engine must never be able to hand over ready-made work
+        /// and bypass validation.
+        /// </summary>
+        internal IReadOnlyList<GameEvent> Resolve(ResolutionAction rootAction)
+        {
+            ResolutionContext context = new ResolutionContext(State);
+
+            if (rootAction != null)
+            {
+                context.Enqueue(rootAction);
+            }
+
+            context.Run();
+            return context.Events;
+        }
+
+        /// <summary>
+        /// Runs the pipeline with nothing queued, which still performs a death
+        /// phase. Lets a caller change state directly and then have the
+        /// consequences processed properly.
+        /// </summary>
+        internal IReadOnlyList<GameEvent> ResolvePending() => Resolve(null);
 
         private RejectionReason Validate(GameCommand command)
         {
-            if (State.Phase == GamePhase.Ended)
+            if (State.HasEnded)
             {
                 return RejectionReason.GameAlreadyEnded;
             }
@@ -163,7 +196,7 @@ namespace CoH.Core.Rules
             return RejectionReason.None;
         }
 
-        private void ApplyMulligan(MulliganCommand command, List<GameEvent> events)
+        private void ApplyMulligan(MulliganCommand command, ResolutionContext context)
         {
             Player player = State.GetPlayer(command.PlayerId);
             player.SetMulliganSelection(command.CardsToReplace);
@@ -175,7 +208,7 @@ namespace CoH.Core.Rules
 
             if (bothConfirmed)
             {
-                MulliganSystem.ResolveAll(State, events);
+                context.Enqueue(new ResolveMulligansAction());
             }
         }
 

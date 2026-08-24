@@ -27,7 +27,7 @@ namespace CoH.Core.State
             Deck = new Zone<CardInstance>(ZoneType.Deck);
             Hand = new Zone<CardInstance>(ZoneType.Hand, config.MaxHandSize);
             Board = new Zone<Minion>(ZoneType.Play, config.MaxBoardSize);
-            Graveyard = new Zone<CardInstance>(ZoneType.Graveyard);
+            Graveyard = new Zone<Entity>(ZoneType.Graveyard);
 
             _mulliganSelection = new List<EntityId>();
         }
@@ -46,7 +46,17 @@ namespace CoH.Core.State
         /// <summary>Minions in play, left to right. The index is the board position.</summary>
         public Zone<Minion> Board { get; }
 
-        public Zone<CardInstance> Graveyard { get; }
+        /// <summary>
+        /// Everything of this player's that has died or been destroyed, in the
+        /// order it happened: burned cards, spent cards later, and the minions
+        /// removed by death phases.
+        ///
+        /// Typed as Entity rather than CardInstance because a dead minion is
+        /// not a card: it is a distinct entity that was in play. Keeping one
+        /// graveyard rather than two preserves the real order of events, which
+        /// resurrection effects will need.
+        /// </summary>
+        public Zone<Entity> Graveyard { get; }
 
         /// <summary>Mana crystals owned, up to GameConfig.MaxManaCrystals.</summary>
         public int MaxMana { get; internal set; }

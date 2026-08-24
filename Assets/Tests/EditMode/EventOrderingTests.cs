@@ -81,7 +81,7 @@ namespace CoH.Tests.EditMode
 
             List<string> events = TypeNames(result.Events);
             int fatigue = events.IndexOf(nameof(FatigueDamageEvent));
-            int damage = events.IndexOf(nameof(HeroDamagedEvent));
+            int damage = events.IndexOf(nameof(DamageDealtEvent));
 
             Assert.That(fatigue, Is.GreaterThanOrEqualTo(0));
             Assert.That(damage, Is.EqualTo(fatigue + 1), "The damage follows the fatigue that caused it.");

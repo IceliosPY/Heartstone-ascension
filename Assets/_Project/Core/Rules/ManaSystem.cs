@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using CoH.Core.Events;
+using CoH.Core.Rules.Resolution;
 using CoH.Core.Setup;
 using CoH.Core.State;
 
@@ -19,12 +19,12 @@ namespace CoH.Core.Rules
         /// "AvailableMana = MaxMana" would be a formula we know to be wrong and
         /// would have to be found and fixed later.
         /// </summary>
-        public static void StartTurn(Player player, GameConfig config, List<GameEvent> events)
+        public static void StartTurn(Player player, GameConfig config, ResolutionContext context)
         {
             if (player.MaxMana < config.MaxManaCrystals)
             {
                 player.MaxMana++;
-                events.Add(new ManaCrystalGainedEvent(player.Id, player.MaxMana));
+                context.Emit(new ManaCrystalGainedEvent(player.Id, player.MaxMana));
             }
 
             player.OverloadLocked = player.OverloadOwed;
@@ -34,7 +34,7 @@ namespace CoH.Core.Rules
             player.TemporaryMana = 0;
 
             player.AvailableMana = player.MaxMana - player.OverloadLocked;
-            events.Add(new ManaRefilledEvent(player.Id, player.AvailableMana, player.MaxMana));
+            context.Emit(new ManaRefilledEvent(player.Id, player.AvailableMana, player.MaxMana));
         }
     }
 }

@@ -42,14 +42,21 @@ namespace CoH.Core.State
             {
                 PlayerId playerId = PlayerId.FromIndex(index);
                 Hero hero = new Hero(_entityIds.Next(), playerId, config.StartingHeroHealth);
+
+                // Heroes are in play from the moment the match state exists, so
+                // they get the first timestamps. Without one they would sort
+                // ahead of every minion in a death phase purely because zero is
+                // the smallest number.
+                hero.Timestamp = NextTimestamp();
+
                 RegisterEntity(hero);
                 _players[index] = new Player(playerId, hero, config);
             }
 
             CurrentPlayer = PlayerId.None;
             StartingPlayer = PlayerId.None;
-            Winner = PlayerId.None;
             Phase = GamePhase.Setup;
+            Result = GameResult.InProgress;
         }
 
         public GameConfig Config { get; }
@@ -92,12 +99,39 @@ namespace CoH.Core.State
         public PlayerId StartingPlayer { get; internal set; }
 
         /// <summary>
-        /// Winner once <see cref="Phase"/> is Ended. None on a draw, which
-        /// happens when both heroes die in the same step.
+        /// The outcome of the match. The single source of truth: nothing else
+        /// decides whether the match is over.
         /// </summary>
-        public PlayerId Winner { get; internal set; }
+        public GameResult Result { get; internal set; }
 
-        public bool HasEnded => Phase == GamePhase.Ended;
+        /// <summary>
+        /// Convenience view of <see cref="Result"/>. None while the match runs
+        /// and on a draw, so never read it without checking the result first.
+        /// </summary>
+        public PlayerId Winner
+        {
+            get
+            {
+                if (Result == GameResult.PlayerOneWins)
+                {
+                    return PlayerId.One;
+                }
+
+                if (Result == GameResult.PlayerTwoWins)
+                {
+                    return PlayerId.Two;
+                }
+
+                return PlayerId.None;
+            }
+        }
+
+        /// <summary>
+        /// Derived from <see cref="Result"/> rather than from the phase, so
+        /// there is exactly one thing to look at to know whether the match is
+        /// over.
+        /// </summary>
+        public bool HasEnded => Result != GameResult.InProgress;
 
         public Player GetPlayer(PlayerId id)
         {

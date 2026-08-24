@@ -107,13 +107,19 @@ namespace CoH.Tests.EditMode
         }
 
         [Test]
-        public void Timestamps_are_monotonic_and_start_at_one()
+        public void Heroes_take_the_first_timestamps_and_the_rest_follow()
         {
             GameState game = TestFactory.Game();
 
-            Assert.That(game.NextTimestamp(), Is.EqualTo(1));
-            Assert.That(game.NextTimestamp(), Is.EqualTo(2));
+            // Heroes are in play from the start, so they are stamped first.
+            // Without that, a hero would sort ahead of every minion in a death
+            // phase purely because zero is the smallest number.
+            Assert.That(game.GetPlayer(PlayerId.One).Hero.Timestamp, Is.EqualTo(1));
+            Assert.That(game.GetPlayer(PlayerId.Two).Hero.Timestamp, Is.EqualTo(2));
+
             Assert.That(game.NextTimestamp(), Is.EqualTo(3));
+            Assert.That(game.NextTimestamp(), Is.EqualTo(4));
+            Assert.That(game.NextTimestamp(), Is.EqualTo(5));
         }
 
         [Test]

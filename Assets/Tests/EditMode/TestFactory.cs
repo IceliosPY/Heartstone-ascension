@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Events;
 using CoH.Core.Identifiers;
 using CoH.Core.Rules;
+using CoH.Core.Rules.Actions;
 using CoH.Core.Setup;
 using CoH.Core.State;
 
@@ -121,6 +123,54 @@ namespace CoH.Tests.EditMode
         /// <summary>Ends the current turn, asserting nothing; callers check the result.</summary>
         public static CommandResult EndTurn(GameEngine engine) =>
             engine.Execute(new EndTurnCommand(engine.State.CurrentPlayer));
+
+        /// <summary>
+        /// Puts a minion straight onto a board, bypassing the summoning rules
+        /// that do not exist yet. Stamps it with a play order like a real
+        /// summon would, since death ordering depends on that stamp.
+        /// </summary>
+        public static Minion PutMinionOnBoard(
+            GameEngine engine,
+            PlayerId controller,
+            int attack = 2,
+            int health = 3,
+            int position = -1)
+        {
+            GameState state = engine.State;
+            Minion minion = state.CreateMinion(new CardId(MinionCardId), controller);
+
+            minion.BaseAttack = attack;
+            minion.BaseHealth = health;
+            minion.Zone = ZoneType.Play;
+            minion.Timestamp = state.NextTimestamp();
+            minion.SummonedOnTurn = state.TurnNumber;
+
+            Player player = state.GetPlayer(controller);
+            if (position < 0)
+            {
+                player.Board.TryAdd(minion);
+            }
+            else
+            {
+                player.Board.TryInsert(position, minion);
+            }
+
+            return minion;
+        }
+
+        /// <summary>Runs damage against one target through the pipeline.</summary>
+        public static IReadOnlyList<GameEvent> Damage(GameEngine engine, EntityId target, int amount) =>
+            engine.Resolve(new DealDamageAction(EntityId.None, target, amount));
+
+        /// <summary>Destroys targets outright, all in the same death phase.</summary>
+        public static IReadOnlyList<GameEvent> Destroy(GameEngine engine, params EntityId[] targets) =>
+            engine.Resolve(new DestroyAction(targets));
+
+        /// <summary>Damages several targets inside a single action, so they die together.</summary>
+        public static IReadOnlyList<GameEvent> DamageTogether(
+            GameEngine engine,
+            params (EntityId Target, int Amount)[] hits) =>
+            engine.Resolve(SimultaneousDamageAction.Against(hits));
     }
 
     /// <summary>
