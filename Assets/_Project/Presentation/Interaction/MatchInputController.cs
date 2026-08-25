@@ -67,7 +67,11 @@ namespace CoH.Presentation
         private Vector3 _pressPoint;
         private bool _movedEnoughToDrop;
 
-        // The card waiting for a target, and where it was dropped.
+        // The card waiting for a target: who is playing it, which card, where it
+        // was dropped and where the arrow starts. Everything the command needs
+        // is settled here, before a single thing has been mutated, so answering
+        // the question sends one command and cancelling sends none.
+        private PlayerId _pendingPlayer = PlayerId.None;
         private EntityId _pendingCard = EntityId.None;
         private int _pendingSlot = -1;
         private Vector3 _pendingOrigin;
@@ -588,6 +592,7 @@ namespace CoH.Presentation
                 return false;
             }
 
+            _pendingPlayer = acting;
             _pendingCard = card;
             _pendingSlot = slot;
             _pendingOrigin = AimPoint(ray);
@@ -602,6 +607,15 @@ namespace CoH.Presentation
 
             _held = card;
             _state = InteractionState.TargetingPlay;
+
+            // A new gesture starts here, so it is measured from here. The
+            // distance travelled while the card was being carried belongs to
+            // the gesture that just ended, and leaving it on the clock would
+            // make the release of the very click that put the card down read as
+            // a deliberate answer to a question asked a moment earlier. Aiming
+            // an attack has always re-based its press point on the press that
+            // starts it; this is the same rule for the same reason.
+            _pressPoint = AimPoint(ray);
             _movedEnoughToDrop = false;
 
             ClearHighlights();
@@ -625,7 +639,7 @@ namespace CoH.Presentation
         {
             EntityId card = _pendingCard;
             int slot = _pendingSlot;
-            PlayerId acting = session.State.CurrentPlayer;
+            PlayerId acting = _pendingPlayer;
 
             EntityId target = _probe.TryFindCharacter(out PointerHit character) && IsLegalTarget(character.EntityId)
                 ? character.EntityId
@@ -657,6 +671,7 @@ namespace CoH.Presentation
             presenter.SetInsertionPreview(-1);
             presenter.SetDraggedCard(EntityId.None);
 
+            _pendingPlayer = PlayerId.None;
             _pendingCard = EntityId.None;
             _pendingSlot = -1;
             _held = EntityId.None;

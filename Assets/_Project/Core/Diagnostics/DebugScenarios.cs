@@ -177,9 +177,9 @@ namespace CoH.Core.Diagnostics
         /// <summary>A targeted battlecry with something worth aiming it at.</summary>
         public static DebugScenario BattlecryTarget => new DebugScenario(
             BattlecryTargetId,
-            "Player one holds a targeted battlecry. Player two has a minion and a hero to aim it at.",
+            "Both players hold a targeted battlecry, and each has something to aim it at.",
             one: Side(hand: new[] { TestBattlecryDamage, TestBattlecryDamage }),
-            two: Side(board: new[] { Soldier() }),
+            two: Side(hand: new[] { TestBattlecryDamage }, board: new[] { Soldier() }),
             turnNumber: 5,
             activePlayer: PlayerId.One);
 
@@ -204,12 +204,19 @@ namespace CoH.Core.Diagnostics
             turnNumber: 5,
             activePlayer: PlayerId.One);
 
-        /// <summary>A targeted buff and a friendly minion to put it on.</summary>
+        /// <summary>
+        /// A targeted buff and a friendly minion to put it on, and on the other
+        /// side the same buff with nobody to put it on.
+        ///
+        /// Both halves of the rule in one position: a battlecry that has
+        /// somewhere to point must be pointed, and one that has nowhere to point
+        /// is played anyway.
+        /// </summary>
         public static DebugScenario Buff => new DebugScenario(
             BuffId,
-            "Player one holds a buff and has a minion to give it to.",
+            "Player one holds a buff and a minion to give it to. Player two holds one with an empty board.",
             one: Side(hand: new[] { TestBuff, TestBuff }, board: new[] { Soldier() }),
-            two: Side(),
+            two: Side(hand: new[] { TestBuff }),
             turnNumber: 5,
             activePlayer: PlayerId.One);
 

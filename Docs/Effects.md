@@ -94,6 +94,23 @@ not on the board yet.
 A target that has become invalid by the time an effect resolves is simply not
 reached. No crash, no retarget.
 
+### Aiming it with the mouse
+
+There are two gestures, and they are the two Hearthstone has. Drag the card onto
+your board and let go, or click it up, carry it and click it down. Both arrive
+at the same place: the card stops, the arrow appears, the legal targets light
+up, and the next click answers. A click somewhere else puts the card back,
+having spent nothing.
+
+Nothing is committed until the question is answered. The minion does not arrive
+and then wait to be aimed; the board position and the target are decided first
+and sent as **one command**, so cancelling is a cancel rather than an undo.
+
+The two gestures meet at exactly one method, and the release that ends the
+gesture belongs to the gesture that ended — not to the question it just asked.
+Getting that wrong is invisible on one gesture and fatal on the other, which is
+why the tests drive both, and why every click in them is a whole click.
+
 ---
 
 ## Actions and the pipeline

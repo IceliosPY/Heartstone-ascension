@@ -4,6 +4,7 @@ using CoH.Core.Diagnostics;
 using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.Rules;
+using CoH.Core.Rules.Effects;
 using CoH.Core.State;
 using NUnit.Framework;
 
@@ -219,6 +220,107 @@ namespace CoH.Tests.EditMode
             IReadOnlyList<EntityId> legal = engine.GetLegalPlayTargets(active, quartermaster.Id);
 
             Assert.That(legal, Is.EqualTo(new[] { existing.Id }));
+        }
+
+        // ------------------------------------------------------------------
+        //  What a chosen target actually reaches
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// A hero is a character, so a battlecry that wants a chosen enemy
+        /// character may be aimed at one. Nothing about heroes is written into
+        /// the action; the selector hands one over and the damage goes where the
+        /// damage always goes.
+        /// </summary>
+        [Test]
+        public void A_targeted_battlecry_can_be_aimed_at_the_enemy_hero()
+        {
+            GameEngine engine = Ready(out PlayerId active);
+            Hero enemy = engine.State.GetPlayer(active.Opponent).Hero;
+
+            CardInstance card = TestFactory.PutCardInHand(engine, active, "test_battlecry_damage");
+
+            Assert.That(engine.GetLegalPlayTargets(active, card.Id), Has.Member(enemy.Id),
+                "The enemy hero should be among the legal targets.");
+
+            int before = enemy.CurrentHealth;
+            CommandResult result = engine.Execute(new PlayCardCommand(active, card.Id, 0, enemy.Id));
+
+            Assert.That(result.IsAccepted, Is.True);
+            Assert.That(enemy.CurrentHealth, Is.EqualTo(before - 2),
+                "The battlecry did not reach the hero.");
+            Assert.That(engine.State.GetPlayer(active).Board.Count, Is.EqualTo(1),
+                "The minion should still have arrived.");
+        }
+
+        /// <summary>
+        /// The friendly half of the same machinery: a buff aimed at a minion
+        /// leaves the printed card alone and adds one modifier.
+        /// </summary>
+        [Test]
+        public void A_targeted_buff_lands_on_the_friendly_minion_that_was_chosen()
+        {
+            GameEngine engine = Ready(out PlayerId active);
+
+            Minion chosen = TestFactory.PutMinionOnBoard(engine, active);
+            Minion other = TestFactory.PutMinionOnBoard(engine, active);
+
+            CardInstance card = TestFactory.PutCardInHand(engine, active, "test_buff");
+            CommandResult result = engine.Execute(new PlayCardCommand(active, card.Id, 0, chosen.Id));
+
+            Assert.That(result.IsAccepted, Is.True);
+
+            Assert.That(chosen.Modifiers.Count, Is.EqualTo(1), "No modifier was recorded.");
+            Assert.That(chosen.BaseAttack, Is.EqualTo(2), "The printed attack was changed.");
+            Assert.That(chosen.BaseHealth, Is.EqualTo(3), "The printed health was changed.");
+            Assert.That(chosen.Attack, Is.EqualTo(3));
+            Assert.That(chosen.MaxHealth, Is.EqualTo(4));
+
+            Assert.That(other.Modifiers, Is.Empty,
+                "The buff reached a minion nobody pointed at.");
+        }
+
+        /// <summary>
+        /// A chosen target that is no longer there is simply not reached.
+        ///
+        /// Rare with a synchronous resolution, but the policy has to be written
+        /// down somewhere, and it is this: the effect resolves on nothing. It
+        /// does not crash, and it does not quietly pick somebody else.
+        /// </summary>
+        [Test]
+        public void A_chosen_target_that_has_gone_is_reached_by_nobody()
+        {
+            GameEngine engine = Ready(out PlayerId active);
+            Minion victim = TestFactory.PutMinionOnBoard(engine, active.Opponent);
+            Hero enemyHero = engine.State.GetPlayer(active.Opponent).Hero;
+
+            int heroBefore = enemyHero.CurrentHealth;
+
+            EffectContext context = new EffectContext(
+                sourceEntityId: victim.Id,
+                sourceCardInstanceId: EntityId.None,
+                sourceCardId: new CardId("test_battlecry_damage"),
+                owner: active,
+                controller: active,
+                chosenTargetId: new EntityId(9999),
+                sourceBoardPosition: 0);
+
+            List<EntityId> found = new List<EntityId>();
+
+            SelectorResolver.Resolve(
+                engine.State,
+                new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.EnemyCharacter),
+                context,
+                found);
+
+            // The selector hands the id over as it was given; the action is what
+            // finds nothing behind it.
+            Assert.That(found, Is.EqualTo(new[] { new EntityId(9999) }),
+                "The selector invented a target of its own.");
+
+            Assert.That(enemyHero.CurrentHealth, Is.EqualTo(heroBefore));
+            Assert.That(victim.CurrentHealth, Is.EqualTo(victim.MaxHealth),
+                "Something was damaged by an effect aimed at nobody.");
         }
 
         private static void AssertRefused(GameEngine engine, PlayerId active, PlayCardCommand command)

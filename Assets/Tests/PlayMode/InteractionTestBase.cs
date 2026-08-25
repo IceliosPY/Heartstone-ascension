@@ -134,6 +134,34 @@ namespace CoH.Tests.PlayMode
             Release(to);
         }
 
+        /// <summary>
+        /// A whole mouse click: the button goes down and comes back up in the
+        /// same place.
+        ///
+        /// Both halves, always. A press on its own is half a gesture, and a
+        /// controller that does the right thing on the press can still undo it
+        /// on the release nobody sent it. That is not hypothetical; it is the
+        /// shape of a bug this suite let through once.
+        /// </summary>
+        protected void Click(Vector3 worldPoint)
+        {
+            Press(worldPoint);
+            Release(worldPoint);
+        }
+
+        /// <summary>
+        /// Moves the pointer the way frames do, in several steps rather than
+        /// one jump, so anything that measures how far a gesture has travelled
+        /// sees a journey rather than a teleport.
+        /// </summary>
+        protected void CarryTo(Vector3 worldPoint)
+        {
+            for (int step = 0; step < 3; step++)
+            {
+                MoveTo(worldPoint);
+            }
+        }
+
         // --- places on the board -------------------------------------------
 
         /// <summary>Over the acting player's row, clear of any minion on it.</summary>
