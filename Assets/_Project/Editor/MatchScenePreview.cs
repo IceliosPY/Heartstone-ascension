@@ -1,5 +1,7 @@
 using System.IO;
+using CoH.Core.Cards;
 using CoH.Presentation;
+using CoH.Presentation.CardVisuals;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -18,7 +20,7 @@ namespace CoH.Editor
     public static class MatchScenePreview
     {
         private const string ScenePath = "Assets/_Project/Scenes/Match.unity";
-        private const string CardPrefab = "Assets/_Project/Prefabs/P_CardPlaceholder.prefab";
+        private const string CardPrefab = "Assets/_Project/Prefabs/P_Card.prefab";
         private const string MinionPrefab = "Assets/_Project/Prefabs/P_MinionPlaceholder.prefab";
 
         [MenuItem("Conquest of Hearthstone/Capture Match Preview")]
@@ -331,6 +333,29 @@ namespace CoH.Editor
                 Scale = 0.9f
             };
 
+            bool faceUp = name != null;
+
+            // Composed, not poked at. This used to reach into the card prefab's
+            // children by path and rewrite their labels, which worked only for
+            // as long as every card was the same tree of objects. A card is now
+            // whatever its description composes to, so a preview asks for one
+            // the same way the game does.
+            CardVisualDescriptor card = faceUp
+                ? new CardVisualDescriptor(
+                    CardType.Minion,
+                    CardClass.Neutral,
+                    Rarity.Free,
+                    Tribe.None,
+                    artwork: null,
+                    name: name,
+                    rulesText: string.Empty,
+                    manaCost: Number(mana),
+                    attack: Number(attack),
+                    health: Number(health),
+                    showsCost: true,
+                    showsStatistics: true)
+                : default;
+
             for (int index = 0; index < count; index++)
             {
                 GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, anchor);
@@ -340,34 +365,31 @@ namespace CoH.Editor
                 instance.transform.localRotation = pose.LocalRotation;
                 instance.transform.localScale = Vector3.one * pose.Scale * sideScale;
 
-                bool faceUp = name != null;
-                Transform cover = instance.transform.Find("FaceDownCover");
-                if (cover != null)
-                {
-                    cover.gameObject.SetActive(!faceUp);
-                }
+                CardView view = instance.GetComponent<CardView>();
 
-                if (!faceUp)
+                if (view == null)
                 {
-                    Hide(instance, "ArtworkArea/Artwork");
-                    Hide(instance, "RarityGem");
-                    Hide(instance, "ManaGem");
-                    Hide(instance, "Statistics");
-                    Hide(instance, "TribeBanner");
-                    Hide(instance, "NameBanner/NameText");
-                    Hide(instance, "RulesBox/RulesText");
                     continue;
                 }
 
-                SetText(instance, "NameBanner/NameText", name);
-                SetText(instance, "ManaGem/ManaText", mana);
-                SetText(instance, "Statistics/AttackGem/AttackText", attack);
-                SetText(instance, "Statistics/HealthGem/HealthText", health);
-                SetText(instance, "RulesBox/RulesText", string.Empty);
+                if (faceUp)
+                {
+                    CardVisualFactory factory = view.Visuals;
 
-                Hide(instance, "TribeBanner");
+                    view.Show(
+                        factory != null && factory.Library != null
+                            ? card.With(factory.Library.ArtworkFor(default))
+                            : card);
+                }
+                else
+                {
+                    view.BindFaceDown();
+                }
             }
         }
+
+        private static int Number(string value) =>
+            int.TryParse(value, out int parsed) ? parsed : 0;
 
         private static void PopulateBoard(Transform anchor, GameObject prefab, int count)
         {

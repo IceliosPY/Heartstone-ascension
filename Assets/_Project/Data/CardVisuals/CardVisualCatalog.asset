@@ -1,0 +1,253 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acda7147be1885e458b6b25d2be8e5b0, type: 3}
+  m_Name: CardVisualCatalog
+  m_EditorClassIdentifier: 
+  entries:
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 7ba24a1b0ccac8e45a0214fb43987c4b, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 900a3e7ecfd97254282ad24150f59a72, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 3
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: cb2650a6c33e0734296702073339d13f, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 3
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: a5525fa9b66635f4cb0b2b23eadded52, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 1
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 18a6e9a7cb71f1148897db8ba709c816, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 13
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 1e55db528f962334bb6d8868231dd77e, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 7
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 3250a91831b6ca54a825a824d5b7feee, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 8
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 35c47f01e017ad74a898e03f5b29d603, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 9
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 34de6d8010fd48746a1a218c38db13fd, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 5
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 3a004712a776a5a4098693ed3e00c82d, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 6
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 0e67b3ae25f1db34aab83dc155797b70, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 11
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 11e9cd71b20e82c4bbcefd5abae15c72, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 10
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 1
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: dbb3252674f6a2e479f46ff2feaeb763, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 10
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 2
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: e24fedb8057a03849a6b8d65341ade49, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 10
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 3
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: e3da467c97d31044aa4482a71c1793bc, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 10
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 9344a8388293ce243a04f6eb8c4423e0, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 4
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 58bd77dd08c52e548915b270bc22e92b, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.

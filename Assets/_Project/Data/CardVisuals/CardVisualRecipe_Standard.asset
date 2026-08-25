@@ -1,0 +1,326 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9315b055ae488e4d973e8214c6cb559, type: 3}
+  m_Name: CardVisualRecipe_Standard
+  m_EditorClassIdentifier: 
+  style:
+    value: standard
+  layers:
+  - name: CardBack
+    slot: 13
+    text: 0
+    face: 1
+    sortingOrder: 120
+    x: 0
+    y: 0
+    width: 800
+    height: 1100
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 1
+    conditions: []
+  - name: Backdrop
+    slot: 1
+    text: 0
+    face: 0
+    sortingOrder: 0
+    x: 0
+    y: 0
+    width: 800
+    height: 1100
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: Artwork
+    slot: 2
+    text: 0
+    face: 0
+    sortingOrder: 10
+    x: 186
+    y: 185
+    width: 434
+    height: 420
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 7
+      comparison: 0
+      value: 1
+  - name: Frame
+    slot: 3
+    text: 0
+    face: 0
+    sortingOrder: 20
+    x: 66
+    y: 92
+    width: 669
+    height: 1007
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 1
+    conditions: []
+  - name: EliteFrame
+    slot: 4
+    text: 0
+    face: 0
+    sortingOrder: 30
+    x: 40
+    y: 60
+    width: 720
+    height: 1075
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 9
+      comparison: 0
+      value: 1
+  - name: NameBanner
+    slot: 5
+    text: 0
+    face: 0
+    sortingOrder: 40
+    x: 92
+    y: 572
+    width: 624
+    height: 159
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: RulesPanel
+    slot: 6
+    text: 0
+    face: 0
+    sortingOrder: 50
+    x: 113
+    y: 718
+    width: 580
+    height: 341
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 8
+      comparison: 0
+      value: 1
+  - name: ManaGem
+    slot: 7
+    text: 0
+    face: 0
+    sortingOrder: 60
+    x: 25
+    y: 106
+    width: 195
+    height: 197
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 5
+      comparison: 0
+      value: 1
+  - name: AttackGem
+    slot: 8
+    text: 0
+    face: 0
+    sortingOrder: 70
+    x: 8
+    y: 885
+    width: 210
+    height: 215
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 4
+      comparison: 0
+      value: 1
+  - name: HealthGem
+    slot: 9
+    text: 0
+    face: 0
+    sortingOrder: 80
+    x: 582
+    y: 885
+    width: 210
+    height: 215
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 4
+      comparison: 0
+      value: 1
+  - name: RarityGem
+    slot: 10
+    text: 0
+    face: 0
+    sortingOrder: 90
+    x: 347
+    y: 663
+    width: 122
+    height: 92
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 2
+      comparison: 1
+      value: 0
+  - name: TribeBanner
+    slot: 11
+    text: 0
+    face: 0
+    sortingOrder: 100
+    x: 145
+    y: 975
+    width: 511
+    height: 97
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 6
+      comparison: 0
+      value: 1
+  - name: ExpansionEmblem
+    slot: 12
+    text: 0
+    face: 0
+    sortingOrder: 110
+    x: 360
+    y: 890
+    width: 80
+    height: 80
+    rotation: 0
+    fontSize: 3
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: NameText
+    slot: 0
+    text: 1
+    face: 0
+    sortingOrder: 130
+    x: 110
+    y: 590
+    width: 588
+    height: 122
+    rotation: 0
+    fontSize: 3.4
+    bold: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: ManaText
+    slot: 0
+    text: 3
+    face: 0
+    sortingOrder: 140
+    x: 25
+    y: 116
+    width: 195
+    height: 177
+    rotation: 0
+    fontSize: 7.5
+    bold: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: RulesText
+    slot: 0
+    text: 2
+    face: 0
+    sortingOrder: 150
+    x: 150
+    y: 760
+    width: 500
+    height: 200
+    rotation: 0
+    fontSize: 2.1
+    bold: 0
+    tint: {r: 0.12, g: 0.09, b: 0.06, a: 1}
+    required: 0
+    conditions: []
+  - name: AttackText
+    slot: 0
+    text: 4
+    face: 0
+    sortingOrder: 160
+    x: 8
+    y: 895
+    width: 210
+    height: 195
+    rotation: 0
+    fontSize: 7.5
+    bold: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: HealthText
+    slot: 0
+    text: 5
+    face: 0
+    sortingOrder: 170
+    x: 582
+    y: 895
+    width: 210
+    height: 195
+    rotation: 0
+    fontSize: 7.5
+    bold: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []
+  - name: TribeText
+    slot: 0
+    text: 6
+    face: 0
+    sortingOrder: 180
+    x: 145
+    y: 985
+    width: 511
+    height: 77
+    rotation: 0
+    fontSize: 2.1
+    bold: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions: []

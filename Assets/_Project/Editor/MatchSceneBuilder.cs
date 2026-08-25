@@ -2,6 +2,7 @@ using System.IO;
 using CoH.App;
 using CoH.Data;
 using CoH.Presentation;
+using CoH.Presentation.CardVisuals;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -90,74 +91,45 @@ namespace CoH.Editor
 
         private static GameObject BuildCardPrefab()
         {
-            GameObject root = new GameObject("P_CardPlaceholder");
+            GameObject root = new GameObject("P_Card");
+
             CardView view = root.AddComponent<CardView>();
-
-            // A body slightly larger than the frame, standing in for the drop
-            // shadow layer HearthCards draws underneath everything.
-            Quad(root, "CardBody", 0f, 0f, CanvasWidth, CanvasHeight, 0f, "M_CardBody");
-
-            // classFrame: x 66, y 92, 669 x 1007
-            Renderer frame = Quad(root, "Frame", 66f, 92f, 669f, 1007f, -0.001f, "M_CardFrame");
-
-            // Rectangular art mask: x 186, y 185, 434 x 420
-            GameObject artArea = Group(root, "ArtworkArea");
-            Renderer art = Quad(artArea, "Artwork", 186f, 185f, 434f, 420f, -0.002f, "M_CardArt");
-
-            // textBanner: x 92, y 572, 624 x 159
-            GameObject nameBanner = Group(root, "NameBanner");
-            Quad(nameBanner, "BannerPlate", 92f, 572f, 624f, 159f, -0.003f, "M_CardBanner");
-            TextMeshPro nameText = Text(nameBanner, "NameText", 110f, 590f, 588f, 122f, -0.004f,
-                3.4f, TextAlignmentOptions.Center, Color.white, bold: true);
-
-            // textParchment: x 113, y 718, 580 x 341
-            GameObject rulesBox = Group(root, "RulesBox");
-            Quad(rulesBox, "Parchment", 113f, 718f, 580f, 341f, -0.003f, "M_CardParchment");
-            TextMeshPro rulesText = Text(rulesBox, "RulesText", 150f, 760f, 500f, 200f, -0.004f,
-                2.1f, TextAlignmentOptions.Center, new Color(0.12f, 0.09f, 0.06f));
-
-            // manaGem: x 33, y 114, 179 x 181
-            GameObject manaGemGroup = Group(root, "ManaGem");
-            Renderer manaGem = Quad(manaGemGroup, "Gem", 25f, 106f, 195f, 197f, -0.004f, "M_ManaGem");
-            TextMeshPro manaText = Text(manaGemGroup, "ManaText", 25f, 116f, 195f, 177f, -0.005f,
-                7.5f, TextAlignmentOptions.Center, Color.white, bold: true);
-
-            // rarityGem: x 347, y 663, 122 x 92
-            Renderer rarityGem = Quad(root, "RarityGem", 347f, 663f, 122f, 92f, -0.004f, "M_RarityGem");
-
-            // attackIcon: x 0, y 893, 222 x 245  /  healthIcon: x 590, y 906, 170 x 231
-            GameObject statistics = Group(root, "Statistics");
-
-            GameObject attackGem = Group(statistics, "AttackGem");
-            Quad(attackGem, "Gem", 8f, 885f, 210f, 215f, -0.004f, "M_AttackGem");
-            TextMeshPro attackText = Text(attackGem, "AttackText", 8f, 895f, 210f, 195f, -0.005f,
-                7.5f, TextAlignmentOptions.Center, Color.white, bold: true);
-
-            GameObject healthGem = Group(statistics, "HealthGem");
-            Quad(healthGem, "Gem", 582f, 885f, 210f, 215f, -0.004f, "M_HealthGem");
-            TextMeshPro healthText = Text(healthGem, "HealthText", 582f, 895f, 210f, 195f, -0.005f,
-                7.5f, TextAlignmentOptions.Center, Color.white, bold: true);
-
-            // tribePlaque: x 145, y 975, 511 x 97
-            GameObject tribeBanner = Group(root, "TribeBanner");
-            Quad(tribeBanner, "Plaque", 145f, 975f, 511f, 97f, -0.005f, "M_TribePlaque");
-            TextMeshPro tribeText = Text(tribeBanner, "TribeText", 145f, 985f, 511f, 77f, -0.006f,
-                2.1f, TextAlignmentOptions.Center, Color.white);
-
-            GameObject faceDown = Group(root, "FaceDownCover");
-            Quad(faceDown, "Back", 0f, 0f, CanvasWidth, CanvasHeight, -0.02f, "M_CardBack");
-            Quad(faceDown, "BackInlay", 90f, 120f, 620f, 860f, -0.021f, "M_CardBackInlay");
+            CardVisualPainter painter = root.AddComponent<CardVisualPainter>();
 
             BoxCollider collider = root.AddComponent<BoxCollider>();
             collider.size = new Vector3(CardWidth, CardHeight, 0.06f);
 
+            // Nothing else. Every picture on this card is composed at runtime
+            // from the recipe and the catalog, which is why one prefab is now
+            // enough for a neutral minion, a spell, a legendary and everything
+            // that has not been authored yet. The tree of quads that used to
+            // live here is the recipe.
             Wire(view,
-                ("frame", frame), ("artwork", art), ("manaGem", manaGem), ("rarityGem", rarityGem),
-                ("tribeBanner", tribeBanner), ("statistics", statistics), ("faceDownCover", faceDown),
-                ("nameText", nameText), ("manaText", manaText), ("attackText", attackText),
-                ("healthText", healthText), ("rulesText", rulesText), ("tribeText", tribeText));
+                ("visuals", LoadCardVisualFactory()),
+                ("painter", painter));
 
-            return SavePrefab(root, PrefabFolder + "/P_CardPlaceholder.prefab");
+            return SavePrefab(root, PrefabFolder + "/P_Card.prefab");
+        }
+
+        /// <summary>
+        /// The composition assets, built on demand.
+        ///
+        /// Rebuilding the scene without them would produce a hand of invisible
+        /// cards, so the one menu command implies the other rather than leaving
+        /// somebody to discover the order they had to be run in.
+        /// </summary>
+        private static CardVisualFactory LoadCardVisualFactory()
+        {
+            CardVisualFactory factory =
+                AssetDatabase.LoadAssetAtPath<CardVisualFactory>(CardVisualSetup.FactoryAssetPath);
+
+            if (factory == null)
+            {
+                CardVisualSetup.Rebuild();
+                factory = AssetDatabase.LoadAssetAtPath<CardVisualFactory>(CardVisualSetup.FactoryAssetPath);
+            }
+
+            return factory;
         }
 
         // ------------------------------------------------------------------

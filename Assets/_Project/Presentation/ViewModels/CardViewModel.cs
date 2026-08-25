@@ -22,6 +22,7 @@ namespace CoH.Presentation
             int health,
             string rulesText,
             CardType cardType,
+            CardClass cardClass,
             Tribe tribe,
             Rarity rarity,
             bool isPlayable)
@@ -34,6 +35,7 @@ namespace CoH.Presentation
             Health = health;
             RulesText = rulesText;
             CardType = cardType;
+            CardClass = cardClass;
             Tribe = tribe;
             Rarity = rarity;
             IsPlayable = isPlayable;
@@ -55,6 +57,13 @@ namespace CoH.Presentation
         public string RulesText { get; }
 
         public CardType CardType { get; }
+
+        /// <summary>
+        /// Read by the card composer to pick a frame. It is a gameplay fact
+        /// rather than a decoration, which is why it comes from the definition
+        /// rather than from anything on the Unity side.
+        /// </summary>
+        public CardClass CardClass { get; }
 
         public Tribe Tribe { get; }
 

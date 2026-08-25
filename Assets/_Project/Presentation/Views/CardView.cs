@@ -1,5 +1,5 @@
 using CoH.Core.Identifiers;
-using TMPro;
+using CoH.Presentation.CardVisuals;
 using UnityEngine;
 
 namespace CoH.Presentation
@@ -7,45 +7,23 @@ namespace CoH.Presentation
     /// <summary>
     /// One card in a hand.
     ///
-    /// Built as a stack of separate pieces rather than one picture, and that is
-    /// the whole point of the prefab: every slot below is a placeholder quad
-    /// today and a painted sprite later, with no code change in between. A cost
-    /// going from 5 to 3 rewrites a label; it never regenerates an image.
+    /// It owns no picture and knows no card. What a card looks like is composed
+    /// from data by the <see cref="CardVisualFactory"/> and drawn by the
+    /// <see cref="CardVisualPainter"/>, which is why this one component shows a
+    /// neutral minion, a spell and a legendary without a second prefab existing
+    /// and without a single line here mentioning any of them. Turning a card
+    /// into a different kind of card is handing the painter a different plan.
     ///
-    /// The proportions come from measuring how HearthCards composes a card: an
-    /// 800 by 1100 canvas with the mana gem top left, the name banner across
-    /// the middle, the rules parchment below it, and the attack and health gems
-    /// in the bottom corners. Their artwork is not used, only the geometry that
-    /// makes a card read as a Hearthstone card.
+    /// What is left here is everything the composer has no opinion about: where
+    /// the card sits, how it rises to be read, how it follows the pointer, and
+    /// whether the engine says it can be played. A cost going from 5 to 3
+    /// rewrites a label; it never re-resolves an image.
     /// </summary>
     public sealed class CardView : MonoBehaviour
     {
-        [Header("Layers")]
-        [SerializeField] private Renderer frame;
-        [SerializeField] private Renderer artwork;
-        [SerializeField] private Renderer manaGem;
-        [SerializeField] private Renderer rarityGem;
-        [SerializeField] private GameObject tribeBanner;
-        [SerializeField] private GameObject statistics;
-        [SerializeField] private GameObject faceDownCover;
-
-        [Header("Text")]
-        [SerializeField] private TextMeshPro nameText;
-        [SerializeField] private TextMeshPro manaText;
-        [SerializeField] private TextMeshPro attackText;
-        [SerializeField] private TextMeshPro healthText;
-        [SerializeField] private TextMeshPro rulesText;
-        [SerializeField] private TextMeshPro tribeText;
-
-        [Header("Palette")]
-        [SerializeField] private Color frameColor = new Color(0.55f, 0.38f, 0.21f);
-        [SerializeField] private Color artworkColor = new Color(0.26f, 0.33f, 0.42f);
-        [SerializeField] private Color manaColor = new Color(0.16f, 0.42f, 0.85f);
-        [SerializeField] private Color selectedFrameColor = new Color(1f, 0.84f, 0.38f);
-
-        [Tooltip("How much an unplayable card is dimmed. Zero is untouched, one is black.")]
-        [Range(0f, 1f)]
-        [SerializeField] private float dimStrength = 0.55f;
+        [Header("Composition")]
+        [SerializeField] private CardVisualFactory visuals;
+        [SerializeField] private CardVisualPainter painter;
 
         [Header("Hover")]
         [Tooltip("How far a hovered card rises out of the hand.")]
@@ -59,7 +37,11 @@ namespace CoH.Presentation
         [Tooltip("How quickly a card reaches its target pose. Higher is snappier.")]
         [SerializeField] private float poseSmoothing = 18f;
 
-        private MaterialPropertyBlock _block;
+        private readonly CardVisualPlan _plan = new CardVisualPlan();
+
+        private CardVisualDescriptor _shown;
+        private bool _hasShown;
+
         private bool _isHovered;
         private bool _isPlayable;
         private bool _isFaceDown;
@@ -90,7 +72,27 @@ namespace CoH.Presentation
         /// <summary>Where the layout wants this card, whatever it is doing right now.</summary>
         public Vector3 RestingLocalPosition => _restingPosition;
 
-        private void Awake() => _collider = GetComponent<Collider>();
+        /// <summary>
+        /// What the last composition could not find. Empty on a finished card.
+        ///
+        /// Read by the reports rather than by the game: a card with a gap still
+        /// draws, with that layer absent, so a missing file is a thing somebody
+        /// can see and fix instead of an exception in the middle of a match.
+        /// </summary>
+        internal System.Collections.Generic.IReadOnlyList<CardVisualGap> Gaps => _plan.Gaps;
+
+        /// <summary>The composed stack, for the tests and the preview tool.</summary>
+        internal CardVisualPlan Plan => _plan;
+
+        private void Awake()
+        {
+            _collider = GetComponent<Collider>();
+
+            if (painter == null)
+            {
+                painter = GetComponent<CardVisualPainter>();
+            }
+        }
 
         /// <summary>
         /// Records where the layout wants this card.
@@ -218,78 +220,101 @@ namespace CoH.Presentation
             transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * targetScale, t);
         }
 
-        /// <summary>Shows a card, face up, from a snapshot the presenter built.</summary>
+        /// <summary>
+        /// Shows a card, face up, from a snapshot the presenter built.
+        ///
+        /// Two paths, and which one is taken is the difference between a smooth
+        /// hand and a stuttering one. A card that has become a different card —
+        /// a different type, class, rarity or painting — is composed again. A
+        /// card that is the same card with different numbers on it, which is
+        /// what a match produces constantly, only has its labels rewritten.
+        /// </summary>
         public void Bind(CardViewModel model)
         {
             EntityId = model.EntityId;
             _isPlayable = model.IsPlayable;
+            _isFaceDown = false;
 
-            SetFaceDown(false);
-
-            SetText(nameText, model.DisplayName);
-            SetText(manaText, model.ManaCost.ToString());
-            SetText(rulesText, model.RulesText);
-
-            if (statistics != null)
+            if (visuals == null)
             {
-                statistics.SetActive(model.ShowsStatistics);
+                return;
             }
 
-            SetText(attackText, model.Attack.ToString());
-            SetText(healthText, model.Health.ToString());
-
-            bool hasTribe = model.Tribe != Core.Cards.Tribe.None;
-
-            if (tribeBanner != null)
-            {
-                tribeBanner.SetActive(hasTribe);
-            }
-
-            SetText(tribeText, hasTribe ? model.Tribe.ToString().ToUpperInvariant() : string.Empty);
-
-            Repaint();
+            Show(visuals.Describe(model), model.IsPlayable);
         }
 
         /// <summary>
         /// Shows the back of a card. Used for the waiting player's hand, where
         /// the count matters and the contents do not.
+        ///
+        /// Composed rather than covered: the back is layers like everything
+        /// else, so it can vary by style without a lid being invented for it.
+        /// Nothing about the card is passed in, which is the strongest form the
+        /// guarantee can take — there is nothing here to leak.
         /// </summary>
         public void BindFaceDown()
         {
             EntityId = EntityId.None;
             _isPlayable = false;
             _isHovered = false;
-            SetFaceDown(true);
+            _isFaceDown = true;
+
+            if (visuals == null)
+            {
+                return;
+            }
+
+            Show(
+                new CardVisualDescriptor(
+                    Core.Cards.CardType.None,
+                    Core.Cards.CardClass.Neutral,
+                    showsCost: false,
+                    faceDown: true),
+                playable: false);
         }
 
-        private void SetFaceDown(bool faceDown)
+        /// <summary>
+        /// Shows a described card directly, without a match behind it. The
+        /// preview tool, the captures and the tests use this.
+        ///
+        /// Lit by default, because a card composed outside a match has no
+        /// engine to ask whether it can be played, and a still of six dimmed
+        /// cards would misrepresent the game rather than describe it.
+        /// </summary>
+        public void Show(in CardVisualDescriptor card, bool playable = true)
         {
-            _isFaceDown = faceDown;
-
-            if (faceDownCover != null)
+            if (visuals == null || painter == null)
             {
-                faceDownCover.SetActive(faceDown);
+                return;
             }
 
-            SetVisible(artwork, !faceDown);
-            SetVisible(rarityGem, !faceDown);
-            SetVisible(manaGem, !faceDown);
-            SetActive(nameText, !faceDown);
-            SetActive(manaText, !faceDown);
-            SetActive(rulesText, !faceDown);
+            _isPlayable = playable;
+            _isFaceDown = card.IsFaceDown;
 
-            if (faceDown)
+            if (_hasShown && _shown.LooksTheSameAs(card))
             {
-                if (statistics != null)
-                {
-                    statistics.SetActive(false);
-                }
-
-                if (tribeBanner != null)
-                {
-                    tribeBanner.SetActive(false);
-                }
+                // Same pictures, possibly different numbers.
+                RecomposeTextOnly(card);
+                return;
             }
+
+
+            visuals.Compose(card, _plan);
+            painter.Apply(_plan);
+
+            _shown = card;
+            _hasShown = true;
+
+            Repaint();
+        }
+
+        private void RecomposeTextOnly(in CardVisualDescriptor card)
+        {
+            visuals.Compose(card, _plan);
+            painter.RefreshText(_plan);
+
+            _shown = card;
+            Repaint();
         }
 
         /// <summary>
@@ -298,84 +323,35 @@ namespace CoH.Presentation
         /// An unplayable card is dimmed rather than merely refused on click, so
         /// a player can tell at a glance what they can afford. The judgement
         /// itself is never made here: it arrives already decided in the model.
+        ///
+        /// A card being read is never dimmed. Not affording a card stops it
+        /// being played, not inspected, and a player deciding what to do next
+        /// needs to read exactly the ones they cannot afford yet.
         /// </summary>
         private void Repaint()
         {
-            if (_isFaceDown)
+            if (painter == null)
             {
                 return;
             }
 
-            // A card being read is never dimmed. Not affording a card stops it
-            // being played, not inspected, and a player deciding what to do next
-            // needs to read exactly the ones they cannot afford yet.
-            bool lit = _isPlayable || _isHovered || _isDragging;
-            float dim = lit ? 0f : dimStrength;
-
-            Tint(frame, _isDragging || _isHovered ? selectedFrameColor : Dimmed(frameColor, dim));
-            Tint(artwork, Dimmed(artworkColor, dim));
-            Tint(manaGem, Dimmed(manaColor, dim));
-
-            Color textTint = lit ? Color.white : new Color(0.62f, 0.62f, 0.66f);
-
-            Fade(nameText, textTint);
-            Fade(manaText, textTint);
-            Fade(attackText, textTint);
-            Fade(healthText, textTint);
+            bool lit = _isFaceDown || _isPlayable || _isHovered || _isDragging;
+            painter.SetDimmed(!lit);
         }
 
-        private static Color Dimmed(Color colour, float amount) =>
-            Color.Lerp(colour, new Color(0.07f, 0.07f, 0.09f), amount);
+        /// <summary>Where this card's appearance comes from. Tooling and tests.</summary>
+        internal CardVisualFactory Visuals => visuals;
 
-        private void Tint(Renderer target, Color colour)
+        /// <summary>
+        /// Points a card at a factory and a painter, for a card that was not
+        /// built from the prefab. Used by the tests and the preview tool, which
+        /// is the point: they compose through this class rather than around it.
+        /// </summary>
+        internal void UseForTests(CardVisualFactory factory, CardVisualPainter thePainter)
         {
-            if (target == null)
-            {
-                return;
-            }
-
-            _block ??= new MaterialPropertyBlock();
-            target.GetPropertyBlock(_block);
-            _block.SetColor(ShaderIds.BaseColor, colour);
-            target.SetPropertyBlock(_block);
+            visuals = factory;
+            painter = thePainter;
+            _hasShown = false;
         }
-
-        private static void Fade(TextMeshPro target, Color colour)
-        {
-            if (target != null)
-            {
-                target.color = colour;
-            }
-        }
-
-        private static void SetText(TextMeshPro target, string value)
-        {
-            if (target != null)
-            {
-                target.text = value;
-            }
-        }
-
-        private static void SetActive(Component target, bool active)
-        {
-            if (target != null)
-            {
-                target.gameObject.SetActive(active);
-            }
-        }
-
-        private static void SetVisible(Renderer target, bool visible)
-        {
-            if (target != null)
-            {
-                target.enabled = visible;
-            }
-        }
-    }
-
-    /// <summary>Shader property ids, resolved once.</summary>
-    internal static class ShaderIds
-    {
-        public static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
     }
 }

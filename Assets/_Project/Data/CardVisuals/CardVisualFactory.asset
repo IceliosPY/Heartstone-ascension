@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec6cf11fa7b4e214fa20e6417384324d, type: 3}
+  m_Name: CardVisualFactory
+  m_EditorClassIdentifier: 
+  recipes:
+  - {fileID: 11400000, guid: 02e25737219cc8242bfb6560224a751d, type: 2}
+  catalog: {fileID: 11400000, guid: 7d0639150faf68a438dcc35886cc3922, type: 2}
+  library: {fileID: 11400000, guid: 224b0bd0013328a4390ed2772d5d227f, type: 2}

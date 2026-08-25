@@ -587,6 +587,7 @@ namespace CoH.Presentation
                 definition.Health + card.HealthModifier,
                 definition.Text,
                 definition.Type,
+                definition.Class,
                 definition.Tribe,
                 definition.Rarity,
                 playable);
