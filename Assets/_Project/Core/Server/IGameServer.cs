@@ -34,5 +34,17 @@ namespace CoH.Core.Server
 
         /// <summary>Everything a minion may attack right now.</summary>
         IReadOnlyList<EntityId> GetLegalAttackTargets(PlayerId playerId, EntityId attackerId);
+
+        /// <summary>
+        /// Whether a minion is in a state to attack at all, ignoring targets.
+        /// None means it can.
+        ///
+        /// Read-only, and answered by the same rules that would judge the
+        /// command itself. A client needs it to know whether picking a minion up
+        /// should start an attack, and to say why when it should not; working
+        /// that out from summoning turns and attack counters on the client would
+        /// be a second copy of a rule that already exists here.
+        /// </summary>
+        RejectionReason CanAttack(PlayerId playerId, EntityId attackerId);
     }
 }

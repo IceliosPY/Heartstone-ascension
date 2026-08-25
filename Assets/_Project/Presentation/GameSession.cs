@@ -80,5 +80,15 @@ namespace CoH.Presentation
             _server == null
                 ? Array.Empty<EntityId>()
                 : _server.GetLegalAttackTargets(playerId, attackerId);
+
+        /// <summary>
+        /// Whether a minion could attack at all, and why not when it could not.
+        /// Asked before an attack is aimed, so picking up a minion that has
+        /// already swung says so instead of doing nothing.
+        /// </summary>
+        public RejectionReason CanAttack(PlayerId playerId, EntityId attackerId) =>
+            _server == null
+                ? RejectionReason.WrongPhase
+                : _server.CanAttack(playerId, attackerId);
     }
 }

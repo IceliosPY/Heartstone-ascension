@@ -47,12 +47,31 @@ namespace CoH.Presentation
         [Range(0f, 1f)]
         [SerializeField] private float dimStrength = 0.55f;
 
+        [Header("Hover")]
+        [Tooltip("How far a hovered card rises out of the hand.")]
+        [SerializeField] private float hoverLift = 0.5f;
+
+        [Tooltip("How far it comes toward the camera, which is what puts it in front of its neighbours.")]
+        [SerializeField] private float hoverForward = 0.62f;
+
+        [SerializeField] private float hoverScale = 1.24f;
+
+        [Tooltip("How quickly a card reaches its target pose. Higher is snappier.")]
+        [SerializeField] private float poseSmoothing = 18f;
+
         private MaterialPropertyBlock _block;
-        private bool _isSelected;
+        private bool _isHovered;
         private bool _isPlayable;
         private bool _isFaceDown;
+        private bool _isDragging;
+
         private Vector3 _restingPosition;
-        private float _selectionLift;
+        private Quaternion _restingRotation = Quaternion.identity;
+        private float _restingScale = 1f;
+        private bool _hasPose;
+        private Transform _poseParent;
+
+        private Collider _collider;
 
         /// <summary>Which card instance in the engine this view stands for.</summary>
         public EntityId EntityId { get; private set; }
@@ -62,19 +81,141 @@ namespace CoH.Presentation
 
         public bool IsFaceDown => _isFaceDown;
 
+        /// <summary>True while the pointer is over this card and it has risen.</summary>
+        public bool IsHovered => _isHovered;
+
+        /// <summary>True while this card is following the pointer.</summary>
+        public bool IsDragging => _isDragging;
+
+        /// <summary>Where the layout wants this card, whatever it is doing right now.</summary>
+        public Vector3 RestingLocalPosition => _restingPosition;
+
+        private void Awake() => _collider = GetComponent<Collider>();
+
         /// <summary>
-        /// Records where the layout wants this card, so a selected card can lift
-        /// out of the hand and drop back without the layout being consulted.
+        /// Records where the layout wants this card.
+        ///
+        /// Hovering and dragging are offsets from this pose, never edits to it,
+        /// which is what stops a card drifting a little further out of the hand
+        /// every time the pointer crosses it. However an interaction ends, the
+        /// card returns to exactly what the fan computed.
         /// </summary>
-        public void SetRestingPose(Vector3 localPosition, Quaternion localRotation, float scale, float selectionLift)
+        public void SetRestingPose(Vector3 localPosition, Quaternion localRotation, float scale)
         {
             _restingPosition = localPosition;
-            _selectionLift = selectionLift;
+            _restingRotation = localRotation;
+            _restingScale = scale;
 
-            transform.localRotation = localRotation;
+            // A card eases to a new pose when the hand re-fans under it, and
+            // arrives instantly when it is new or when the board has just
+            // flipped. Easing across a turn change would mean sliding somebody
+            // else's hand across the table.
+            bool snap = !_hasPose || _poseParent != transform.parent;
+
+            _hasPose = true;
+            _poseParent = transform.parent;
+
+            if (snap && !_isDragging)
+            {
+                ApplyPose(1f);
+            }
+        }
+
+        /// <summary>Raises the card so it can be read, and brings it in front of its neighbours.</summary>
+        public void SetHovered(bool hovered)
+        {
+            if (_isHovered == hovered)
+            {
+                return;
+            }
+
+            _isHovered = hovered;
+            Repaint();
+        }
+
+        /// <summary>
+        /// Takes the card out of the hand so it can follow the pointer. The
+        /// collider goes with it: a card under the cursor would otherwise be the
+        /// first thing every ray meets, and the board could never be aimed at.
+        /// </summary>
+        public void BeginDrag(Transform dragLayer)
+        {
+            _isDragging = true;
+            _isHovered = false;
+
+            if (dragLayer != null)
+            {
+                transform.SetParent(dragLayer, true);
+            }
+
+            if (_collider != null)
+            {
+                _collider.enabled = false;
+            }
+
+            Repaint();
+        }
+
+        /// <summary>Places the dragged card, in world space, under the pointer.</summary>
+        public void UpdateDrag(Vector3 worldPosition, Quaternion worldRotation, float scale)
+        {
+            if (!_isDragging)
+            {
+                return;
+            }
+
+            transform.SetPositionAndRotation(worldPosition, worldRotation);
             transform.localScale = Vector3.one * scale;
+        }
 
-            ApplyLift();
+        /// <summary>
+        /// Puts the card back under the hand without moving it, so it glides
+        /// home from wherever it was let go rather than blinking there.
+        /// </summary>
+        public void EndDrag(Transform handAnchor)
+        {
+            _isDragging = false;
+
+            if (handAnchor != null)
+            {
+                transform.SetParent(handAnchor, true);
+                _poseParent = handAnchor;
+            }
+
+            if (_collider != null)
+            {
+                _collider.enabled = true;
+            }
+
+            Repaint();
+        }
+
+        private void LateUpdate()
+        {
+            if (_isDragging || !_hasPose)
+            {
+                return;
+            }
+
+            // Frame rate independent easing: what stays constant is the fraction
+            // of the remaining distance covered per second, not per frame.
+            ApplyPose(1f - Mathf.Exp(-poseSmoothing * Time.deltaTime));
+        }
+
+        private void ApplyPose(float t)
+        {
+            Vector3 targetPosition = _isHovered
+                ? _restingPosition + new Vector3(0f, hoverLift, -hoverForward)
+                : _restingPosition;
+
+            // A hovered card straightens up out of the fan, which is most of
+            // what makes it readable.
+            Quaternion targetRotation = _isHovered ? Quaternion.identity : _restingRotation;
+            float targetScale = _isHovered ? _restingScale * hoverScale : _restingScale;
+
+            transform.localPosition = Vector3.Lerp(transform.localPosition, targetPosition, t);
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, t);
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * targetScale, t);
         }
 
         /// <summary>Shows a card, face up, from a snapshot the presenter built.</summary>
@@ -117,23 +258,8 @@ namespace CoH.Presentation
         {
             EntityId = EntityId.None;
             _isPlayable = false;
-            _isSelected = false;
+            _isHovered = false;
             SetFaceDown(true);
-            ApplyLift();
-        }
-
-        public void SetSelected(bool selected)
-        {
-            _isSelected = selected;
-            ApplyLift();
-            Repaint();
-        }
-
-        private void ApplyLift()
-        {
-            transform.localPosition = _isSelected
-                ? _restingPosition + Vector3.up * _selectionLift
-                : _restingPosition;
         }
 
         private void SetFaceDown(bool faceDown)
@@ -180,13 +306,17 @@ namespace CoH.Presentation
                 return;
             }
 
-            float dim = _isPlayable || _isSelected ? 0f : dimStrength;
+            // A card being read is never dimmed. Not affording a card stops it
+            // being played, not inspected, and a player deciding what to do next
+            // needs to read exactly the ones they cannot afford yet.
+            bool lit = _isPlayable || _isHovered || _isDragging;
+            float dim = lit ? 0f : dimStrength;
 
-            Tint(frame, _isSelected ? selectedFrameColor : Dimmed(frameColor, dim));
+            Tint(frame, _isDragging || _isHovered ? selectedFrameColor : Dimmed(frameColor, dim));
             Tint(artwork, Dimmed(artworkColor, dim));
             Tint(manaGem, Dimmed(manaColor, dim));
 
-            Color textTint = _isPlayable || _isSelected ? Color.white : new Color(0.62f, 0.62f, 0.66f);
+            Color textTint = lit ? Color.white : new Color(0.62f, 0.62f, 0.66f);
 
             Fade(nameText, textTint);
             Fade(manaText, textTint);

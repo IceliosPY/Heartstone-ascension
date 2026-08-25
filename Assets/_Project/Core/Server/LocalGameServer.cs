@@ -54,5 +54,8 @@ namespace CoH.Core.Server
 
         public IReadOnlyList<EntityId> GetLegalAttackTargets(PlayerId playerId, EntityId attackerId) =>
             _engine.GetLegalAttackTargets(playerId, attackerId);
+
+        public RejectionReason CanAttack(PlayerId playerId, EntityId attackerId) =>
+            _engine.CanAttack(playerId, attackerId);
     }
 }

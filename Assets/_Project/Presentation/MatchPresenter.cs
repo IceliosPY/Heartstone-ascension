@@ -41,6 +41,12 @@ namespace CoH.Presentation
         [SerializeField] private HeroView nearHero;
         [SerializeField] private HeroView farHero;
 
+        [Header("Interaction")]
+        [Tooltip("Where a card being dragged is parented, clear of both hands.")]
+        [SerializeField] private Transform dragLayer;
+
+        [SerializeField] private BoardInsertionMarker insertionMarker;
+
         [Header("Layout")]
         [SerializeField] private HandFanSettings handLayout = new HandFanSettings();
         [SerializeField] private float boardSpacing = 1.2f;
@@ -53,8 +59,25 @@ namespace CoH.Presentation
         private readonly List<EntityId> _scratch = new List<EntityId>();
 
         private PlayerId _viewpoint = PlayerId.None;
+        private EntityId _draggedCard = EntityId.None;
+        private int _insertionSlot = -1;
 
         public GameSession Session => session;
+
+        /// <summary>Where a card being dragged lives while it follows the pointer.</summary>
+        public Transform DragLayer => dragLayer;
+
+        /// <summary>The acting player's hand anchor, which a dropped card returns to.</summary>
+        public Transform NearHandAnchor => anchors == null ? null : anchors.Hand(true);
+
+        /// <summary>The acting player's minion row, whose space the drop preview is computed in.</summary>
+        public Transform NearBoardAnchor => anchors == null ? null : anchors.Board(true);
+
+        /// <summary>Gap between two neighbouring minions, shared with the drop resolver.</summary>
+        public float BoardSpacing => boardSpacing;
+
+        /// <summary>Which slot the drop preview is currently holding open, or -1.</summary>
+        public int InsertionSlot => _insertionSlot;
 
         /// <summary>Whose side of the screen is the near one right now.</summary>
         public PlayerId Viewpoint => _viewpoint;
@@ -89,6 +112,41 @@ namespace CoH.Presentation
         public HeroView NearHero => nearHero;
 
         public HeroView FarHero => farHero;
+
+        /// <summary>
+        /// Tells the hand that one of its cards is currently in the air.
+        ///
+        /// The card is still in the engine's hand, and stays there until the
+        /// engine says otherwise. This only takes it out of the fan, so the
+        /// others close the gap behind it exactly as they would if it had been
+        /// played, and open it again if it comes back.
+        /// </summary>
+        public void SetDraggedCard(EntityId card)
+        {
+            if (_draggedCard == card)
+            {
+                return;
+            }
+
+            _draggedCard = card;
+            Rebuild();
+        }
+
+        /// <summary>
+        /// Holds a slot open in the acting player's row, or -1 to close it.
+        ///
+        /// Called only when the slot actually changes, not on every mouse move.
+        /// </summary>
+        public void SetInsertionPreview(int slot)
+        {
+            if (_insertionSlot == slot)
+            {
+                return;
+            }
+
+            _insertionSlot = slot;
+            Rebuild();
+        }
 
         private void OnEnable()
         {
@@ -171,6 +229,8 @@ namespace CoH.Presentation
             RebuildBoard(state, near, true);
             RebuildBoard(state, far, false);
 
+            RefreshInsertionMarker(state, near);
+
             RebuildHand(state, near, true);
             RebuildHand(state, far, false);
 
@@ -204,6 +264,10 @@ namespace CoH.Presentation
             Player player = state.GetPlayer(seat);
             Transform anchor = anchors.Board(near);
 
+            // Only the acting player's row opens up for a drop, and only while
+            // one is being previewed.
+            int gap = near ? _insertionSlot : -1;
+
             for (int slot = 0; slot < player.Board.Count; slot++)
             {
                 Minion minion = player.Board[slot];
@@ -215,12 +279,34 @@ namespace CoH.Presentation
                 }
 
                 view.transform.SetParent(anchor, false);
-                view.transform.localPosition = BoardRowLayout.GetPosition(slot, player.Board.Count, boardSpacing);
+                view.transform.localPosition =
+                    BoardDropResolver.PositionWithGap(slot, player.Board.Count, gap, boardSpacing);
                 view.transform.localRotation = Quaternion.identity;
                 view.transform.localScale = Vector3.one;
 
                 view.Bind(BuildMinionModel(state, minion));
             }
+        }
+
+        private void RefreshInsertionMarker(GameState state, PlayerId near)
+        {
+            if (insertionMarker == null)
+            {
+                return;
+            }
+
+            if (_insertionSlot < 0)
+            {
+                insertionMarker.Hide();
+                return;
+            }
+
+            int count = state.GetPlayer(near).Board.Count;
+
+            insertionMarker.Show(
+                anchors.Board(true),
+                BoardDropResolver.GapPosition(count, _insertionSlot, boardSpacing),
+                _insertionSlot);
         }
 
         private void RebuildHand(GameState state, PlayerId seat, bool near)
@@ -233,6 +319,13 @@ namespace CoH.Presentation
             bool faceUp = near;
             float scale = handLayout.Scale * (near ? 1f : farHandScale);
 
+            // A card in the air is still in the engine's hand but is no longer
+            // in the fan, so the rest of the hand closes up behind it.
+            bool holdsDragged = near && !_draggedCard.IsNone && ContainsCard(player, _draggedCard);
+            int laidOut = holdsDragged ? player.Hand.Count - 1 : player.Hand.Count;
+
+            int position = 0;
+
             for (int index = 0; index < player.Hand.Count; index++)
             {
                 CardInstance card = player.Hand[index];
@@ -243,10 +336,24 @@ namespace CoH.Presentation
                     _cardViews[card.Id] = view;
                 }
 
-                view.transform.SetParent(anchor, false);
+                bool dragged = holdsDragged && card.Id == _draggedCard;
 
-                CardPose pose = HandFanLayout.GetPose(index, player.Hand.Count, handLayout);
-                view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, scale, handLayout.SelectionLift);
+                if (!dragged)
+                {
+                    // Reparent only when the card is actually somewhere else,
+                    // and keep its world position when it moves. A card that has
+                    // just been dropped is already under this anchor, holding
+                    // the place it was let go of, which is what it has to glide
+                    // home from rather than being flung there first.
+                    if (view.transform.parent != anchor)
+                    {
+                        view.transform.SetParent(anchor, true);
+                    }
+
+                    CardPose pose = HandFanLayout.GetPose(position, laidOut, handLayout);
+                    view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, scale);
+                    position++;
+                }
 
                 if (faceUp)
                 {
@@ -257,6 +364,19 @@ namespace CoH.Presentation
                     view.BindFaceDown();
                 }
             }
+        }
+
+        private static bool ContainsCard(Player player, EntityId card)
+        {
+            for (int index = 0; index < player.Hand.Count; index++)
+            {
+                if (player.Hand[index].Id == card)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private CardViewModel BuildCardModel(GameState state, CardInstance card, PlayerId owner)

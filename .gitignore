@@ -57,4 +57,7 @@ Thumbs.db
 desktop.ini
 
 # --- Generated previews ---------------------------------------
+# Stills the editor writes to the project root to check framing.
 match-preview.png
+interaction-drag.png
+interaction-aim.png

@@ -37,8 +37,25 @@ namespace CoH.Presentation
         [SerializeField] private Color healthPlateColor = new Color(0.74f, 0.18f, 0.18f);
         [SerializeField] private Color hurtPlateColor = new Color(0.95f, 0.32f, 0.28f);
 
+        [Tooltip("Ring colour for a target that is legal but not being pointed at.")]
+        [SerializeField] private Color targetRestingColor = new Color(0.85f, 0.25f, 0.22f, 1f);
+
+        [Tooltip("Ring colour for the target under the pointer.")]
+        [SerializeField] private Color targetHoveredColor = new Color(1f, 0.85f, 0.35f, 1f);
+
         private MaterialPropertyBlock _block;
         private bool _canAttack;
+        private Renderer _targetRingRenderer;
+        private Vector3 _targetRingScale = Vector3.one;
+
+        private void Awake()
+        {
+            if (targetRing != null)
+            {
+                _targetRingRenderer = targetRing.GetComponent<Renderer>();
+                _targetRingScale = targetRing.transform.localScale;
+            }
+        }
 
         public EntityId EntityId { get; private set; }
 
@@ -67,12 +84,39 @@ namespace CoH.Presentation
             }
         }
 
+        /// <summary>
+        /// Marks this minion as something the current attacker may hit. The list
+        /// this comes from is the engine's; the view only paints it.
+        /// </summary>
         public void SetTargetable(bool targetable)
         {
             if (targetRing != null)
             {
                 targetRing.SetActive(targetable);
             }
+
+            if (targetable)
+            {
+                SetTargetHighlighted(false);
+            }
+        }
+
+        /// <summary>
+        /// Strengthens the marker on the one legal target the pointer is
+        /// actually over, so a player aiming across a crowded board can tell
+        /// which of the highlighted minions they are about to hit.
+        /// </summary>
+        public void SetTargetHighlighted(bool highlighted)
+        {
+            if (_targetRingRenderer == null)
+            {
+                return;
+            }
+
+            Tint(_targetRingRenderer, highlighted ? targetHoveredColor : targetRestingColor);
+            _targetRingRenderer.transform.localScale = highlighted
+                ? _targetRingScale * 1.18f
+                : _targetRingScale;
         }
 
         private void Tint(Renderer target, Color colour)

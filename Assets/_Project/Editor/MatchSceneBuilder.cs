@@ -163,8 +163,10 @@ namespace CoH.Editor
             GameObject root = new GameObject("P_MinionPlaceholder");
             MinionView view = root.AddComponent<MinionView>();
 
-            GameObject targetRing = Ring(root, "TargetRing", 1.22f, "M_TargetRing", 0.006f);
-            GameObject selectionRing = Ring(root, "SelectionRing", 1.14f, "M_SelectionRing", 0.008f);
+            // Kept inside the 1.2 the row spaces minions by, or seven lit
+            // targets read as one long band instead of seven choices.
+            GameObject targetRing = Ring(root, "TargetRing", 1.02f, "M_TargetRing", 0.006f);
+            GameObject selectionRing = Ring(root, "SelectionRing", 1.1f, "M_SelectionRing", 0.008f);
 
             GameObject body = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             body.name = "Body";
@@ -283,6 +285,16 @@ namespace CoH.Editor
             BuildDropZone(world, "NearDropZone", new Vector3(0f, 0.2f, NearRowZ), true);
             BuildDropZone(world, "FarDropZone", new Vector3(0f, 0.2f, FarRowZ), false);
 
+            // -- Interaction ------------------------------------------------
+            // A card being dragged is parented here rather than left under a
+            // hand, so it is not dragged around by the fan re-laying itself out
+            // underneath it.
+            GameObject dragLayer = new GameObject("DragLayer");
+            dragLayer.transform.SetParent(world.transform, false);
+
+            BoardInsertionMarker marker = BuildInsertionMarker(world);
+            TargetingArrow arrow = BuildTargetingArrow(world, camera);
+
             // -- HUD --------------------------------------------------------
             MatchHud hud = BuildHud();
 
@@ -302,7 +314,8 @@ namespace CoH.Editor
                 ("session", session), ("anchors", anchors), ("hud", hud),
                 ("cardPrefab", cardPrefab.GetComponent<CardView>()),
                 ("minionPrefab", minionPrefab.GetComponent<MinionView>()),
-                ("nearHero", nearHero), ("farHero", farHero));
+                ("nearHero", nearHero), ("farHero", farHero),
+                ("dragLayer", dragLayer.transform), ("insertionMarker", marker));
 
             WireNumbers(presenter,
                 ("handLayout.PivotDistance", 7f),
@@ -310,7 +323,6 @@ namespace CoH.Editor
                 ("handLayout.MaxSpreadAngle", 38f),
                 ("handLayout.DepthStep", 0.035f),
                 ("handLayout.Scale", 0.9f),
-                ("handLayout.SelectionLift", 0.35f),
                 ("boardSpacing", 1.2f),
                 ("farHandScale", 0.55f));
 
@@ -318,7 +330,8 @@ namespace CoH.Editor
             inputObject.transform.SetParent(systems.transform, false);
             MatchInputController input = inputObject.AddComponent<MatchInputController>();
             Wire(input,
-                ("session", session), ("presenter", presenter), ("hud", hud), ("matchCamera", camera));
+                ("session", session), ("presenter", presenter), ("hud", hud),
+                ("matchCamera", camera), ("targetingArrow", arrow));
 
             GameObject bootstrapObject = new GameObject("MatchBootstrap");
             bootstrapObject.transform.SetParent(systems.transform, false);
@@ -408,6 +421,64 @@ namespace CoH.Editor
             zone.AddComponent<BoardDropZone>().SetNearSide(near);
         }
 
+        /// <summary>
+        /// The empty slot held open under a card being dragged over the board.
+        /// A footprint the size of a minion, lying where that minion will stand.
+        /// </summary>
+        private static BoardInsertionMarker BuildInsertionMarker(GameObject parent)
+        {
+            GameObject root = new GameObject("BoardInsertionMarker");
+            root.transform.SetParent(parent.transform, false);
+
+            BoardInsertionMarker marker = root.AddComponent<BoardInsertionMarker>();
+
+            GameObject visual = Group(root, "Slot");
+            Ring(visual, "Footprint", 1.05f, "M_InsertionSlot", 0.012f);
+            FacingQuad(visual, "Riser", new Vector3(0f, 0.34f, 0f), new Vector2(0.86f, 0.62f), "M_InsertionSlot");
+
+            Wire(marker, ("visual", visual));
+
+            visual.SetActive(false);
+            return marker;
+        }
+
+        /// <summary>
+        /// The attack arrow. A world space line so it belongs to the board it is
+        /// drawn across, plus a generated triangle for the head.
+        /// </summary>
+        private static TargetingArrow BuildTargetingArrow(GameObject parent, Camera camera)
+        {
+            GameObject root = new GameObject("TargetingArrow");
+            root.transform.SetParent(parent.transform, false);
+
+            TargetingArrow arrow = root.AddComponent<TargetingArrow>();
+
+            GameObject lineObject = Group(root, "Line");
+            LineRenderer line = lineObject.AddComponent<LineRenderer>();
+            line.sharedMaterial = Mat("M_TargetArrow");
+            line.useWorldSpace = true;
+            line.numCapVertices = 4;
+            line.alignment = LineAlignment.View;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            line.positionCount = 0;
+            line.enabled = false;
+
+            GameObject headObject = Group(root, "Head");
+            MeshFilter headFilter = headObject.AddComponent<MeshFilter>();
+            MeshRenderer headRenderer = headObject.AddComponent<MeshRenderer>();
+            headRenderer.sharedMaterial = Mat("M_TargetArrow");
+            headRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            headRenderer.receiveShadows = false;
+            headRenderer.enabled = false;
+
+            Wire(arrow,
+                ("line", line), ("headFilter", headFilter),
+                ("headRenderer", headRenderer), ("matchCamera", camera));
+
+            return arrow;
+        }
+
         private static MatchHud BuildHud()
         {
             GameObject hudObject = new GameObject("HUD");
@@ -437,6 +508,11 @@ namespace CoH.Editor
             Image panelBackground = panel.AddComponent<Image>();
             panelBackground.color = new Color(0f, 0f, 0f, 0.42f);
 
+            // Everything on the HUD except the button itself is transparent to
+            // the pointer. A readout that eats clicks would silently kill a drag
+            // that happened to pass under it.
+            panelBackground.raycastTarget = false;
+
             TextMeshProUGUI turn = UiText(panel, "TurnText", new Vector2(22f, -18f), new Vector2(380f, 40f), 30f);
             turn.color = new Color(0.75f, 0.75f, 0.82f);
             TextMeshProUGUI active = UiText(panel, "ActivePlayerText", new Vector2(22f, -58f), new Vector2(390f, 52f), 42f);
@@ -455,6 +531,7 @@ namespace CoH.Editor
             hint.fontSize = 28f;
             hint.alignment = TextAlignmentOptions.Center;
             hint.color = new Color(1f, 0.86f, 0.48f);
+            hint.raycastTarget = false;
             hint.text = string.Empty;
 
             // --- Developer overlay, small and out of the way ---------------
@@ -468,6 +545,7 @@ namespace CoH.Editor
             debug.fontSize = 18f;
             debug.alignment = TextAlignmentOptions.BottomLeft;
             debug.color = new Color(0.45f, 0.45f, 0.5f);
+            debug.raycastTarget = false;
             debug.text = string.Empty;
 
             // --- End turn --------------------------------------------------
@@ -495,7 +573,9 @@ namespace CoH.Editor
             RectTransform resultRect = (RectTransform)resultPanel.transform;
             Anchor(resultRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             resultRect.sizeDelta = new Vector2(980f, 220f);
-            resultPanel.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.82f);
+            Image resultBackground = resultPanel.AddComponent<Image>();
+            resultBackground.color = new Color(0f, 0f, 0f, 0.82f);
+            resultBackground.raycastTarget = false;
 
             TextMeshProUGUI result = UiText(resultPanel, "ResultText", Vector2.zero, new Vector2(950f, 200f), 76f);
             result.fontStyle = FontStyles.Bold;
@@ -657,6 +737,7 @@ namespace CoH.Editor
             text.fontSize = fontSize;
             text.alignment = TextAlignmentOptions.Left;
             text.color = Color.white;
+            text.raycastTarget = false;
             text.text = string.Empty;
             return text;
         }
@@ -761,6 +842,8 @@ namespace CoH.Editor
 
                 case "M_SelectionRing": return new Color(1f, 0.84f, 0.34f);
                 case "M_TargetRing": return new Color(0.92f, 0.30f, 0.26f);
+                case "M_TargetArrow": return new Color(1f, 0.79f, 0.30f);
+                case "M_InsertionSlot": return new Color(0.98f, 0.86f, 0.45f);
 
                 default: return new Color(0.7f, 0.7f, 0.7f);
             }

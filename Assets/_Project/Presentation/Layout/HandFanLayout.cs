@@ -35,9 +35,6 @@ namespace CoH.Presentation
         public float DepthStep = 0.035f;
 
         public float Scale = 0.9f;
-
-        [Tooltip("How far a selected card lifts out of the hand.")]
-        public float SelectionLift = 0.35f;
     }
 
     /// <summary>

@@ -37,7 +37,24 @@ namespace CoH.Presentation
         [SerializeField] private Color healthColor = new Color(0.74f, 0.18f, 0.18f);
         [SerializeField] private Color armorColor = new Color(0.36f, 0.55f, 0.80f);
 
+        [Tooltip("Ring colour for a target that is legal but not being pointed at.")]
+        [SerializeField] private Color targetRestingColor = new Color(0.85f, 0.25f, 0.22f, 1f);
+
+        [Tooltip("Ring colour for the target under the pointer.")]
+        [SerializeField] private Color targetHoveredColor = new Color(1f, 0.85f, 0.35f, 1f);
+
         private MaterialPropertyBlock _block;
+        private Renderer _targetRingRenderer;
+        private Vector3 _targetRingScale = Vector3.one;
+
+        private void Awake()
+        {
+            if (targetRing != null)
+            {
+                _targetRingRenderer = targetRing.GetComponent<Renderer>();
+                _targetRingScale = targetRing.transform.localScale;
+            }
+        }
 
         public EntityId EntityId { get; private set; }
 
@@ -70,12 +87,36 @@ namespace CoH.Presentation
             Tint(armorPlate, armorColor);
         }
 
+        /// <summary>
+        /// Marks this hero as something the current attacker may hit. A hero is
+        /// a target exactly when the engine lists it, and no rule about heroes
+        /// lives here.
+        /// </summary>
         public void SetTargetable(bool targetable)
         {
             if (targetRing != null)
             {
                 targetRing.SetActive(targetable);
             }
+
+            if (targetable)
+            {
+                SetTargetHighlighted(false);
+            }
+        }
+
+        /// <summary>Strengthens the marker while the pointer is over this hero.</summary>
+        public void SetTargetHighlighted(bool highlighted)
+        {
+            if (_targetRingRenderer == null)
+            {
+                return;
+            }
+
+            Tint(_targetRingRenderer, highlighted ? targetHoveredColor : targetRestingColor);
+            _targetRingRenderer.transform.localScale = highlighted
+                ? _targetRingScale * 1.12f
+                : _targetRingScale;
         }
 
         private void Tint(Renderer target, Color colour)
