@@ -27,6 +27,10 @@ namespace CoH.Tests.PlayMode
         {
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
 
+            // Durations to zero: these tests are about what the board holds, not
+            // about how long the animations that put it there take.
+            MatchTestScene.MakeInstant();
+
             // One frame for Start to run and the opening snapshot to be drawn.
             yield return null;
         }

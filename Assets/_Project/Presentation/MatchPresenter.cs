@@ -22,11 +22,12 @@ namespace CoH.Presentation
     /// everything. Reconciling rather than mutating blindly means the scene
     /// cannot drift out of step with the rules.
     ///
-    /// It is also the only <see cref="IEventVisualizer"/> for now. When
-    /// animations arrive, this splits into one visualizer per event and the
-    /// reconcile becomes a safety net rather than the main mechanism.
+    /// It no longer stages events itself. Animations belong to the visualizers,
+    /// which drive the views over time; what is left here is the layout they
+    /// animate toward, and one reconcile once a batch has finished, as a safety
+    /// net rather than as the mechanism.
     /// </summary>
-    public sealed class MatchPresenter : MonoBehaviour, IEventVisualizer
+    public sealed class MatchPresenter : MonoBehaviour
     {
         [Header("Wiring")]
         [SerializeField] private GameSession session;
@@ -109,9 +110,208 @@ namespace CoH.Presentation
             return false;
         }
 
+        /// <summary>The hero view currently showing this seat, whichever side it is on.</summary>
+        public bool TryGetHeroViewOf(PlayerId seat, out HeroView view)
+        {
+            if (nearHero != null && nearHero.PlayerId == seat)
+            {
+                view = nearHero;
+                return true;
+            }
+
+            if (farHero != null && farHero.PlayerId == seat)
+            {
+                view = farHero;
+                return true;
+            }
+
+            view = null;
+            return false;
+        }
+
         public HeroView NearHero => nearHero;
 
         public HeroView FarHero => farHero;
+
+        /// <summary>Anchors, so a staged event can find the deck or a row.</summary>
+        public BoardAnchors Anchors => anchors;
+
+        /// <summary>True when this seat currently owns the near side of the screen.</summary>
+        public bool IsNear(PlayerId seat) => seat == _viewpoint;
+
+        /// <summary>Lays out the two rows and nothing else.</summary>
+        public void RelayoutBoards()
+        {
+            if (session == null || !session.IsReady)
+            {
+                return;
+            }
+
+            GameState state = session.State;
+            PlayerId near = _viewpoint.IsNone ? PlayerId.One : _viewpoint;
+
+            // Places what is on the board and removes nothing. A minion the
+            // engine has already taken away may still be mid death animation,
+            // and sweeping it here would delete the second half of a trade
+            // before anyone saw it die. Removal belongs to the death that is
+            // being staged; the reconcile at the end of the batch is the net.
+            RebuildBoard(state, near, true);
+            RebuildBoard(state, near.Opponent, false);
+            RefreshInsertionMarker(state, near);
+
+            Physics.SyncTransforms();
+        }
+
+        /// <summary>Lays out the two hands and nothing else.</summary>
+        public void RelayoutHands()
+        {
+            if (session == null || !session.IsReady)
+            {
+                return;
+            }
+
+            GameState state = session.State;
+            PlayerId near = _viewpoint.IsNone ? PlayerId.One : _viewpoint;
+
+            // Same rule as the rows: a card on its way out is removed by the
+            // animation showing it leave, not by a layout pass.
+            RebuildHand(state, near, true);
+            RebuildHand(state, near.Opponent, false);
+
+            Physics.SyncTransforms();
+        }
+
+        /// <summary>Refreshes the two hero plates from the current state.</summary>
+        public void RefreshHeroes()
+        {
+            if (session == null || !session.IsReady)
+            {
+                return;
+            }
+
+            GameState state = session.State;
+            PlayerId near = _viewpoint.IsNone ? PlayerId.One : _viewpoint;
+
+            if (nearHero != null)
+            {
+                nearHero.Bind(state.GetPlayer(near), MatchHud.Describe(near), true);
+            }
+
+            if (farHero != null)
+            {
+                farHero.Bind(state.GetPlayer(near.Opponent), MatchHud.Describe(near.Opponent), false);
+            }
+        }
+
+        /// <summary>Refreshes the readout without touching anything on the table.</summary>
+        public void RefreshHud()
+        {
+            if (hud != null && session != null && session.IsReady)
+            {
+                hud.Refresh(session.State);
+            }
+        }
+
+        /// <summary>
+        /// Creates a card view off to one side, for an event that wants to bring
+        /// a card in from somewhere. It is parented to the drag layer, so no
+        /// hand layout moves it until the animation hands it over.
+        /// </summary>
+        public CardView SpawnLooseCardView(EntityId card, PlayerId seat)
+        {
+            if (_cardViews.TryGetValue(card, out CardView existing) && existing != null)
+            {
+                return existing;
+            }
+
+            CardView view = Instantiate(cardPrefab, dragLayer);
+            _cardViews[card] = view;
+
+            BindCardView(view, card, seat);
+            return view;
+        }
+
+        /// <summary>Shows a card as its seat should see it: face up only for the near side.</summary>
+        public void BindCardView(CardView view, EntityId card, PlayerId seat)
+        {
+            if (view == null || session == null || !session.IsReady)
+            {
+                return;
+            }
+
+            GameState state = session.State;
+
+            if (IsNear(seat) && state.TryGetEntity(card, out Entity entity) && entity is CardInstance instance)
+            {
+                view.Bind(BuildCardModel(state, instance, seat));
+            }
+            else
+            {
+                view.BindFaceDown();
+            }
+        }
+
+        /// <summary>
+        /// Where a card of this hand will end up once the fan settles, in world
+        /// space. What a travelling card aims at, so it arrives exactly where
+        /// the layout was going to put it and nothing jumps afterwards.
+        /// </summary>
+        public bool TryGetHandPose(
+            PlayerId seat, EntityId card, out Vector3 position, out Quaternion rotation, out float scale)
+        {
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+            scale = handLayout.Scale;
+
+            if (session == null || !session.IsReady || anchors == null)
+            {
+                return false;
+            }
+
+            bool near = IsNear(seat);
+            Transform anchor = anchors.Hand(near);
+            Player player = session.State.GetPlayer(seat);
+
+            int index = IndexInHand(player, card);
+
+            if (index < 0 || anchor == null)
+            {
+                return false;
+            }
+
+            CardPose pose = HandFanLayout.GetPose(index, player.Hand.Count, handLayout);
+            scale = handLayout.Scale * (near ? 1f : farHandScale);
+
+            position = anchor.TransformPoint(pose.LocalPosition);
+            rotation = anchor.rotation * pose.LocalRotation;
+            return true;
+        }
+
+        /// <summary>Where a deck sits, which is where a drawn card comes from.</summary>
+        public Vector3 DeckPosition(PlayerId seat)
+        {
+            Transform deck = anchors == null ? null : anchors.Deck(IsNear(seat));
+            return deck == null ? Vector3.zero : deck.position;
+        }
+
+        /// <summary>Forgets a card view and destroys it.</summary>
+        public void RemoveCardView(EntityId card) => Despawn(card);
+
+        /// <summary>Forgets a minion view and destroys it.</summary>
+        public void RemoveMinionView(EntityId minion) => Despawn(minion);
+
+        private static int IndexInHand(Player player, EntityId card)
+        {
+            for (int index = 0; index < player.Hand.Count; index++)
+            {
+                if (player.Hand[index].Id == card)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
 
         /// <summary>
         /// Tells the hand that one of its cards is currently in the air.
@@ -152,7 +352,6 @@ namespace CoH.Presentation
         {
             if (session != null && session.Queue != null)
             {
-                session.Queue.AddVisualizer(this);
                 session.Queue.Drained += Rebuild;
             }
         }
@@ -163,39 +362,6 @@ namespace CoH.Presentation
             {
                 session.Queue.Drained -= Rebuild;
             }
-        }
-
-        /// <summary>
-        /// Reacts to one event.
-        ///
-        /// Removal happens here rather than in the reconcile, so a minion
-        /// disappears at the moment its death is reported and not a batch later.
-        /// Everything else is left to the reconcile, because with instant
-        /// visuals there is nothing to gain from touching a label twice.
-        /// </summary>
-        public bool Handle(GameEvent gameEvent)
-        {
-            switch (gameEvent)
-            {
-                case MinionDiedEvent died:
-                    Despawn(died.MinionId);
-                    return true;
-
-                case CardBurnedEvent burned:
-                    Despawn(burned.CardInstanceId);
-                    return true;
-
-                case GameEndedEvent ended:
-                    if (hud != null)
-                    {
-                        hud.ShowResult(ended.Result);
-                    }
-
-                    return true;
-            }
-
-            // Everything else is picked up by the reconcile that follows.
-            return false;
         }
 
         /// <summary>
@@ -278,11 +444,17 @@ namespace CoH.Presentation
                     _minionViews[minion.Id] = view;
                 }
 
-                view.transform.SetParent(anchor, false);
-                view.transform.localPosition =
-                    BoardDropResolver.PositionWithGap(slot, player.Board.Count, gap, boardSpacing);
+                if (view.transform.parent != anchor)
+                {
+                    view.transform.SetParent(anchor, false);
+                }
+
+                // A target rather than a placement: the view slides there, so a
+                // summon opens the row instead of teleporting its neighbours.
+                view.SetRestingPose(
+                    BoardDropResolver.PositionWithGap(slot, player.Board.Count, gap, boardSpacing));
+
                 view.transform.localRotation = Quaternion.identity;
-                view.transform.localScale = Vector3.one;
 
                 view.Bind(BuildMinionModel(state, minion));
             }

@@ -33,6 +33,7 @@ namespace CoH.Tests.PlayMode
         private IEnumerator LoadMatch()
         {
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
+            MatchTestScene.MakeInstant();
             yield return null;
 
             _session = Object.FindFirstObjectByType<GameSession>();

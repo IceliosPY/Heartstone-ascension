@@ -62,7 +62,8 @@ namespace CoH.Core.Rules
                 minion.Controller,
                 amount,
                 absorbedByArmor: 0,
-                remainingHealth: minion.CurrentHealth));
+                remainingHealth: minion.CurrentHealth,
+                remainingArmor: 0));
         }
 
         private static void DamageHero(ResolutionContext context, EntityId sourceId, Hero hero, int amount)
@@ -83,7 +84,8 @@ namespace CoH.Core.Rules
                 hero.Owner,
                 amount,
                 absorbed,
-                hero.CurrentHealth));
+                hero.CurrentHealth,
+                hero.Armor));
         }
     }
 }

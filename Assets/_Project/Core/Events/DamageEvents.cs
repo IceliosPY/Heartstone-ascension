@@ -41,7 +41,8 @@ namespace CoH.Core.Events
             PlayerId targetController,
             int amount,
             int absorbedByArmor,
-            int remainingHealth)
+            int remainingHealth,
+            int remainingArmor)
         {
             SourceId = sourceId;
             TargetId = targetId;
@@ -49,6 +50,7 @@ namespace CoH.Core.Events
             Amount = amount;
             AbsorbedByArmor = absorbedByArmor;
             RemainingHealth = remainingHealth;
+            RemainingArmor = remainingArmor;
         }
 
         /// <summary>What dealt the damage, or None when nothing did, as with fatigue.</summary>
@@ -65,6 +67,17 @@ namespace CoH.Core.Events
 
         /// <summary>Health after the hit. May be zero or below; the target is not removed yet.</summary>
         public int RemainingHealth { get; }
+
+        /// <summary>
+        /// Armour after the hit, always zero for a minion.
+        ///
+        /// Here for the same reason as <see cref="RemainingHealth"/>: a reader
+        /// showing the hit at the moment it lands needs the numbers as they are
+        /// then, and the state has long since moved on. Without it a client
+        /// would have to keep a running subtraction of its own, which is a copy
+        /// of something the engine already knows.
+        /// </summary>
+        public int RemainingArmor { get; }
 
         public override string ToString() =>
             "DamageDealt(" + TargetId + ", " + Amount + " -> " + RemainingHealth + " hp)";

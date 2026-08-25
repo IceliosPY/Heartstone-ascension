@@ -27,6 +27,7 @@ namespace CoH.Tests.PlayMode
         private static IEnumerator LoadMatch()
         {
             yield return SceneManager.LoadSceneAsync(ScenePath, LoadSceneMode.Single);
+            MatchTestScene.MakeInstant();
             yield return null;
         }
 

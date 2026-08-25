@@ -21,16 +21,21 @@ namespace CoH.Presentation
         [SerializeField] private Transform nearHand;
         [SerializeField] private Transform nearBoard;
         [SerializeField] private Transform nearHero;
+        [SerializeField] private Transform nearDeck;
 
         [Header("Far side, their opponent")]
         [SerializeField] private Transform farHand;
         [SerializeField] private Transform farBoard;
         [SerializeField] private Transform farHero;
+        [SerializeField] private Transform farDeck;
 
         public Transform Hand(bool near) => near ? nearHand : farHand;
 
         public Transform Board(bool near) => near ? nearBoard : farBoard;
 
         public Transform Hero(bool near) => near ? nearHero : farHero;
+
+        /// <summary>Where a deck stands, which is where a drawn card comes from.</summary>
+        public Transform Deck(bool near) => near ? nearDeck : farDeck;
     }
 }

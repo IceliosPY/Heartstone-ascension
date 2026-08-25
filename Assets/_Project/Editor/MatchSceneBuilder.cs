@@ -60,6 +60,9 @@ namespace CoH.Editor
         private const float FarHandZ = 4.3f;
         private const float FarHandY = 0.55f;
 
+        // Off to the side of both hero plates, clear of the drop zones.
+        private const float DeckX = 5.7f;
+
         [MenuItem("Conquest of Hearthstone/Rebuild Match Scene")]
         public static void Rebuild()
         {
@@ -69,8 +72,9 @@ namespace CoH.Editor
 
             GameObject cardPrefab = BuildCardPrefab();
             GameObject minionPrefab = BuildMinionPrefab();
+            GameObject numberPrefab = BuildFloatingNumberPrefab();
 
-            BuildScene(cardPrefab, minionPrefab);
+            BuildScene(cardPrefab, minionPrefab, numberPrefab);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -198,13 +202,18 @@ namespace CoH.Editor
             collider.size = new Vector3(0.95f, 0.5f, 0.95f);
             collider.center = new Vector3(0f, 0.25f, 0f);
 
+            // Where an attack aims and where a damage number rises from, rather
+            // than a height guessed by whatever is doing the aiming.
+            Transform impact = Anchor(root, "ImpactAnchor", new Vector3(0f, 0.3f, 0f), Vector3.zero);
+
             selectionRing.SetActive(false);
             targetRing.SetActive(false);
 
             Wire(view,
                 ("body", bodyRenderer), ("attackPlate", attackPlate), ("healthPlate", healthPlate),
                 ("selectionRing", selectionRing), ("targetRing", targetRing),
-                ("nameText", nameText), ("attackText", attackText), ("healthText", healthText));
+                ("nameText", nameText), ("attackText", attackText), ("healthText", healthText),
+                ("impactAnchor", impact));
 
             return SavePrefab(root, PrefabFolder + "/P_MinionPlaceholder.prefab");
         }
@@ -213,7 +222,8 @@ namespace CoH.Editor
         //  Scene
         // ------------------------------------------------------------------
 
-        private static void BuildScene(GameObject cardPrefab, GameObject minionPrefab)
+        private static void BuildScene(
+            GameObject cardPrefab, GameObject minionPrefab, GameObject numberPrefab)
         {
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -275,9 +285,20 @@ namespace CoH.Editor
             Transform farHand = Anchor(anchorsObject, "FarHand",
                 new Vector3(0f, FarHandY, FarHandZ), new Vector3(90f - CameraPitch, 0f, 0f));
 
+            // A drawn card has to come from somewhere a player can point at.
+            Transform nearDeck = Anchor(anchorsObject, "NearDeck",
+                new Vector3(DeckX, 0.35f, NearHeroZ), Vector3.zero);
+            Transform farDeck = Anchor(anchorsObject, "FarDeck",
+                new Vector3(DeckX, 0.35f, FarHeroZ), Vector3.zero);
+
             Wire(anchors,
                 ("nearHand", nearHand), ("nearBoard", nearBoard), ("nearHero", nearHeroAnchor),
-                ("farHand", farHand), ("farBoard", farBoard), ("farHero", farHeroAnchor));
+                ("nearDeck", nearDeck),
+                ("farHand", farHand), ("farBoard", farBoard), ("farHero", farHeroAnchor),
+                ("farDeck", farDeck));
+
+            BuildDeckStack(world, "NearDeck", new Vector3(DeckX, 0f, NearHeroZ));
+            BuildDeckStack(world, "FarDeck", new Vector3(DeckX, 0f, FarHeroZ));
 
             HeroView nearHero = BuildHero(world, "NearHeroView", nearHeroAnchor.position);
             HeroView farHero = BuildHero(world, "FarHeroView", farHeroAnchor.position);
@@ -294,6 +315,11 @@ namespace CoH.Editor
 
             BoardInsertionMarker marker = BuildInsertionMarker(world);
             TargetingArrow arrow = BuildTargetingArrow(world, camera);
+
+            // Floating numbers and any future puff of dust live here, clear of
+            // anything a layout moves.
+            GameObject effectLayer = new GameObject("EffectLayer");
+            effectLayer.transform.SetParent(world.transform, false);
 
             // -- HUD --------------------------------------------------------
             MatchHud hud = BuildHud();
@@ -332,6 +358,27 @@ namespace CoH.Editor
             Wire(input,
                 ("session", session), ("presenter", presenter), ("hud", hud),
                 ("matchCamera", camera), ("targetingArrow", arrow));
+
+            GameObject timingObject = new GameObject("PresentationTiming");
+            timingObject.transform.SetParent(systems.transform, false);
+            PresentationTiming timing = timingObject.AddComponent<PresentationTiming>();
+
+            GameObject audioObject = new GameObject("AudioFeedback");
+            audioObject.transform.SetParent(systems.transform, false);
+            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
+            AudioFeedback audioFeedback = audioObject.AddComponent<AudioFeedback>();
+            Wire(audioFeedback, ("source", audioSource));
+
+            GameObject animatorObject = new GameObject("MatchAnimator");
+            animatorObject.transform.SetParent(systems.transform, false);
+            MatchAnimator animator = animatorObject.AddComponent<MatchAnimator>();
+            Wire(animator,
+                ("session", session), ("presenter", presenter), ("hud", hud),
+                ("timing", timing), ("audioFeedback", audioFeedback), ("matchCamera", camera),
+                ("floatingNumberPrefab", numberPrefab.GetComponent<FloatingNumber>()),
+                ("effectLayer", effectLayer.transform));
 
             GameObject bootstrapObject = new GameObject("MatchBootstrap");
             bootstrapObject.transform.SetParent(systems.transform, false);
@@ -399,12 +446,15 @@ namespace CoH.Editor
             collider.size = new Vector3(3.0f, 0.6f, 1.45f);
             collider.center = new Vector3(0f, 0.3f, 0f);
 
+            Transform impact = Anchor(root, "ImpactAnchor", new Vector3(0f, 0.4f, 0f), Vector3.zero);
+
             Wire(view,
                 ("plate", plate), ("portrait", portrait),
                 ("healthPlate", healthPlate), ("armorPlate", armorPlate),
                 ("armorBadge", armorBadge), ("targetRing", targetRing),
                 ("nameText", nameText), ("healthText", healthText),
-                ("armorText", armorText), ("countersText", countersText));
+                ("armorText", armorText), ("countersText", countersText),
+                ("impactAnchor", impact));
 
             return view;
         }
@@ -425,6 +475,39 @@ namespace CoH.Editor
         /// The empty slot held open under a card being dragged over the board.
         /// A footprint the size of a minion, lying where that minion will stand.
         /// </summary>
+        /// <summary>
+        /// A small stack standing in for a deck. Decorative, so it carries no
+        /// collider and cannot swallow a click meant for the board.
+        /// </summary>
+        private static void BuildDeckStack(GameObject parent, string name, Vector3 position)
+        {
+            GameObject root = new GameObject(name + "Stack");
+            root.transform.SetParent(parent.transform, false);
+            root.transform.position = position;
+
+            for (int layer = 0; layer < 4; layer++)
+            {
+                Slab(root, "Layer" + layer,
+                    new Vector3(0f, 0.06f + layer * 0.075f, 0f),
+                    new Vector3(0.72f, 0.07f, 0.98f),
+                    layer % 2 == 0 ? "M_CardBack" : "M_CardBackInlay");
+            }
+        }
+
+        /// <summary>A damage number that rises off a character and fades.</summary>
+        private static GameObject BuildFloatingNumberPrefab()
+        {
+            GameObject root = new GameObject("P_FloatingNumber");
+            FloatingNumber number = root.AddComponent<FloatingNumber>();
+
+            TextMeshPro label = FacingText(root, "Label",
+                Vector3.zero, new Vector2(1.6f, 0.5f), 3.4f, Color.white, bold: true);
+
+            Wire(number, ("label", label));
+
+            return SavePrefab(root, PrefabFolder + "/P_FloatingNumber.prefab");
+        }
+
         private static BoardInsertionMarker BuildInsertionMarker(GameObject parent)
         {
             GameObject root = new GameObject("BoardInsertionMarker");
@@ -567,6 +650,32 @@ namespace CoH.Editor
             label.alignment = TextAlignmentOptions.Center;
             label.text = "END TURN";
 
+            // --- Turn banner -----------------------------------------------
+            // Large and central: it says whose board this now is, and it covers
+            // the moment the table swings round.
+            GameObject banner = new GameObject("TurnBanner", typeof(RectTransform));
+            banner.transform.SetParent(hudObject.transform, false);
+            RectTransform bannerRect = (RectTransform)banner.transform;
+            Anchor(bannerRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            bannerRect.anchoredPosition = new Vector2(0f, 150f);
+            bannerRect.sizeDelta = new Vector2(1100f, 150f);
+
+            CanvasGroup bannerGroup = banner.AddComponent<CanvasGroup>();
+            bannerGroup.blocksRaycasts = false;
+            bannerGroup.interactable = false;
+            bannerGroup.alpha = 0f;
+
+            Image bannerBackground = banner.AddComponent<Image>();
+            bannerBackground.color = new Color(0f, 0f, 0f, 0.55f);
+            bannerBackground.raycastTarget = false;
+
+            TextMeshProUGUI bannerLabel = UiText(banner, "BannerText", Vector2.zero, new Vector2(1060f, 130f), 66f);
+            bannerLabel.fontStyle = FontStyles.Bold;
+            Anchor(bannerLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            bannerLabel.rectTransform.anchoredPosition = Vector2.zero;
+            bannerLabel.alignment = TextAlignmentOptions.Center;
+            banner.SetActive(false);
+
             // --- Result ----------------------------------------------------
             GameObject resultPanel = new GameObject("ResultPanel", typeof(RectTransform));
             resultPanel.transform.SetParent(hudObject.transform, false);
@@ -576,6 +685,10 @@ namespace CoH.Editor
             Image resultBackground = resultPanel.AddComponent<Image>();
             resultBackground.color = new Color(0f, 0f, 0f, 0.82f);
             resultBackground.raycastTarget = false;
+
+            CanvasGroup resultGroup = resultPanel.AddComponent<CanvasGroup>();
+            resultGroup.blocksRaycasts = false;
+            resultGroup.interactable = false;
 
             TextMeshProUGUI result = UiText(resultPanel, "ResultText", Vector2.zero, new Vector2(950f, 200f), 76f);
             result.fontStyle = FontStyles.Bold;
@@ -588,7 +701,9 @@ namespace CoH.Editor
                 ("turnText", turn), ("activePlayerText", active), ("manaText", mana),
                 ("hintText", hint), ("debugText", debug),
                 ("endTurnButton", button), ("endTurnLabel", label),
-                ("resultPanel", resultPanel), ("resultText", result));
+                ("bannerGroup", bannerGroup), ("bannerText", bannerLabel),
+                ("resultPanel", resultPanel), ("resultText", result),
+                ("resultGroup", resultGroup), ("resultRect", resultRect));
 
             return hud;
         }

@@ -35,9 +35,15 @@ namespace CoH.Presentation
         [SerializeField] private Button endTurnButton;
         [SerializeField] private TextMeshProUGUI endTurnLabel;
 
+        [Header("Turn banner")]
+        [SerializeField] private CanvasGroup bannerGroup;
+        [SerializeField] private TextMeshProUGUI bannerText;
+
         [Header("Result")]
         [SerializeField] private GameObject resultPanel;
         [SerializeField] private TextMeshProUGUI resultText;
+        [SerializeField] private CanvasGroup resultGroup;
+        [SerializeField] private RectTransform resultRect;
 
         /// <summary>Raised when the player asks to end the turn.</summary>
         public event Action EndTurnRequested;
@@ -52,6 +58,47 @@ namespace CoH.Presentation
             if (resultPanel != null)
             {
                 resultPanel.SetActive(false);
+            }
+
+            SetBannerAlpha(0f);
+        }
+
+        /// <summary>Names the turn that is beginning. Shown by the turn animation.</summary>
+        public void SetBannerText(string text)
+        {
+            if (bannerText != null)
+            {
+                bannerText.text = text;
+            }
+        }
+
+        /// <summary>
+        /// Fades the turn banner. Driven from outside rather than run here, so
+        /// the presentation queue can wait for it like anything else.
+        /// </summary>
+        public void SetBannerAlpha(float alpha)
+        {
+            if (bannerGroup != null)
+            {
+                bannerGroup.alpha = Mathf.Clamp01(alpha);
+                bannerGroup.gameObject.SetActive(alpha > 0.001f);
+            }
+        }
+
+        /// <summary>Brings the result in, from nothing to fully present.</summary>
+        public void SetResultReveal(float amount)
+        {
+            float t = Mathf.Clamp01(amount);
+
+            if (resultGroup != null)
+            {
+                resultGroup.alpha = t;
+            }
+
+            if (resultRect != null)
+            {
+                // Unclamped, so an overshooting curve is allowed to overshoot.
+                resultRect.localScale = Vector3.one * Mathf.LerpUnclamped(0.7f, 1f, amount);
             }
         }
 
@@ -97,12 +144,18 @@ namespace CoH.Presentation
                 "   entities " + state.EntityCount);
         }
 
+        /// <summary>
+        /// Puts the result up, hidden. The reveal is a separate step so the
+        /// animation controls when it is actually seen.
+        /// </summary>
         public void ShowResult(GameResult result)
         {
             if (resultPanel != null)
             {
                 resultPanel.SetActive(true);
             }
+
+            SetResultReveal(0f);
 
             Set(resultText, result switch
             {
