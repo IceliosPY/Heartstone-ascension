@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using CoH.Core.Cards;
+using CoH.Core.Effects;
+using CoH.Core.Rules.Effects;
 using CoH.Core.Commands;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
@@ -299,7 +301,9 @@ namespace CoH.Core.Rules
                 return RejectionReason.CardNotInHand;
             }
 
-            if (definition.Type != CardType.Minion)
+            bool isMinion = definition.Type == CardType.Minion;
+
+            if (!isMinion && definition.Type != CardType.Spell)
             {
                 return RejectionReason.CardTypeNotPlayable;
             }
@@ -309,19 +313,128 @@ namespace CoH.Core.Rules
                 return RejectionReason.NotEnoughMana;
             }
 
-            if (player.Board.IsFull)
+            if (isMinion && player.Board.IsFull)
             {
                 return RejectionReason.BoardFull;
             }
 
             // Rightmost is the one negative value that means something.
-            if (command.BoardPosition != PlayCardCommand.Rightmost &&
+            if (isMinion &&
+                command.BoardPosition != PlayCardCommand.Rightmost &&
                 (command.BoardPosition < 0 || command.BoardPosition > player.Board.Count))
             {
                 return RejectionReason.InvalidBoardPosition;
             }
 
+            return ValidateTarget(definition, command.PlayerId, command.TargetId);
+        }
+
+        /// <summary>
+        /// Checks what the player pointed at, if anything.
+        ///
+        /// The rule differs between a spell and a minion, and that difference is
+        /// Hearthstone's rather than ours. A spell is only its effect, so with
+        /// nothing legal to aim at there is nothing to buy and it cannot be
+        /// cast. A minion is also a body, so it goes down and the battlecry
+        /// simply does not happen. Where a target does exist, both must point at
+        /// one: Hearthstone gives no option to decline.
+        /// </summary>
+        private RejectionReason ValidateTarget(
+            CardDefinition definition, PlayerId controller, EntityId targetId)
+        {
+            PlayTargetRequirement requirement = TargetRequirementOf(definition);
+
+            if (requirement == PlayTargetRequirement.None)
+            {
+                return targetId.IsNone ? RejectionReason.None : RejectionReason.InvalidTarget;
+            }
+
+            SelectorDefinition selector = EffectQueries.FindPlayTargetSelector(definition.Effects);
+
+            List<EntityId> legal = new List<EntityId>();
+            SelectorResolver.CollectLegalTargets(State, selector, controller, legal);
+
+            if (legal.Count == 0)
+            {
+                // Nothing to aim at. A spell is unplayable; a minion is played
+                // and its battlecry finds nobody.
+                if (requirement == PlayTargetRequirement.Required)
+                {
+                    return RejectionReason.InvalidTarget;
+                }
+
+                return targetId.IsNone ? RejectionReason.None : RejectionReason.InvalidTarget;
+            }
+
+            if (targetId.IsNone || !legal.Contains(targetId))
+            {
+                return RejectionReason.InvalidTarget;
+            }
+
             return RejectionReason.None;
+        }
+
+        private static PlayTargetRequirement TargetRequirementOf(CardDefinition definition)
+        {
+            if (EffectQueries.FindPlayTargetSelector(definition.Effects) == null)
+            {
+                return PlayTargetRequirement.None;
+            }
+
+            return definition.Type == CardType.Spell
+                ? PlayTargetRequirement.Required
+                : PlayTargetRequirement.Optional;
+        }
+
+        /// <summary>
+        /// Whether playing this card asks the player to point at something.
+        ///
+        /// Read only, and the same answer the validation will give. A client
+        /// asks rather than inspecting the card's effects and inventing a rule
+        /// of its own, which is the only way the highlighted list a player sees
+        /// can be the list the engine checks their answer against.
+        /// </summary>
+        public PlayTargetRequirement GetPlayTargetRequirement(PlayerId playerId, EntityId cardInstanceId)
+        {
+            if (playerId.IsNone)
+            {
+                return PlayTargetRequirement.None;
+            }
+
+            CardInstance card = FindInHand(State.GetPlayer(playerId), cardInstanceId);
+
+            if (card == null || !State.Catalog.TryGet(card.CardId, out CardDefinition definition))
+            {
+                return PlayTargetRequirement.None;
+            }
+
+            return TargetRequirementOf(definition);
+        }
+
+        /// <summary>
+        /// Everything this card may legally be aimed at right now, in a fixed
+        /// order. Empty when it takes no target, or when nothing qualifies.
+        /// </summary>
+        public IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId)
+        {
+            List<EntityId> targets = new List<EntityId>();
+
+            if (playerId.IsNone)
+            {
+                return targets;
+            }
+
+            CardInstance card = FindInHand(State.GetPlayer(playerId), cardInstanceId);
+
+            if (card == null || !State.Catalog.TryGet(card.CardId, out CardDefinition definition))
+            {
+                return targets;
+            }
+
+            SelectorResolver.CollectLegalTargets(
+                State, EffectQueries.FindPlayTargetSelector(definition.Effects), playerId, targets);
+
+            return targets;
         }
 
         private RejectionReason ValidateEndTurn(EndTurnCommand command)

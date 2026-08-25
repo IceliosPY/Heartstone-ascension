@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.Server;
 using CoH.Core.State;
@@ -102,6 +103,24 @@ namespace CoH.Presentation
             _server == null
                 ? Array.Empty<EntityId>()
                 : _server.GetLegalAttackTargets(playerId, attackerId);
+
+        /// <summary>
+        /// Whether playing this card asks the player to point at something.
+        ///
+        /// Asked of the engine rather than worked out from the card's effects,
+        /// so that what the view highlights is exactly what the engine will
+        /// accept. The view has no opinion about targeting at all.
+        /// </summary>
+        public PlayTargetRequirement GetPlayTargetRequirement(PlayerId playerId, EntityId cardInstanceId) =>
+            _server == null
+                ? PlayTargetRequirement.None
+                : _server.GetPlayTargetRequirement(playerId, cardInstanceId);
+
+        /// <summary>Everything this card may legally be aimed at right now.</summary>
+        public IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId) =>
+            _server == null
+                ? Array.Empty<EntityId>()
+                : _server.GetLegalPlayTargets(playerId, cardInstanceId);
 
         /// <summary>
         /// Whether a minion could attack at all, and why not when it could not.

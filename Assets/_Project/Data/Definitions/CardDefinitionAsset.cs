@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoH.Core.Cards;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using UnityEngine;
 
@@ -46,6 +47,10 @@ namespace CoH.Data
         [Tooltip("Health for a minion, durability for a weapon, unused otherwise.")]
         [SerializeField] private int health;
 
+        [Header("Effects")]
+        [Tooltip("What this card does, in order. A card with none is a plain body.")]
+        [SerializeField] private List<AuthoredEffect> effects = new List<AuthoredEffect>();
+
         [Header("Presentation")]
         [Tooltip("Shown to the player. Never read by the engine to work out what the card does.")]
         [TextArea(2, 4)]
@@ -62,6 +67,9 @@ namespace CoH.Data
         public string DisplayName => displayName;
 
         public CardType CardType => cardType;
+
+        /// <summary>What this card does, as authored.</summary>
+        public IReadOnlyList<AuthoredEffect> Effects => effects;
 
         public bool Collectible => collectible;
 
@@ -87,7 +95,30 @@ namespace CoH.Data
                 cardClass,
                 rarity,
                 tribe,
-                rulesText);
+                rulesText,
+                ConvertEffects());
+
+        /// <summary>
+        /// Converts the authored effects in order, and keeps that order. A card
+        /// that damages and then draws must do so in that order, so nothing here
+        /// sorts, groups or filters.
+        /// </summary>
+        private EffectDefinition[] ConvertEffects()
+        {
+            if (effects == null || effects.Count == 0)
+            {
+                return System.Array.Empty<EffectDefinition>();
+            }
+
+            EffectDefinition[] converted = new EffectDefinition[effects.Count];
+
+            for (int index = 0; index < effects.Count; index++)
+            {
+                converted[index] = effects[index].ToDefinition();
+            }
+
+            return converted;
+        }
 
         /// <summary>
         /// Appends everything wrong with this card to <paramref name="problems"/>.
@@ -142,6 +173,48 @@ namespace CoH.Data
             if (cardType == CardType.Weapon && health <= 0)
             {
                 problems.Add(label + ": a weapon needs at least 1 durability.");
+            }
+
+            ValidateEffects(label, problems);
+        }
+
+        private void ValidateEffects(string label, List<string> problems)
+        {
+            if (effects == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < effects.Count; index++)
+            {
+                if (effects[index] == null)
+                {
+                    problems.Add(label + " effect [" + index + "]: the entry is empty.");
+                    continue;
+                }
+
+                effects[index].Validate(label, index, cardType, problems);
+            }
+        }
+
+        /// <summary>
+        /// Checks the effects against the rest of the catalog, which a card
+        /// cannot do alone: a summon naming a card nobody has is only visible
+        /// once every card is known.
+        /// </summary>
+        public void ValidateAgainstCatalog(
+            IReadOnlyDictionary<string, CardType> knownCards, List<string> problems)
+        {
+            if (effects == null)
+            {
+                return;
+            }
+
+            string label = string.IsNullOrEmpty(cardId) ? name : cardId;
+
+            for (int index = 0; index < effects.Count; index++)
+            {
+                effects[index]?.ValidateAgainstCatalog(label, index, knownCards, problems);
             }
         }
     }

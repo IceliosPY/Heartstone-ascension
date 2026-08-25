@@ -83,8 +83,7 @@ namespace CoH.Tests.EditMode
             // The example from the design brief: a printed 2 mana 2/3 that is a
             // 4/5 on the board having taken 2 damage.
             Minion minion = game.CreateMinion(MinionId, PlayerId.One);
-            minion.AttackModifier = 2;
-            minion.HealthModifier = 2;
+            minion.AddModifier(2, 2);
             minion.Damage = 2;
 
             Assert.That(minion.Attack, Is.EqualTo(4));
@@ -104,12 +103,12 @@ namespace CoH.Tests.EditMode
 
             // This is exactly why damage is stored instead of current health.
             Minion minion = game.CreateMinion(MinionId, PlayerId.One);
-            minion.HealthModifier = 2;   // 2/5
-            minion.Damage = 4;           // 1 health left
+            StatModifier buff = minion.AddModifier(0, 2);   // 2/5
+            minion.Damage = 4;                              // 1 health left
 
             Assert.That(minion.CurrentHealth, Is.EqualTo(1));
 
-            minion.HealthModifier = 0;   // the buff expires, back to 3 max health
+            minion.RemoveModifier(buff.Order);   // the buff expires, back to 3 max health
 
             Assert.That(minion.MaxHealth, Is.EqualTo(3));
             Assert.That(minion.CurrentHealth, Is.EqualTo(-1));

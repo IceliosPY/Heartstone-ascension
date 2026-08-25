@@ -36,7 +36,9 @@ namespace CoH.Editor
         private const string MaterialFolder = "Assets/_Project/Art/Placeholder";
 
         private const string CatalogPath = "Assets/_Project/Data/Catalog/CardCatalog_Starter.asset";
-        private const string DeckPath = "Assets/_Project/Data/Decks/Deck_TestSoldier.asset";
+        // The development deck holds every demonstration card, so a match can
+        // reach all of them without a deck builder existing yet.
+        private const string DeckPath = "Assets/_Project/Data/Decks/Deck_Development.asset";
 
         // The HearthCards canvas, used only as a coordinate system.
         private const float CanvasWidth = 800f;

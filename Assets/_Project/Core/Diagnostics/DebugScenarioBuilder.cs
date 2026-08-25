@@ -114,8 +114,10 @@ namespace CoH.Core.Diagnostics
                 minion.Damage = described_minion.Damage;
                 minion.AttacksThisTurn = described_minion.AttacksThisTurn;
                 minion.SummonedOnTurn = described_minion.SummonedOnTurn;
-                minion.AttackModifier = described_minion.AttackModifier;
-                minion.HealthModifier = described_minion.HealthModifier;
+                if (described_minion.AttackModifier != 0 || described_minion.HealthModifier != 0)
+                {
+                    minion.AddModifier(described_minion.AttackModifier, described_minion.HealthModifier);
+                }
 
                 // Handed out here for the same reason a summon hands one out:
                 // order of entry decides who dies first when two die together.

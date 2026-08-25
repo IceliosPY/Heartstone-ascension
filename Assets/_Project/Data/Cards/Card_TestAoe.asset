@@ -10,18 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 512e9c72a07f5d741a056d6bedfd5840, type: 3}
-  m_Name: Card_TestSoldier
+  m_Name: Card_TestAoe
   m_EditorClassIdentifier: 
-  cardId: test_soldier
-  displayName: Test Soldier
-  cardType: 1
+  cardId: test_aoe
+  displayName: Test Volley
+  cardType: 2
   cardClass: 0
   rarity: 0
   tribe: 0
   collectible: 1
   manaCost: 2
-  attack: 2
-  health: 3
-  effects: []
-  rulesText: 
+  attack: 0
+  health: 0
+  effects:
+  - trigger: 1
+    selector: 6
+    targetFilter: 0
+    action: 1
+    amount: 1
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: 
+    summonCount: 1
+    placement: 0
+  rulesText: Deal 1 damage to all enemy minions.
   artwork: {fileID: 0}

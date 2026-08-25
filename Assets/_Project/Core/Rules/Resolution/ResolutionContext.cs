@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using CoH.Core.Effects;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
+using CoH.Core.Rules.Effects;
 using CoH.Core.State;
 
 namespace CoH.Core.Rules.Resolution
@@ -37,6 +39,7 @@ namespace CoH.Core.Rules.Resolution
         private readonly Queue<ResolutionAction> _queue = new Queue<ResolutionAction>();
         private readonly List<GameEvent> _events = new List<GameEvent>();
         private readonly List<Entity> _dyingBuffer = new List<Entity>();
+        private readonly List<DeathrattleWork> _deathrattleBuffer = new List<DeathrattleWork>();
 
         public ResolutionContext(GameState state)
         {
@@ -113,9 +116,9 @@ namespace CoH.Core.Rules.Resolution
         /// exactly the bug that makes two minions trading fail to kill each
         /// other.
         ///
-        /// The loop repeats because processing deaths can create new ones once
-        /// deathrattles and auras exist. With neither implemented it settles on
-        /// the second pass.
+        /// The loop repeats because processing deaths can create new ones: a
+        /// deathrattle that summons something into a board sweep, or that
+        /// finishes a hero off, produces more work and another pass.
         /// </summary>
         private void RunDeathPhase()
         {
@@ -140,14 +143,29 @@ namespace CoH.Core.Rules.Resolution
 
                 _dyingBuffer.Sort(DeathOrder.Comparer);
 
+                // Removed first, all of them, and only then are deathrattles
+                // queued. A deathrattle therefore sees a board with every one of
+                // this phase's dead already gone, rather than a board that is
+                // still being cleared around it.
+                _deathrattleBuffer.Clear();
+
                 for (int index = 0; index < _dyingBuffer.Count; index++)
                 {
-                    RemoveFromPlay(_dyingBuffer[index]);
+                    int boardPosition = RemoveFromPlay(_dyingBuffer[index]);
+
+                    if (_dyingBuffer[index] is Minion dead)
+                    {
+                        _deathrattleBuffer.Add(new DeathrattleWork(dead, boardPosition));
+                    }
                 }
 
-                // Extension point (Phase 11): deathrattles are queued here, in
-                // the same order as the removals above, so that they resolve
-                // after every death of this phase has been applied.
+                // In the order the deaths were sequenced in, which is oldest
+                // first by order of entry, the ordering settled in Phase 3.
+                for (int index = 0; index < _deathrattleBuffer.Count; index++)
+                {
+                    EffectResolver.TriggerDeathrattle(
+                        this, State, _deathrattleBuffer[index].Minion, _deathrattleBuffer[index].BoardPosition);
+                }
 
                 ContinuousEffects.Recalculate(State);
             }
@@ -185,12 +203,12 @@ namespace CoH.Core.Rules.Resolution
             }
         }
 
-        private void RemoveFromPlay(Entity entity)
+        /// <summary>Removes one entity and reports where it stood, or -1.</summary>
+        private int RemoveFromPlay(Entity entity)
         {
             if (entity is Minion minion)
             {
-                RemoveMinion(minion);
-                return;
+                return RemoveMinion(minion);
             }
 
             if (entity is Hero hero)
@@ -198,9 +216,11 @@ namespace CoH.Core.Rules.Resolution
                 hero.HasDied = true;
                 Emit(new HeroDiedEvent(hero.Owner, hero.Id));
             }
+
+            return -1;
         }
 
-        private void RemoveMinion(Minion minion)
+        private int RemoveMinion(Minion minion)
         {
             Player controller = State.GetPlayer(minion.Controller);
             int boardPosition = controller.Board.IndexOf(minion);
@@ -218,6 +238,25 @@ namespace CoH.Core.Rules.Resolution
                 minion.Id,
                 minion.CardId,
                 boardPosition));
+
+            return boardPosition;
+        }
+
+        /// <summary>
+        /// A death waiting to have its deathrattle queued, with the place it
+        /// happened, which the state has already forgotten.
+        /// </summary>
+        private readonly struct DeathrattleWork
+        {
+            public DeathrattleWork(Minion minion, int boardPosition)
+            {
+                Minion = minion;
+                BoardPosition = boardPosition;
+            }
+
+            public Minion Minion { get; }
+
+            public int BoardPosition { get; }
         }
 
         /// <summary>

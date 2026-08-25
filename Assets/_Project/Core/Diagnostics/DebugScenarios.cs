@@ -20,6 +20,12 @@ namespace CoH.Core.Diagnostics
     {
         public const string TestSoldier = "test_soldier";
         public const string TheCoin = "the_coin";
+        public const string TestToken = "test_token";
+        public const string TestBattlecryDamage = "test_battlecry_damage";
+        public const string TestDeathrattleDraw = "test_deathrattle_draw";
+        public const string TestSummoner = "test_summoner";
+        public const string TestBuff = "test_buff";
+        public const string TestAoe = "test_aoe";
 
         public const string ReadyCombatId = "ready_combat";
         public const string BothSurviveId = "both_survive";
@@ -29,6 +35,13 @@ namespace CoH.Core.Diagnostics
         public const string FatigueId = "fatigue";
         public const string SevenMinionBoardId = "seven_minion_board";
 
+        public const string CoinId = "coin";
+        public const string BattlecryTargetId = "battlecry_target";
+        public const string DeathrattleId = "deathrattle";
+        public const string SummonId = "summon";
+        public const string BuffId = "buff";
+        public const string AoeId = "aoe";
+
         private static readonly DebugScenario[] Catalogue =
         {
             ReadyCombat,
@@ -37,7 +50,13 @@ namespace CoH.Core.Diagnostics
             HeroLethal,
             FullHand,
             Fatigue,
-            SevenMinionBoard
+            SevenMinionBoard,
+            Coin,
+            BattlecryTarget,
+            Deathrattle,
+            Summon,
+            Buff,
+            AreaDamage
         };
 
         /// <summary>Everything on offer, in a fixed order.</summary>
@@ -140,6 +159,73 @@ namespace CoH.Core.Diagnostics
             activePlayer: PlayerId.One);
 
         // ------------------------------------------------------------------
+        //  Effects
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Two crystals and a Coin. Playing it has to reach three spendable
+        /// mana while leaving the crystals owned at two.
+        /// </summary>
+        public static DebugScenario Coin => new DebugScenario(
+            CoinId,
+            "Player one holds The Coin on two crystals. Playing it gives a third for this turn only.",
+            one: Side(maxMana: 2, availableMana: 2, hand: new[] { TheCoin, TestSoldier, TestSoldier }),
+            two: Side(),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>A targeted battlecry with something worth aiming it at.</summary>
+        public static DebugScenario BattlecryTarget => new DebugScenario(
+            BattlecryTargetId,
+            "Player one holds a targeted battlecry. Player two has a minion and a hero to aim it at.",
+            one: Side(hand: new[] { TestBattlecryDamage, TestBattlecryDamage }),
+            two: Side(board: new[] { Soldier() }),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>
+        /// A minion whose death draws a card, standing in front of something
+        /// that will finish it in one exchange.
+        /// </summary>
+        public static DebugScenario Deathrattle => new DebugScenario(
+            DeathrattleId,
+            "Player one has a minion that draws when it dies, and an attack that will kill it.",
+            one: Side(board: new[] { Minion(TestDeathrattleDraw) }),
+            two: Side(board: new[] { Soldier() }),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>A battlecry that puts two more bodies down beside it.</summary>
+        public static DebugScenario Summon => new DebugScenario(
+            SummonId,
+            "Player one holds a minion whose battlecry summons two tokens.",
+            one: Side(hand: new[] { TestSummoner, TestSummoner }, board: new[] { Soldier() }),
+            two: Side(),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>A targeted buff and a friendly minion to put it on.</summary>
+        public static DebugScenario Buff => new DebugScenario(
+            BuffId,
+            "Player one holds a buff and has a minion to give it to.",
+            one: Side(hand: new[] { TestBuff, TestBuff }, board: new[] { Soldier() }),
+            two: Side(),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>
+        /// A sweep and three minions on one health, so one damage finishes all
+        /// three and the death phase has to handle them together.
+        /// </summary>
+        public static DebugScenario AreaDamage => new DebugScenario(
+            AoeId,
+            "Player one holds a sweep. Player two has three minions on one health, so all three die at once.",
+            one: Side(hand: new[] { TestAoe, TestAoe }),
+            two: Side(board: new[] { Soldier(damage: 2), Soldier(damage: 2), Soldier(damage: 2) }),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        // ------------------------------------------------------------------
 
         private static ScenarioPlayer Side(
             int heroHealth = 30,
@@ -159,6 +245,10 @@ namespace CoH.Core.Diagnostics
         /// <summary>Summoned two turns ago, so it is never summoning sick.</summary>
         private static ScenarioMinion Soldier(int damage = 0, int attacksThisTurn = 0) =>
             new ScenarioMinion(TestSoldier, damage, attacksThisTurn, summonedOnTurn: 3);
+
+        /// <summary>Any other minion, also old enough to act.</summary>
+        private static ScenarioMinion Minion(string cardId, int damage = 0) =>
+            new ScenarioMinion(cardId, damage, attacksThisTurn: 0, summonedOnTurn: 3);
 
         private static ScenarioMinion[] Soldiers(int count)
         {

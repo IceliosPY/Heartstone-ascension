@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using CoH.Core.Cards;
+using CoH.Core.Effects;
 
 namespace CoH.Core.Diagnostics
 {
@@ -53,8 +54,31 @@ namespace CoH.Core.Diagnostics
                     .Append('|').Append(card.Collectible ? '1' : '0')
                     .Append('|').Append(card.Class)
                     .Append('|').Append(card.Rarity)
-                    .Append('|').Append(card.Tribe)
-                    .Append('\n');
+                    .Append('|').Append(card.Tribe);
+
+                // What a card does is the most gameplay-relevant thing
+                // about it. Re-tuning a battlecry from two damage to
+                // three has to invalidate a replay of a match it was in,
+                // exactly as changing its cost does.
+                text.Append('|').Append(card.Effects.Count);
+
+                for (int effect = 0; effect < card.Effects.Count; effect++)
+                {
+                    EffectDefinition described = card.Effects[effect];
+
+                    text.Append('|').Append(described.Trigger)
+                        .Append(':').Append(described.Selector.Kind)
+                        .Append(':').Append(described.Selector.Filter)
+                        .Append(':').Append(described.Action.Kind)
+                        .Append(':').Append(Number(described.Action.Amount))
+                        .Append(':').Append(Number(described.Action.AttackDelta))
+                        .Append(':').Append(Number(described.Action.HealthDelta))
+                        .Append(':').Append(described.Action.SummonCardId.Value)
+                        .Append(':').Append(Number(described.Action.SummonCount))
+                        .Append(':').Append(described.Action.Placement);
+                }
+
+                text.Append('\n');
             }
 
             return text.ToString();

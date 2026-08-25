@@ -151,8 +151,25 @@ namespace CoH.Core.Diagnostics
                     .Append(" doomed=").Append(Flag(minion.IsMarkedForDestruction))
                     .Append(" owner=").Append(Seat(minion.Owner))
                     .Append(" controller=").Append(Seat(minion.Controller))
-                    .Append(" ts=").Append(Number(minion.Timestamp))
-                    .Append('\n');
+                    .Append(" ts=").Append(Number(minion.Timestamp));
+
+                // Written out one by one rather than as a total, because
+                // two minions holding the same totals through different
+                // buffs are two different positions the moment anything
+                // removes one of them.
+                text.Append(" mods=").Append(Number(minion.Modifiers.Count));
+
+                for (int mod = 0; mod < minion.Modifiers.Count; mod++)
+                {
+                    StatModifier modifier = minion.Modifiers[mod];
+
+                    text.Append(' ').Append(Number(modifier.Order))
+                        .Append(':').Append(Signed(modifier.AttackDelta))
+                        .Append('/').Append(Signed(modifier.HealthDelta))
+                        .Append(':').Append(modifier.Source);
+                }
+
+                text.Append('\n');
             }
         }
 

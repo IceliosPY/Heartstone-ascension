@@ -1,6 +1,8 @@
 using CoH.Core.Cards;
+using CoH.Core.Effects;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
+using CoH.Core.Rules.Effects;
 using CoH.Core.Rules.Resolution;
 using CoH.Core.State;
 
@@ -49,7 +51,14 @@ namespace CoH.Core.Rules.Actions
                 return;
             }
 
-            if (definition.Type != CardType.Minion || player.Board.IsFull)
+            bool isMinion = definition.Type == CardType.Minion;
+
+            if (!isMinion && definition.Type != CardType.Spell)
+            {
+                return;
+            }
+
+            if (isMinion && player.Board.IsFull)
             {
                 return;
             }
@@ -68,11 +77,28 @@ namespace CoH.Core.Rules.Actions
 
             context.Emit(new CardPlayedEvent(player.Id, card.Id, card.CardId, _targetId));
 
-            SummonRules.Summon(context, player, card.CardId, _boardPosition);
+            if (!isMinion)
+            {
+                // A spell is nothing but its effects, so playing it and
+                // resolving it are the same moment. It is already in the
+                // graveyard, exactly as in Hearthstone, before it does anything.
+                EffectResolver.TriggerOnPlay(context, definition, card, player.Id, _targetId);
+                return;
+            }
 
-            // Extension point (Phase 11): a battlecry is queued here, after the
-            // minion is already on the board, which is where Hearthstone
-            // resolves it from.
+            Minion minion = SummonRules.Summon(context, player, card.CardId, _boardPosition);
+
+            if (minion == null)
+            {
+                return;
+            }
+
+            // Queued after the minion is already standing on the board, which is
+            // where Hearthstone resolves a battlecry from. It is why a battlecry
+            // that damages every minion damages its own, and why one that counts
+            // your minions counts itself.
+            EffectResolver.TriggerBattlecry(
+                context, definition, minion, card.Id, _targetId, player.Board.IndexOf(minion));
         }
 
         private static CardInstance FindInHand(Player player, EntityId cardInstanceId)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
 using CoH.Core.Rules;
@@ -72,5 +73,11 @@ namespace CoH.Core.Server
 
         public RejectionReason CanAttack(PlayerId playerId, EntityId attackerId) =>
             _engine.CanAttack(playerId, attackerId);
+
+        public PlayTargetRequirement GetPlayTargetRequirement(PlayerId playerId, EntityId cardInstanceId) =>
+            _engine.GetPlayTargetRequirement(playerId, cardInstanceId);
+
+        public IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId) =>
+            _engine.GetLegalPlayTargets(playerId, cardInstanceId);
     }
 }

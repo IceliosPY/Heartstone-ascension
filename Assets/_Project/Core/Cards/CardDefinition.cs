@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 
 namespace CoH.Core.Cards
@@ -30,7 +32,8 @@ namespace CoH.Core.Cards
             CardClass cardClass = CardClass.Neutral,
             Rarity rarity = Rarity.Free,
             Tribe tribe = Tribe.None,
-            string text = "")
+            string text = "",
+            IReadOnlyList<EffectDefinition> effects = null)
         {
             if (id.IsNone)
             {
@@ -53,7 +56,26 @@ namespace CoH.Core.Cards
             Rarity = rarity;
             Tribe = tribe;
             Text = text ?? string.Empty;
+
+            Effects = effects == null || effects.Count == 0
+                ? NoEffects
+                : new List<EffectDefinition>(effects).ToArray();
         }
+
+        private static readonly EffectDefinition[] NoEffects = Array.Empty<EffectDefinition>();
+
+        /// <summary>
+        /// What this card does, in the order it was written.
+        ///
+        /// A card with none is a plain body, exactly as every card was before
+        /// this existed. Order is kept because a card that damages and then
+        /// draws must do so in that order, and nothing anywhere sorts or groups
+        /// this list.
+        /// </summary>
+        public IReadOnlyList<EffectDefinition> Effects { get; }
+
+        /// <summary>True when this card does something beyond being a body.</summary>
+        public bool HasEffects => Effects.Count > 0;
 
         public CardId Id { get; }
 

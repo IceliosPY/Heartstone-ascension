@@ -10,18 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 512e9c72a07f5d741a056d6bedfd5840, type: 3}
-  m_Name: Card_TestSoldier
+  m_Name: Card_TestBuff
   m_EditorClassIdentifier: 
-  cardId: test_soldier
-  displayName: Test Soldier
+  cardId: test_buff
+  displayName: Test Quartermaster
   cardType: 1
   cardClass: 0
   rarity: 0
   tribe: 0
   collectible: 1
   manaCost: 2
-  attack: 2
-  health: 3
-  effects: []
-  rulesText: 
+  attack: 1
+  health: 2
+  effects:
+  - trigger: 2
+    selector: 2
+    targetFilter: 3
+    action: 5
+    amount: 0
+    attackDelta: 1
+    healthDelta: 1
+    summonCardId: 
+    summonCount: 1
+    placement: 0
+  rulesText: 'Battlecry: Give a friendly minion +1/+1.'
   artwork: {fileID: 0}

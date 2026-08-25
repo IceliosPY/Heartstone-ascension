@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CoH.Core.Cards;
 using CoH.Core.Identifiers;
 
@@ -16,6 +17,8 @@ namespace CoH.Core.State
     /// </summary>
     public sealed class Minion : Entity
     {
+        private readonly List<StatModifier> _modifiers = new List<StatModifier>();
+
         internal Minion(EntityId id, PlayerId owner, CardDefinition definition)
             : base(id, owner)
         {
@@ -47,9 +50,66 @@ namespace CoH.Core.State
         /// <summary>Health copied from the definition at summon time, then possibly overwritten by effects.</summary>
         public int BaseHealth { get; internal set; }
 
-        public int AttackModifier { get; internal set; }
+        /// <summary>
+        /// Everything currently changing this minion's statistics, in the order
+        /// it was applied.
+        ///
+        /// A list rather than two totals, so that what was added can later be
+        /// taken away again. Nothing removes one yet; silence and expiring buffs
+        /// are what it is here for.
+        /// </summary>
+        public IReadOnlyList<StatModifier> Modifiers => _modifiers;
 
-        public int HealthModifier { get; internal set; }
+        /// <summary>Total attack change from every modifier.</summary>
+        public int AttackModifier { get; private set; }
+
+        /// <summary>Total maximum health change from every modifier.</summary>
+        public int HealthModifier { get; private set; }
+
+        /// <summary>
+        /// Applies a lasting change and returns it.
+        ///
+        /// The totals are kept alongside the list because effective attack is
+        /// read constantly and the list only ever grows by a handful.
+        /// </summary>
+        internal StatModifier AddModifier(
+            int attackDelta, int healthDelta, ModifierSource source = ModifierSource.Effect)
+        {
+            StatModifier modifier = new StatModifier(
+                _modifiers.Count + 1, attackDelta, healthDelta, source);
+
+            _modifiers.Add(modifier);
+
+            AttackModifier += attackDelta;
+            HealthModifier += healthDelta;
+
+            return modifier;
+        }
+
+        /// <summary>
+        /// Takes one modifier back off, by the order it was applied.
+        ///
+        /// Nothing calls this yet. It exists because a model that can only ever
+        /// add is a model silence and expiring buffs would have to tear down,
+        /// and ten lines now is cheaper than that later.
+        /// </summary>
+        internal bool RemoveModifier(int order)
+        {
+            for (int index = 0; index < _modifiers.Count; index++)
+            {
+                if (_modifiers[index].Order != order)
+                {
+                    continue;
+                }
+
+                AttackModifier -= _modifiers[index].AttackDelta;
+                HealthModifier -= _modifiers[index].HealthDelta;
+                _modifiers.RemoveAt(index);
+                return true;
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Damage taken so far, stored instead of a "current health" field.
@@ -88,6 +148,9 @@ namespace CoH.Core.State
         public int CurrentHealth => MaxHealth - Damage;
 
         public bool IsDamaged => Damage > 0;
+
+        /// <summary>True when something has changed this minion's printed statistics.</summary>
+        public bool IsModified => _modifiers.Count > 0;
 
         /// <summary>Still on the board.</summary>
         public bool IsInPlay => Zone == ZoneType.Play;

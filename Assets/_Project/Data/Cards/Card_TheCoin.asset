@@ -22,5 +22,16 @@ MonoBehaviour:
   manaCost: 0
   attack: 0
   health: 0
+  effects:
+  - trigger: 1
+    selector: 3
+    targetFilter: 0
+    action: 4
+    amount: 1
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: 
+    summonCount: 1
+    placement: 0
   rulesText: Gain 1 Mana Crystal this turn only.
   artwork: {fileID: 0}

@@ -62,6 +62,32 @@ namespace CoH.Core.Rules
         public static bool CanPay(Player player, int cost) => player.AvailableMana >= cost;
 
         /// <summary>
+        /// Grants mana for this turn only.
+        ///
+        /// Available mana goes up and crystals owned do not, which is the whole
+        /// difference between The Coin and gaining a crystal. The turn start
+        /// already clears TemporaryMana and rebuilds AvailableMana from the
+        /// crystals, so nothing has to remember to take this back.
+        ///
+        /// It reports itself as a refill rather than through an event of its
+        /// own: what a client does with either is redraw the same two numbers,
+        /// and a second event carrying identical information would be one more
+        /// thing for every reader to learn.
+        /// </summary>
+        public static void GrantTemporaryMana(ResolutionContext context, Player player, int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            player.TemporaryMana += amount;
+            player.AvailableMana += amount;
+
+            context.Emit(new ManaRefilledEvent(player.Id, player.AvailableMana, player.MaxMana));
+        }
+
+        /// <summary>
         /// Spends mana. Free cards emit nothing: there is no such thing as an
         /// animation for spending zero.
         /// </summary>

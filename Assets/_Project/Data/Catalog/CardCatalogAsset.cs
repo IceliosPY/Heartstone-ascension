@@ -106,6 +106,35 @@ namespace CoH.Data
                     problems.Add(name + ": the card id \"" + id + "\" appears more than once.");
                 }
             }
+
+            ValidateEffectsAcrossCards(problems);
+        }
+
+        /// <summary>
+        /// The checks a card cannot make on its own.
+        ///
+        /// An effect that summons something can only be told it names a card
+        /// nobody has once every card is known, and a summon that turns out to
+        /// name a spell would otherwise fail silently in the middle of a match.
+        /// </summary>
+        private void ValidateEffectsAcrossCards(List<string> problems)
+        {
+            Dictionary<string, CardType> known = new Dictionary<string, CardType>(System.StringComparer.Ordinal);
+
+            for (int index = 0; index < cards.Count; index++)
+            {
+                CardDefinitionAsset card = cards[index];
+
+                if (card != null && !string.IsNullOrEmpty(card.RawId))
+                {
+                    known[card.RawId] = card.CardType;
+                }
+            }
+
+            for (int index = 0; index < cards.Count; index++)
+            {
+                cards[index]?.ValidateAgainstCatalog(known, problems);
+            }
         }
     }
 }

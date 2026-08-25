@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 
@@ -46,5 +47,17 @@ namespace CoH.Core.Server
         /// be a second copy of a rule that already exists here.
         /// </summary>
         RejectionReason CanAttack(PlayerId playerId, EntityId attackerId);
+
+        /// <summary>
+        /// Whether playing this card asks the player to point at something.
+        ///
+        /// Read only. A client asks rather than reading the card's effects and
+        /// inventing a rule of its own, so that what it highlights is exactly
+        /// what the engine will accept.
+        /// </summary>
+        PlayTargetRequirement GetPlayTargetRequirement(PlayerId playerId, EntityId cardInstanceId);
+
+        /// <summary>Everything this card may legally be aimed at right now.</summary>
+        IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId);
     }
 }

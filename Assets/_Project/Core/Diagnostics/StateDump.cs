@@ -119,6 +119,21 @@ namespace CoH.Core.Diagnostics
                     text.Append(" damage=").Append(Number(minion.Damage));
                 }
 
+                if (minion.IsModified)
+                {
+                    // Printed, then what changed it, then the total. A
+                    // buffed minion is the case where the effective
+                    // numbers on their own explain the least.
+                    text.Append(" base=").Append(Number(minion.BaseAttack))
+                        .Append('/').Append(Number(minion.BaseHealth))
+                        .Append(" mods=");
+
+                    for (int mod = 0; mod < minion.Modifiers.Count; mod++)
+                    {
+                        text.Append(minion.Modifiers[mod].Describe()).Append(' ');
+                    }
+                }
+
                 if (minion.AttacksThisTurn > 0)
                 {
                     text.Append(" attacked=").Append(Number(minion.AttacksThisTurn));
