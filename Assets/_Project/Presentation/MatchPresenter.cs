@@ -418,11 +418,28 @@ namespace CoH.Presentation
                 hud.Refresh(state);
             }
 
+            // A reconcile means the board is idle, so nothing may still be
+            // leaning out of its slot. The combat sequence clears its own lean
+            // when it finishes; this is the net under it, so a future animation
+            // that forgets cannot leave a minion permanently displaced.
+            ClearLungeOffsets();
+
             // Everything above moved colliders, and clicking raycasts against
             // them. Unity does not push transform changes into the physics
             // scene on its own, so without this the first click after a turn
             // change would test against where the cards used to be, and miss.
             Physics.SyncTransforms();
+        }
+
+        private void ClearLungeOffsets()
+        {
+            foreach (KeyValuePair<EntityId, MinionView> pair in _minionViews)
+            {
+                if (pair.Value != null)
+                {
+                    pair.Value.SetLungeOffset(Vector3.zero);
+                }
+            }
         }
 
         private void RebuildBoard(GameState state, PlayerId seat, bool near)

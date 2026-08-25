@@ -60,7 +60,14 @@ namespace CoH.Presentation
         private Vector3 _targetRingScale = Vector3.one;
 
         private Vector3 _restingLocal;
-        private Vector3 _offsetLocal;
+
+        // Two independent channels rather than one shared offset. The lunge
+        // belongs to the combat sequence and the recoil belongs to this view,
+        // they overlap in time, and each has to be able to end without knowing
+        // anything about the other.
+        private Vector3 _lungeLocal;
+        private Vector3 _recoilLocal;
+
         private bool _hasPose;
         private Transform _poseParent;
         private Color _bodyColor;
@@ -103,17 +110,28 @@ namespace CoH.Presentation
 
             if (snap)
             {
-                transform.localPosition = _restingLocal + _offsetLocal;
+                transform.localPosition = Target;
             }
         }
 
         /// <summary>
-        /// A temporary displacement, in the row's own space, for a lunge or a
-        /// recoil. Clearing it lets the minion find its way home on its own.
+        /// Where this minion should be right now: the slot the layout gave it,
+        /// plus whatever the animations currently want to add to it.
         /// </summary>
-        public void SetVisualOffset(Vector3 offsetLocal) => _offsetLocal = offsetLocal;
+        private Vector3 Target => _restingLocal + _lungeLocal + _recoilLocal;
 
-        public Vector3 VisualOffset => _offsetLocal;
+        /// <summary>
+        /// The lean into a target during an attack, in the row's own space.
+        ///
+        /// Owned by the combat sequence and by nothing else. It is cleared when
+        /// the attack is released, and no other animation may write it: a recoil
+        /// that captured it and put it back afterwards is exactly how a
+        /// temporary lean became a minion's permanent position.
+        /// </summary>
+        public void SetLungeOffset(Vector3 offsetLocal) => _lungeLocal = offsetLocal;
+
+        /// <summary>Everything currently displacing this minion from its slot.</summary>
+        public Vector3 VisualOffset => _lungeLocal + _recoilLocal;
 
         private void LateUpdate()
         {
@@ -122,16 +140,23 @@ namespace CoH.Presentation
                 return;
             }
 
-            if (_offsetLocal.sqrMagnitude > 0.000001f)
+            Vector3 target = Target;
+
+            if (_lungeLocal.sqrMagnitude > 0.000001f || _recoilLocal.sqrMagnitude > 0.000001f)
             {
                 // An animation is driving it, and that animation is already
                 // eased. Smoothing on top would only add lag to a lunge.
-                transform.localPosition = _restingLocal + _offsetLocal;
+                transform.localPosition = target;
                 return;
             }
 
             float t = 1f - Mathf.Exp(-poseSmoothing * Time.deltaTime);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, _restingLocal, t);
+            Vector3 moved = Vector3.Lerp(transform.localPosition, target, t);
+
+            // Land on the slot exactly rather than approaching it forever. A
+            // minion at rest is meant to be at its layout pose, not near it.
+            transform.localPosition =
+                (moved - target).sqrMagnitude < 0.0000001f ? target : moved;
         }
 
         /// <summary>
@@ -153,12 +178,7 @@ namespace CoH.Presentation
         /// </summary>
         public void PlayHitFeedback(float duration)
         {
-            if (_feedback != null)
-            {
-                StopCoroutine(_feedback);
-                _feedback = null;
-                SetVisualOffset(Vector3.zero);
-            }
+            StopFeedback();
 
             if (duration <= 0f || !isActiveAndEnabled)
             {
@@ -168,22 +188,39 @@ namespace CoH.Presentation
             _feedback = StartCoroutine(HitFeedback(duration));
         }
 
+        /// <summary>
+        /// The recoil writes its own channel and always finishes at zero.
+        ///
+        /// It runs unwaited, so that two minions trading blows light up
+        /// together, which means it routinely outlives the sequence that
+        /// started it. Touching nothing but its own channel is what makes that
+        /// safe.
+        /// </summary>
         private IEnumerator HitFeedback(float duration)
         {
-            Vector3 held = _offsetLocal;
-
             yield return Tweens.Over(duration, Easing.Linear, t =>
             {
                 float decay = 1f - t;
                 float wobble = Mathf.Sin(t * Mathf.PI * 5f) * hitRecoil * decay;
 
-                SetVisualOffset(held + new Vector3(wobble, 0f, wobble * 0.35f));
+                _recoilLocal = new Vector3(wobble, 0f, wobble * 0.35f);
                 Tint(body, Color.Lerp(_bodyColor, hitFlashColor, Easing.Pulse(t)));
             });
 
-            SetVisualOffset(held);
+            _recoilLocal = Vector3.zero;
             Tint(body, _bodyColor);
             _feedback = null;
+        }
+
+        private void StopFeedback()
+        {
+            if (_feedback != null)
+            {
+                StopCoroutine(_feedback);
+                _feedback = null;
+            }
+
+            _recoilLocal = Vector3.zero;
         }
 
         /// <summary>
@@ -195,11 +232,15 @@ namespace CoH.Presentation
             SetSelected(false);
             SetTargetable(false);
 
+            // The death owns this view outright from here: nothing else may
+            // write the transform or the colour while it plays out.
+            StopFeedback();
+
             Vector3 fromScale = transform.localScale;
-            Vector3 startLocal = _restingLocal + _offsetLocal;
+            Vector3 startLocal = Target;
             Quaternion fromRotation = transform.localRotation;
 
-            // Stop the layout from fighting the animation for the transform.
+            _lungeLocal = Vector3.zero;
             _hasPose = false;
 
             yield return Tweens.Over(duration, Easing.OutQuad, t =>

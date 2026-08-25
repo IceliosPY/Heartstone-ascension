@@ -56,7 +56,7 @@ namespace CoH.Presentation
         {
             if (_extended != null)
             {
-                _extended.SetVisualOffset(Vector3.zero);
+                _extended.SetLungeOffset(Vector3.zero);
             }
 
             _extended = null;
@@ -97,7 +97,7 @@ namespace CoH.Presentation
             {
                 if (attacker != null)
                 {
-                    attacker.SetVisualOffset(-direction * (WindupDistance * t));
+                    attacker.SetLungeOffset(-direction * (WindupDistance * t));
                 }
             });
 
@@ -108,7 +108,7 @@ namespace CoH.Presentation
             {
                 if (attacker != null)
                 {
-                    attacker.SetVisualOffset(Vector3.LerpUnclamped(windup, lunge, t));
+                    attacker.SetLungeOffset(Vector3.LerpUnclamped(windup, lunge, t));
                 }
             });
 
