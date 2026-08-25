@@ -572,9 +572,11 @@ namespace CoH.Presentation
         {
             CardDefinition definition = state.Catalog.Get(card.CardId);
 
-            // The engine answers whether it is playable. The view never guesses,
-            // and the command it would send is exactly the one asked about here.
-            bool playable = session.CanSubmit(new PlayCardCommand(owner, card.Id));
+            // The engine answers whether it is playable, target or no target. A
+            // card waiting for the player to aim it is playable; asking about a
+            // command with no target in it would dim every targeted card at
+            // precisely the moment it became castable.
+            bool playable = session.CanPlayCard(owner, card.Id) == RejectionReason.None;
 
             return new CardViewModel(
                 card.Id,

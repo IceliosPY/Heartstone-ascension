@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoH.Core.Cards;
+using CoH.Core.Effects;
 using CoH.Core.Commands;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
@@ -42,19 +43,153 @@ namespace CoH.Tests.EditMode
             new CardDefinition(new CardId(id), name, CardType.Spell, manaCost);
 
         /// <summary>The extra card given to the player going second. Never collectible.</summary>
+        /// <summary>
+        /// The Coin, carrying the effect that makes it work. Nothing recognises
+        /// its id; this row of data is the whole of it.
+        /// </summary>
         public static CardDefinition CoinDefinition() =>
-            new CardDefinition(CoinCardId, "The Coin", CardType.Spell, 0, collectible: false);
+            new CardDefinition(
+                CoinCardId, "The Coin", CardType.Spell, 0, collectible: false,
+                text: "Gain 1 Mana Crystal this turn only.",
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.FriendlyHero),
+                        new EffectActionDefinition(EffectActionKind.GainTemporaryMana, 1))
+                });
 
-        /// <summary>A catalog holding the standard test cards plus the extra card.</summary>
+        /// <summary>
+        /// A catalog holding the standard test cards, plus everything the debug
+        /// scenarios name.
+        ///
+        /// The scenarios are part of the engine's own toolbox and describe
+        /// positions built from real cards, so the catalog a test hands them has
+        /// to contain those cards. Each is defined here rather than loaded from
+        /// an asset, because a Core test may never depend on a ScriptableObject.
+        /// </summary>
         public static CardCatalog Catalog(params CardDefinition[] definitions)
         {
             if (definitions == null || definitions.Length == 0)
             {
-                definitions = new[] { MinionDefinition(), SpellDefinition(), CoinDefinition() };
+                definitions = StandardCards();
             }
 
             return new CardCatalog(definitions);
         }
+
+        /// <summary>Everything a scenario or a default test match may name.</summary>
+        public static CardDefinition[] StandardCards() => new[]
+        {
+            MinionDefinition(),
+            SpellDefinition(),
+            CoinDefinition(),
+            TokenDefinition(),
+            BattlecryDamageDefinition(),
+            DeathrattleDrawDefinition(),
+            SummonerDefinition(),
+            BuffDefinition(),
+            AreaDamageDefinition(),
+            TargetedSpellDefinition(),
+            WeaponDefinition()
+        };
+
+        /// <summary>
+        /// A spell that must be aimed at a minion. With no minion in play there
+        /// is nowhere to point it, which is the case a spell and a minion answer
+        /// differently.
+        /// </summary>
+        public static CardDefinition TargetedSpellDefinition(int amount = 3) =>
+            new CardDefinition(
+                new CardId("test_targeted_spell"), "Test Bolt", CardType.Spell,
+                manaCost: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.AnyMinion),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount))
+                });
+
+        /// <summary>A card type the rules have no support for yet.</summary>
+        public static CardDefinition WeaponDefinition() =>
+            new CardDefinition(
+                new CardId("test_weapon"), "Test Blade", CardType.Weapon,
+                manaCost: 2, attack: 2, health: 2);
+
+        public static CardDefinition TokenDefinition() =>
+            new CardDefinition(
+                new CardId("test_token"), "Test Token", CardType.Minion,
+                manaCost: 1, attack: 1, health: 1, collectible: false);
+
+        /// <summary>Battlecry: deal two damage to a chosen enemy character.</summary>
+        public static CardDefinition BattlecryDamageDefinition(int amount = 2) =>
+            new CardDefinition(
+                new CardId("test_battlecry_damage"), "Test Sharpshooter", CardType.Minion,
+                manaCost: 3, attack: 2, health: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.Battlecry,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.EnemyCharacter),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount))
+                });
+
+        /// <summary>Deathrattle: draw a card.</summary>
+        public static CardDefinition DeathrattleDrawDefinition(int count = 1) =>
+            new CardDefinition(
+                new CardId("test_deathrattle_draw"), "Test Scribe", CardType.Minion,
+                manaCost: 2, attack: 1, health: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.Deathrattle,
+                        new SelectorDefinition(SelectorKind.FriendlyHero),
+                        new EffectActionDefinition(EffectActionKind.DrawCards, count))
+                });
+
+        /// <summary>Battlecry: summon two tokens.</summary>
+        public static CardDefinition SummonerDefinition(int count = 2) =>
+            new CardDefinition(
+                new CardId("test_summoner"), "Test Summoner", CardType.Minion,
+                manaCost: 4, attack: 2, health: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.Battlecry,
+                        new SelectorDefinition(SelectorKind.Self),
+                        new EffectActionDefinition(
+                            EffectActionKind.Summon,
+                            summonCardId: new CardId("test_token"),
+                            summonCount: count))
+                });
+
+        /// <summary>Battlecry: give a chosen friendly minion plus one, plus one.</summary>
+        public static CardDefinition BuffDefinition() =>
+            new CardDefinition(
+                new CardId("test_buff"), "Test Quartermaster", CardType.Minion,
+                manaCost: 2, attack: 1, health: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.Battlecry,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.FriendlyMinion),
+                        new EffectActionDefinition(
+                            EffectActionKind.ModifyStats, attackDelta: 1, healthDelta: 1))
+                });
+
+        /// <summary>A spell that deals one damage to every enemy minion.</summary>
+        public static CardDefinition AreaDamageDefinition(int amount = 1) =>
+            new CardDefinition(
+                new CardId("test_aoe"), "Test Volley", CardType.Spell,
+                manaCost: 2,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.AllEnemyMinions),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount))
+                });
 
         /// <summary>A freshly constructed match state: two heroes, four empty zones each.</summary>
         public static GameState Game(ulong seed = 1UL, params CardDefinition[] definitions) =>
@@ -135,6 +270,38 @@ namespace CoH.Tests.EditMode
         /// When true the minion is treated as having been in play since before
         /// this turn, so it is not summoning sick and can attack straight away.
         /// </param>
+        /// <summary>
+        /// Puts a named card's minion on the board, statistics and effects and
+        /// all. The overload below is for a plain body with chosen numbers.
+        /// </summary>
+        public static Minion PutMinionOnBoard(
+            GameEngine engine,
+            PlayerId controller,
+            string cardId,
+            int position = -1,
+            bool ready = false)
+        {
+            GameState state = engine.State;
+            Minion minion = state.CreateMinion(new CardId(cardId), controller);
+
+            minion.Zone = ZoneType.Play;
+            minion.Timestamp = state.NextTimestamp();
+            minion.SummonedOnTurn = ready ? 0 : state.TurnNumber;
+
+            Player player = state.GetPlayer(controller);
+
+            if (position < 0)
+            {
+                player.Board.TryAdd(minion);
+            }
+            else
+            {
+                player.Board.TryInsert(position, minion);
+            }
+
+            return minion;
+        }
+
         public static Minion PutMinionOnBoard(
             GameEngine engine,
             PlayerId controller,

@@ -79,5 +79,8 @@ namespace CoH.Core.Server
 
         public IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId) =>
             _engine.GetLegalPlayTargets(playerId, cardInstanceId);
+
+        public RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId) =>
+            _engine.CanPlayCard(playerId, cardInstanceId);
     }
 }

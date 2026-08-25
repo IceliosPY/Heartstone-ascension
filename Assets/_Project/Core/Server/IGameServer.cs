@@ -59,5 +59,12 @@ namespace CoH.Core.Server
 
         /// <summary>Everything this card may legally be aimed at right now.</summary>
         IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId);
+
+        /// <summary>
+        /// Whether this card could be played at all, with or without a target.
+        /// A card that only lacks a target is playable; it is waiting for an
+        /// answer rather than being refused.
+        /// </summary>
+        RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId);
     }
 }

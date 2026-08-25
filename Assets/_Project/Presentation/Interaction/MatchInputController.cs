@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using UnityEngine;
@@ -66,6 +67,11 @@ namespace CoH.Presentation
         private Vector3 _pressPoint;
         private bool _movedEnoughToDrop;
 
+        // The card waiting for a target, and where it was dropped.
+        private EntityId _pendingCard = EntityId.None;
+        private int _pendingSlot = -1;
+        private Vector3 _pendingOrigin;
+
         /// <summary>What the player is doing right now.</summary>
         public InteractionState State => _state;
 
@@ -74,7 +80,9 @@ namespace CoH.Presentation
 
         /// <summary>Kept for the older click tests: true while something is held.</summary>
         internal bool HasSelection =>
-            _state == InteractionState.DraggingHandCard || _state == InteractionState.TargetingAttack;
+            _state == InteractionState.DraggingHandCard ||
+            _state == InteractionState.TargetingAttack ||
+            _state == InteractionState.TargetingPlay;
 
         internal EntityId SelectedEntity => _held;
 
@@ -251,6 +259,10 @@ namespace CoH.Presentation
                 case InteractionState.TargetingAttack:
                     ResolveAttack();
                     break;
+
+                case InteractionState.TargetingPlay:
+                    ResolveTargetedPlay();
+                    break;
             }
         }
 
@@ -275,6 +287,7 @@ namespace CoH.Presentation
                     break;
 
                 case InteractionState.TargetingAttack:
+                case InteractionState.TargetingPlay:
                     UpdateAiming(ray);
                     break;
             }
@@ -289,7 +302,9 @@ namespace CoH.Presentation
 
             Probe(ray);
 
-            if (_state != InteractionState.DraggingHandCard && _state != InteractionState.TargetingAttack)
+            if (_state != InteractionState.DraggingHandCard &&
+                _state != InteractionState.TargetingAttack &&
+                _state != InteractionState.TargetingPlay)
             {
                 return;
             }
@@ -305,6 +320,10 @@ namespace CoH.Presentation
             if (_state == InteractionState.DraggingHandCard)
             {
                 ResolveCardDrop(ray);
+            }
+            else if (_state == InteractionState.TargetingPlay)
+            {
+                ResolveTargetedPlay();
             }
             else
             {
@@ -344,7 +363,10 @@ namespace CoH.Presentation
             // Asked of the engine, not worked out here. A card that cannot be
             // played can still be picked up and read, but it never leaves the
             // hand, and no command is built for it.
-            RejectionReason why = session.Validate(new PlayCardCommand(acting, hit.EntityId));
+            //
+            // Asked as "could this be played at all", so a card still waiting to
+            // be aimed counts as playable and can be picked up.
+            RejectionReason why = session.CanPlayCard(acting, hit.EntityId);
 
             if (why != RejectionReason.None)
             {
@@ -456,7 +478,10 @@ namespace CoH.Presentation
                 _movedEnoughToDrop = true;
             }
 
-            if (targetingArrow != null && presenter.TryGetMinionView(_held, out MinionView attacker))
+            bool fromCard = _state == InteractionState.TargetingPlay;
+
+            if (targetingArrow != null &&
+                (fromCard || presenter.TryGetMinionView(_held, out MinionView _)))
             {
                 Vector3 tip = point;
 
@@ -468,7 +493,13 @@ namespace CoH.Presentation
                     tip = character.Collider.bounds.center;
                 }
 
-                targetingArrow.Show(attacker.transform.position, tip);
+                // From the minion when it is swinging, from where the card was
+                // dropped when it is a card asking a question.
+                Vector3 origin = fromCard || !presenter.TryGetMinionView(_held, out MinionView attacker)
+                    ? _pendingOrigin
+                    : attacker.transform.position;
+
+                targetingArrow.Show(origin, tip);
             }
 
             RefreshHoveredTarget();
@@ -506,6 +537,11 @@ namespace CoH.Presentation
             // is built for whoever actually made the gesture.
             PlayerId acting = session.State.CurrentPlayer;
 
+            if (slot >= 0 && BeginTargetedPlay(acting, card, slot, ray))
+            {
+                return;
+            }
+
             EndCardInteraction();
 
             if (slot < 0)
@@ -523,6 +559,110 @@ namespace CoH.Presentation
             {
                 SetHint(string.Empty);
             }
+        }
+
+        /// <summary>
+        /// Turns a drop into a question, when the card has one to ask.
+        ///
+        /// Which cards ask, and what they may be aimed at, are both the engine's
+        /// answer. The view neither reads the card's effects nor decides what a
+        /// legal target is; it draws an arrow at the list it was handed.
+        ///
+        /// Returns true when the play is now waiting for a target.
+        /// </summary>
+        private bool BeginTargetedPlay(PlayerId acting, EntityId card, int slot, Ray ray)
+        {
+            if (session.GetPlayTargetRequirement(acting, card) == PlayTargetRequirement.None)
+            {
+                return false;
+            }
+
+            IReadOnlyList<EntityId> legal = session.GetLegalPlayTargets(acting, card);
+
+            if (legal.Count == 0)
+            {
+                // Nothing to aim at. A minion goes down anyway and its battlecry
+                // finds nobody; a spell is refused by the engine, and the
+                // refusal comes back as a hint. Either way the ordinary path
+                // handles it, and no target is invented here.
+                return false;
+            }
+
+            _pendingCard = card;
+            _pendingSlot = slot;
+            _pendingOrigin = AimPoint(ray);
+
+            // The card stops following the pointer and waits where it was put.
+            if (presenter.TryGetCardView(card, out CardView view))
+            {
+                view.EndDrag(presenter.NearHandAnchor);
+            }
+
+            presenter.SetInsertionPreview(-1);
+
+            _held = card;
+            _state = InteractionState.TargetingPlay;
+            _movedEnoughToDrop = false;
+
+            ClearHighlights();
+            _highlighted.AddRange(legal);
+
+            for (int index = 0; index < _highlighted.Count; index++)
+            {
+                SetTargetable(_highlighted[index], true);
+            }
+
+            UpdateAiming(ray);
+            SetHint("Pick a target for it.");
+            return true;
+        }
+
+        /// <summary>
+        /// The player has answered. A legal target plays the card; anything else
+        /// puts it back, having changed nothing.
+        /// </summary>
+        private void ResolveTargetedPlay()
+        {
+            EntityId card = _pendingCard;
+            int slot = _pendingSlot;
+            PlayerId acting = session.State.CurrentPlayer;
+
+            EntityId target = _probe.TryFindCharacter(out PointerHit character) && IsLegalTarget(character.EntityId)
+                ? character.EntityId
+                : EntityId.None;
+
+            EndTargetedPlay();
+
+            if (target.IsNone)
+            {
+                SetHint(string.Empty);
+                return;
+            }
+
+            if (session.Submit(new PlayCardCommand(acting, card, slot, target)))
+            {
+                SetHint(string.Empty);
+            }
+        }
+
+        private void EndTargetedPlay()
+        {
+            ClearHighlights();
+
+            if (targetingArrow != null)
+            {
+                targetingArrow.Hide();
+            }
+
+            presenter.SetInsertionPreview(-1);
+            presenter.SetDraggedCard(EntityId.None);
+
+            _pendingCard = EntityId.None;
+            _pendingSlot = -1;
+            _held = EntityId.None;
+            _hoveredTarget = EntityId.None;
+            _movedEnoughToDrop = false;
+            _state = InteractionState.Idle;
         }
 
         private void ResolveAttack()
@@ -559,6 +699,10 @@ namespace CoH.Presentation
 
                 case InteractionState.TargetingAttack:
                     EndAttackInteraction();
+                    break;
+
+                case InteractionState.TargetingPlay:
+                    EndTargetedPlay();
                     break;
 
                 case InteractionState.HoveringHandCard:

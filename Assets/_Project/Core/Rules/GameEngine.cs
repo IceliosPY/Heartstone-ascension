@@ -412,6 +412,37 @@ namespace CoH.Core.Rules
         }
 
         /// <summary>
+        /// Whether this card could be played at all, with or without a target.
+        ///
+        /// Distinct from validating one particular command, and the difference
+        /// matters to anything that has to decide whether a card looks playable
+        /// before the player has aimed it. A card that only lacks a target is
+        /// perfectly playable; it is waiting for a question to be answered, not
+        /// refused.
+        /// </summary>
+        public RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId)
+        {
+            RejectionReason withoutTarget = CanExecute(new PlayCardCommand(playerId, cardInstanceId));
+
+            if (withoutTarget != RejectionReason.InvalidTarget)
+            {
+                return withoutTarget;
+            }
+
+            // The only complaint was the target. Ask again with a legal one,
+            // so that everything else is still checked rather than assumed.
+            IReadOnlyList<EntityId> legal = GetLegalPlayTargets(playerId, cardInstanceId);
+
+            if (legal.Count == 0)
+            {
+                return RejectionReason.InvalidTarget;
+            }
+
+            return CanExecute(new PlayCardCommand(
+                playerId, cardInstanceId, PlayCardCommand.Rightmost, legal[0]));
+        }
+
+        /// <summary>
         /// Everything this card may legally be aimed at right now, in a fixed
         /// order. Empty when it takes no target, or when nothing qualifies.
         /// </summary>

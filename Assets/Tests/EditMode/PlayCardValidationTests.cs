@@ -121,16 +121,33 @@ namespace CoH.Tests.EditMode
         }
 
         [Test]
-        public void A_card_that_is_not_a_minion_is_refused_for_now()
+        public void A_spell_is_playable_now_that_effects_exist()
         {
             GameEngine engine = TestFactory.StartedMatch();
             PlayerId active = engine.State.CurrentPlayer;
             TestFactory.GiveMana(engine, active, 10);
 
             CardInstance spell = TestFactory.PutCardInHand(engine, active, TestFactory.SpellCardId);
+
+            // Phase 4 refused every card that was not a minion, because nothing
+            // could have happened when one resolved. Now something can.
+            Assert.That(
+                engine.CanExecute(new PlayCardCommand(active, spell.Id)),
+                Is.EqualTo(RejectionReason.None));
+        }
+
+        [Test]
+        public void A_card_type_the_rules_cannot_play_yet_is_still_refused()
+        {
+            GameEngine engine = TestFactory.StartedMatch();
+            PlayerId active = engine.State.CurrentPlayer;
+            TestFactory.GiveMana(engine, active, 10);
+
+            // Weapons, hero powers and locations have no rules behind them yet.
+            CardInstance weapon = TestFactory.PutCardInHand(engine, active, "test_weapon");
             Snapshot before = new Snapshot(engine, active);
 
-            before.AssertUnchanged(TestFactory.PlayCard(engine, spell.Id), RejectionReason.CardTypeNotPlayable);
+            before.AssertUnchanged(TestFactory.PlayCard(engine, weapon.Id), RejectionReason.CardTypeNotPlayable);
         }
 
         [Test]

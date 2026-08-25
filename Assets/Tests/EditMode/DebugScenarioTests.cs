@@ -20,9 +20,11 @@ namespace CoH.Tests.EditMode
     /// </summary>
     public sealed class DebugScenarioTests
     {
-        private static CardCatalog Catalog() => TestFactory.Catalog(
-            TestFactory.MinionDefinition(manaCost: 2, attack: 2, health: 3),
-            TestFactory.CoinDefinition());
+        /// <summary>
+        /// The standard set, because the scenarios now describe positions built
+        /// from the demonstration cards as well as plain soldiers.
+        /// </summary>
+        private static CardCatalog Catalog() => TestFactory.Catalog();
 
         private static GameState Build(DebugScenario scenario) =>
             DebugScenarioBuilder.Build(scenario, Catalog(), GameConfig.Default);

@@ -123,6 +123,18 @@ namespace CoH.Presentation
                 : _server.GetLegalPlayTargets(playerId, cardInstanceId);
 
         /// <summary>
+        /// Whether this card could be played at all, target or no target.
+        ///
+        /// What a hand should be lit by. Judging a card by a command with no
+        /// target in it would dim every targeted card the moment it became
+        /// playable, which is exactly when it should light up.
+        /// </summary>
+        public RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId) =>
+            _server == null
+                ? RejectionReason.WrongPhase
+                : _server.CanPlayCard(playerId, cardInstanceId);
+
+        /// <summary>
         /// Whether a minion could attack at all, and why not when it could not.
         /// Asked before an attack is aimed, so picking up a minion that has
         /// already swung says so instead of doing nothing.

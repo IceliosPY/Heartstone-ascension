@@ -1,6 +1,7 @@
 using System.Collections;
 using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Diagnostics;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -11,21 +12,20 @@ using UnityEngine.TestTools;
 namespace CoH.Tests.PlayMode
 {
     /// <summary>
-    /// The Coin is in the second player's hand and there is no spell system yet,
-    /// so it can be looked at and cannot be played.
+    /// Spells, on the board and in the hand.
     ///
-    /// What matters here is how that comes about. Nothing in the presentation
-    /// knows what The Coin is: the engine refuses a card whose type it cannot
-    /// put on a board, and the interaction simply never starts. The day spells
-    /// work, this stops being true on its own.
+    /// Until this phase a spell was refused for its type, because nothing could
+    /// have happened when one resolved. It can now. What has not changed is
+    /// where a spell goes: nothing appears on the board, and the card ends up in
+    /// the graveyard.
+    ///
+    /// The Coin is the one worth watching. It works because of the data on it
+    /// and nothing else, so playing it from the scene through the ordinary
+    /// pointer is the honest test of that claim.
     /// </summary>
     public sealed class NonMinionCardTests : InteractionTestBase
     {
-        /// <summary>
-        /// The card in the acting player's hand that is not a minion, found by
-        /// asking the catalog rather than by looking for a name.
-        /// </summary>
-        private CardView FindNonMinionInHand()
+        private CardView FindSpellInHand()
         {
             foreach (CardInstance card in Active.Hand)
             {
@@ -41,67 +41,103 @@ namespace CoH.Tests.PlayMode
             return null;
         }
 
-        /// <summary>Reaches the turn of whoever holds a non minion card.</summary>
         private IEnumerator AdvanceToTheHolder()
         {
-            for (int guard = 0; guard < 4 && FindNonMinionInHand() == null; guard++)
+            for (int guard = 0; guard < 4 && FindSpellInHand() == null; guard++)
             {
                 yield return EndTurn();
             }
 
-            Assert.That(FindNonMinionInHand(), Is.Not.Null,
-                "Neither player is holding a non minion card, so there is nothing to check.");
+            Assert.That(FindSpellInHand(), Is.Not.Null, "Neither player is holding a spell.");
         }
 
         [UnityTest]
-        public IEnumerator A_card_that_cannot_be_played_yet_is_still_readable()
+        public IEnumerator A_spell_can_be_read_in_hand()
         {
             yield return LoadMatch();
             yield return AdvanceToTheHolder();
 
-            CardView coin = FindNonMinionInHand();
+            CardView spell = FindSpellInHand();
 
-            Assert.That(
-                Session.Validate(new PlayCardCommand(Session.State.CurrentPlayer, coin.EntityId)),
-                Is.EqualTo(RejectionReason.CardTypeNotPlayable),
-                "The engine should refuse it for its type, not for its cost.");
+            MoveTo(spell.transform.position);
 
-            MoveTo(coin.transform.position);
+            Assert.That(spell.IsHovered, Is.True,
+                "A spell could not be inspected. The pointer landed on " + Input.LastHit + ".");
 
-            Assert.That(coin.IsHovered, Is.True,
-                "It could not be inspected. The pointer landed on " + Input.LastHit + ".");
+            Vector3 resting = spell.RestingLocalPosition;
+            yield return WaitUntil(() => spell.transform.localPosition.y > resting.y + 0.1f);
 
-            Vector3 resting = coin.RestingLocalPosition;
-            yield return WaitUntil(() => coin.transform.localPosition.y > resting.y + 0.1f);
-
-            Assert.That(coin.transform.localPosition.y, Is.GreaterThan(resting.y + 0.1f),
-                "It would not rise to be read.");
+            Assert.That(spell.transform.localPosition.y, Is.GreaterThan(resting.y + 0.1f));
         }
 
+        /// <summary>
+        /// The Coin, played from the scene by dragging it. Three spendable mana
+        /// from two crystals, and the crystals stay at two.
+        /// </summary>
         [UnityTest]
-        public IEnumerator A_card_that_cannot_be_played_yet_produces_no_command()
+        public IEnumerator The_coin_is_played_by_dragging_it_and_grants_a_temporary_mana()
         {
-            yield return LoadMatch();
-            yield return AdvanceToTheHolder();
+            yield return LoadWithScenario(DebugScenarios.CoinId);
 
             PlayerId acting = Session.State.CurrentPlayer;
-            CardView coin = FindNonMinionInHand();
-            EntityId id = coin.EntityId;
+            Player player = Session.State.GetPlayer(acting);
 
-            int handBefore = Active.Hand.Count;
-            int manaBefore = Active.AvailableMana;
+            Assert.That(player.AvailableMana, Is.EqualTo(2));
+            Assert.That(player.MaxMana, Is.EqualTo(2));
+
+            CardView coin = FindCardInHand(DebugScenarios.TheCoin);
+            Assert.That(coin, Is.Not.Null, "The coin scenario should deal The Coin.");
+            Assert.That(coin.IsPlayable, Is.True, "The Coin costs nothing and should read as playable.");
+
+            EntityId id = coin.EntityId;
 
             Drag(coin.transform.position, NearBoardRight);
             yield return Settle();
 
+            Assert.That(player.AvailableMana, Is.EqualTo(3), "The Coin gave no mana.");
+            Assert.That(player.MaxMana, Is.EqualTo(2), "The Coin granted a crystal.");
+            Assert.That(player.TemporaryMana, Is.EqualTo(1));
+
+            Assert.That(player.Board.Count, Is.Zero, "A spell put something on the board.");
+            Assert.That(Presenter.TryGetCardView(id, out CardView _), Is.False,
+                "The played spell is still shown in hand.");
+        }
+
+        [UnityTest]
+        public IEnumerator A_spell_goes_to_the_graveyard_rather_than_the_board()
+        {
+            yield return LoadWithScenario(DebugScenarios.CoinId);
+
+            PlayerId acting = Session.State.CurrentPlayer;
             Player player = Session.State.GetPlayer(acting);
 
-            Assert.That(Input.State, Is.Not.EqualTo(InteractionState.DraggingHandCard),
-                "It was picked up.");
-            Assert.That(player.Board.Count, Is.Zero, "Something reached the board.");
-            Assert.That(player.Hand.Count, Is.EqualTo(handBefore), "It left the hand.");
-            Assert.That(player.AvailableMana, Is.EqualTo(manaBefore), "It cost mana anyway.");
-            Assert.That(Presenter.TryGetCardView(id, out CardView _), Is.True, "It lost its view.");
+            CardView coin = FindCardInHand(DebugScenarios.TheCoin);
+            EntityId id = coin.EntityId;
+
+            int graveyardBefore = player.Graveyard.Count;
+
+            Session.Submit(new PlayCardCommand(acting, id));
+            yield return Settle();
+
+            Assert.That(player.Graveyard.Count, Is.EqualTo(graveyardBefore + 1));
+            Assert.That(player.Board.Count, Is.Zero);
+        }
+
+        /// <summary>
+        /// An unaffordable card is still readable. Not affording something stops
+        /// it being played, not inspected.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator An_unaffordable_card_can_still_be_hovered()
+        {
+            yield return LoadMatch();
+
+            CardView card = FirstCardInHand();
+
+            // Turn one, one crystal: at least one card in hand is out of reach.
+            MoveTo(card.transform.position);
+
+            Assert.That(card.IsHovered, Is.True);
         }
     }
 }

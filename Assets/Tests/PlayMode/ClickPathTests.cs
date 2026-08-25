@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -83,6 +85,20 @@ namespace CoH.Tests.PlayMode
 
             foreach (CardInstance card in active.Hand)
             {
+                // A plain minion: the hand now also holds spells and cards that
+                // want a target first, and this file is about the two clicks
+                // that put a body on the board.
+                if (_session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                {
+                    continue;
+                }
+
+                if (_session.GetPlayTargetRequirement(active.Id, card.Id) != PlayTargetRequirement.None &&
+                    _session.GetLegalPlayTargets(active.Id, card.Id).Count > 0)
+                {
+                    continue;
+                }
+
                 if (_presenter.TryGetCardView(card.Id, out CardView view) && view.IsPlayable)
                 {
                     playable.Add(view);

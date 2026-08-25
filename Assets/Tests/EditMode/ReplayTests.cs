@@ -22,9 +22,7 @@ namespace CoH.Tests.EditMode
     /// </summary>
     public sealed class ReplayTests
     {
-        private static CardCatalog Catalog() => TestFactory.Catalog(
-            TestFactory.MinionDefinition(manaCost: 2, attack: 2, health: 3),
-            TestFactory.CoinDefinition());
+        private static CardCatalog Catalog() => TestFactory.Catalog();
 
         /// <summary>
         /// Plays a short match against a real engine while recording every

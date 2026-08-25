@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoH.Core.Cards;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.Rules;
 using CoH.Core.Setup;
@@ -17,13 +18,28 @@ namespace CoH.Tests.DataEditMode
     /// </summary>
     public sealed class CatalogAndDeckTests
     {
+        /// <summary>
+        /// The development set. Named rather than counted, so adding a card
+        /// later does not fail a test that has no opinion about the number.
+        /// </summary>
+        private static readonly string[] ExpectedCards =
+        {
+            "test_soldier",
+            "the_coin",
+            "test_token",
+            "test_battlecry_damage",
+            "test_deathrattle_draw",
+            "test_summoner",
+            "test_buff",
+            "test_aoe"
+        };
+
         [Test]
-        public void The_catalog_holds_the_starter_cards()
+        public void The_catalog_holds_the_development_cards()
         {
             CardCatalogAsset asset = AuthoredCards.Catalog();
 
-            Assert.That(asset.Count, Is.EqualTo(2));
-            Assert.That(asset.Cards.Select(card => card.RawId), Is.EquivalentTo(new[] { "test_soldier", "the_coin" }));
+            Assert.That(asset.Cards.Select(card => card.RawId), Is.EquivalentTo(ExpectedCards));
         }
 
         [Test]
@@ -31,10 +47,67 @@ namespace CoH.Tests.DataEditMode
         {
             CardCatalog catalog = AuthoredCards.Catalog().BuildRuntimeCatalog();
 
-            Assert.That(catalog.Count, Is.EqualTo(2));
+            Assert.That(catalog.Count, Is.EqualTo(ExpectedCards.Length));
             Assert.That(catalog.Get(new CardId("test_soldier")).Name, Is.EqualTo("Test Soldier"));
             Assert.That(catalog.TryGet(new CardId("the_coin"), out CardDefinition coin), Is.True);
             Assert.That(coin.Collectible, Is.False);
+        }
+
+        /// <summary>
+        /// The Coin works because of the row of data below and for no other
+        /// reason. Nothing anywhere recognises its id.
+        /// </summary>
+        [Test]
+        public void The_coin_carries_its_effect_as_data()
+        {
+            CardDefinition coin = AuthoredCards.Catalog().BuildRuntimeCatalog().Get(new CardId("the_coin"));
+
+            Assert.That(coin.Effects.Count, Is.EqualTo(1));
+
+            EffectDefinition effect = coin.Effects[0];
+
+            Assert.That(effect.Trigger, Is.EqualTo(EffectTrigger.OnPlay));
+            Assert.That(effect.Selector.Kind, Is.EqualTo(SelectorKind.FriendlyHero));
+            Assert.That(effect.Action.Kind, Is.EqualTo(EffectActionKind.GainTemporaryMana));
+            Assert.That(effect.Action.Amount, Is.EqualTo(1));
+        }
+
+        /// <summary>Every demonstration card reaches the engine with its effects intact.</summary>
+        [Test]
+        public void The_authored_effect_cards_convert_with_their_effects()
+        {
+            CardCatalog catalog = AuthoredCards.Catalog().BuildRuntimeCatalog();
+
+            AssertEffect(catalog, "test_battlecry_damage",
+                EffectTrigger.Battlecry, SelectorKind.ChosenTarget, EffectActionKind.DealDamage);
+
+            AssertEffect(catalog, "test_deathrattle_draw",
+                EffectTrigger.Deathrattle, SelectorKind.FriendlyHero, EffectActionKind.DrawCards);
+
+            AssertEffect(catalog, "test_summoner",
+                EffectTrigger.Battlecry, SelectorKind.Self, EffectActionKind.Summon);
+
+            AssertEffect(catalog, "test_buff",
+                EffectTrigger.Battlecry, SelectorKind.ChosenTarget, EffectActionKind.ModifyStats);
+
+            AssertEffect(catalog, "test_aoe",
+                EffectTrigger.OnPlay, SelectorKind.AllEnemyMinions, EffectActionKind.DealDamage);
+
+            // And a plain body still has none at all.
+            Assert.That(catalog.Get(new CardId("test_soldier")).Effects, Is.Empty);
+            Assert.That(catalog.Get(new CardId("test_token")).Effects, Is.Empty);
+        }
+
+        private static void AssertEffect(
+            CardCatalog catalog, string cardId,
+            EffectTrigger trigger, SelectorKind selector, EffectActionKind action)
+        {
+            CardDefinition card = catalog.Get(new CardId(cardId));
+
+            Assert.That(card.Effects.Count, Is.EqualTo(1), cardId + " should have one effect.");
+            Assert.That(card.Effects[0].Trigger, Is.EqualTo(trigger), cardId);
+            Assert.That(card.Effects[0].Selector.Kind, Is.EqualTo(selector), cardId);
+            Assert.That(card.Effects[0].Action.Kind, Is.EqualTo(action), cardId);
         }
 
         [Test]

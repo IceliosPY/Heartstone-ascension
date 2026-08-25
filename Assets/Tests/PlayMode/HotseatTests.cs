@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -89,6 +91,19 @@ namespace CoH.Tests.PlayMode
 
             foreach (CardInstance card in active.Hand)
             {
+                // A plain minion, for the same reason as everywhere else: this
+                // file is about a card reaching the board, not about aiming.
+                if (session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                {
+                    continue;
+                }
+
+                if (session.GetPlayTargetRequirement(active.Id, card.Id) != PlayTargetRequirement.None &&
+                    session.GetLegalPlayTargets(active.Id, card.Id).Count > 0)
+                {
+                    continue;
+                }
+
                 if (presenter.TryGetCardView(card.Id, out CardView view) && view.IsPlayable)
                 {
                     playable.Add(view);

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -45,6 +47,27 @@ namespace CoH.Tests.PlayMode
             Assert.That(Presenter, Is.Not.Null, "No MatchPresenter in the match scene.");
             Assert.That(Input, Is.Not.Null, "No MatchInputController in the match scene.");
             Assert.That(MatchCamera, Is.Not.Null, "No main camera in the match scene.");
+        }
+
+        /// <summary>
+        /// Loads the match and drops it straight into a prepared position.
+        ///
+        /// Which is what the debug scenarios are for: reaching a situation with
+        /// a particular card in a particular hand takes several turns and a
+        /// certain amount of luck, and none of that is what these tests are
+        /// about.
+        /// </summary>
+        protected IEnumerator LoadWithScenario(string scenarioId)
+        {
+            yield return LoadMatch();
+
+            CoH.App.MatchDebugTools tools = Object.FindFirstObjectByType<CoH.App.MatchDebugTools>();
+
+            Assert.That(tools, Is.Not.Null, "The scene has no MatchDebugTools.");
+            Assert.That(tools.LoadScenario(scenarioId), Is.True,
+                "The scenario '" + scenarioId + "' could not be loaded.");
+
+            yield return null;
         }
 
         protected IEnumerator Settle()
@@ -131,7 +154,46 @@ namespace CoH.Tests.PlayMode
 
         protected Player Active => Session.State.GetPlayer(Session.State.CurrentPlayer);
 
+        /// <summary>
+        /// The cards that can be dropped straight onto the board: minions that
+        /// are affordable and are not waiting to be aimed.
+        ///
+        /// Narrower than "playable" on purpose. Almost every test that asks for
+        /// a playable card means "something I can put on the board and then look
+        /// at", and a hand now also holds spells and cards that want a target
+        /// first. Those have tests of their own.
+        /// </summary>
         protected List<CardView> PlayableCards()
+        {
+            List<CardView> playable = new List<CardView>();
+            PlayerId acting = Session.State.CurrentPlayer;
+
+            foreach (CardInstance card in Active.Hand)
+            {
+                if (!Presenter.TryGetCardView(card.Id, out CardView view) || !view.IsPlayable)
+                {
+                    continue;
+                }
+
+                if (Session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                {
+                    continue;
+                }
+
+                if (Session.GetPlayTargetRequirement(acting, card.Id) != PlayTargetRequirement.None &&
+                    Session.GetLegalPlayTargets(acting, card.Id).Count > 0)
+                {
+                    continue;
+                }
+
+                playable.Add(view);
+            }
+
+            return playable;
+        }
+
+        /// <summary>Every playable card, spells and targeted cards included.</summary>
+        protected List<CardView> PlayableCardsOfAnyKind()
         {
             List<CardView> playable = new List<CardView>();
 
@@ -145,6 +207,27 @@ namespace CoH.Tests.PlayMode
 
             return playable;
         }
+
+        /// <summary>The first card in hand of a named kind, or null.</summary>
+        protected CardView FindCardInHand(string cardId)
+        {
+            foreach (CardInstance card in Active.Hand)
+            {
+                if (string.Equals(card.CardId.Value, cardId, System.StringComparison.Ordinal) &&
+                    Presenter.TryGetCardView(card.Id, out CardView view))
+                {
+                    return view;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Puts a named card into the acting player's hand through the debug
+        /// scenario path, so a test can reach a card the shuffle did not give it.
+        /// </summary>
+        protected bool HandHolds(string cardId) => FindCardInHand(cardId) != null;
 
         protected CardView FirstPlayableCard()
         {
@@ -200,6 +283,13 @@ namespace CoH.Tests.PlayMode
                     if (Session.State.CurrentPlayer != seat)
                     {
                         break;
+                    }
+
+                    // A plain minion, so filling a board never spends a turn on
+                    // a spell or stalls on a card waiting to be aimed.
+                    if (Session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                    {
+                        continue;
                     }
 
                     if (Session.CanSubmit(new PlayCardCommand(seat, card.Id)))

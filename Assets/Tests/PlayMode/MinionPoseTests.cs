@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
@@ -164,6 +165,14 @@ namespace CoH.Tests.PlayMode
                 {
                     foreach (CardInstance card in Session.State.GetPlayer(acting).Hand)
                     {
+                        // A plain minion. This file is about where a minion
+                        // stands after a fight, so a spell or a card waiting to
+                        // be aimed would only waste the turn.
+                        if (Session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                        {
+                            continue;
+                        }
+
                         if (Session.CanSubmit(new PlayCardCommand(acting, card.Id)))
                         {
                             Session.Submit(new PlayCardCommand(acting, card.Id));
