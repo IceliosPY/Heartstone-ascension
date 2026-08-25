@@ -30,6 +30,21 @@ namespace CoH.Core.Server
             _engine = new GameEngine(config, catalog, seed);
         }
 
+        private LocalGameServer(GameEngine engine)
+        {
+            _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+        }
+
+        /// <summary>
+        /// Serves a match that was prepared rather than dealt: a debug scenario,
+        /// or a replay being run again.
+        ///
+        /// Separate from the constructor because it is not how a match starts.
+        /// A real one is always built from two decks and a seed, and everything
+        /// above this interface is unable to tell the difference either way.
+        /// </summary>
+        public static LocalGameServer Wrapping(GameEngine engine) => new LocalGameServer(engine);
+
         public GameState State => _engine.State;
 
         /// <summary>Host-side setup. Returns everything that happened while building the match.</summary>

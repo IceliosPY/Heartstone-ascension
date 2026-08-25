@@ -31,6 +31,22 @@ namespace CoH.Core.Rules
             State = new GameState(config, catalog, seed);
         }
 
+        private GameEngine(GameState state)
+        {
+            State = state ?? throw new ArgumentNullException(nameof(state));
+        }
+
+        /// <summary>
+        /// Wraps a state that was prepared rather than played into existence.
+        ///
+        /// For debug scenarios, and for replaying one. A normal match is always
+        /// built by the constructor above and reaches its position through
+        /// MatchSetup and the rules; this is the seam that lets a developer
+        /// start from a position instead of playing fifteen turns to reach it.
+        /// Nothing in the rules uses it.
+        /// </summary>
+        public static GameEngine FromState(GameState state) => new GameEngine(state);
+
         public GameState State { get; }
 
         /// <summary>

@@ -102,5 +102,18 @@ namespace CoH.Presentation
         internal void SetInstant(bool value) => instant = value;
 
         internal void SetSpeed(float value) => speed = Mathf.Max(0.05f, value);
+
+        /// <summary>
+        /// Sets both at once, for the developer tools.
+        ///
+        /// Public because the debug panel lives in another assembly and turning
+        /// the pacing up while hunting something is exactly what it is for. It
+        /// changes how fast the game is shown and nothing about what it does.
+        /// </summary>
+        public void SetPlayback(float playbackSpeed, bool playInstantly)
+        {
+            speed = Mathf.Max(0.05f, playbackSpeed);
+            instant = playInstantly;
+        }
     }
 }

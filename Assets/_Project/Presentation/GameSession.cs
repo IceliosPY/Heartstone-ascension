@@ -28,6 +28,16 @@ namespace CoH.Presentation
         /// <summary>Raised when the engine refused a command, with the reason why.</summary>
         public event Action<GameCommand, RejectionReason> CommandRejected;
 
+        /// <summary>
+        /// Raised for every command that reached the engine, taken or refused.
+        ///
+        /// This is where a recording comes from. Every player intent already
+        /// passes through Submit, so watching it needs nothing added to the
+        /// rules: the engine has no idea anyone is listening, which is the only
+        /// way a recording can be trusted to describe what actually happened.
+        /// </summary>
+        public event Action<GameCommand, CommandResult> CommandExecuted;
+
         public bool IsReady => _server != null;
 
         /// <summary>Read-only as far as the presentation is concerned.</summary>
@@ -39,6 +49,16 @@ namespace CoH.Presentation
         public bool IsBusy => queue != null && queue.IsPlaying;
 
         public void Initialize(IGameServer server)
+        {
+            _server = server ?? throw new ArgumentNullException(nameof(server));
+        }
+
+        /// <summary>
+        /// Replaces the server behind this session, for a debug scenario or a
+        /// replay. The caller is responsible for rebuilding the presentation
+        /// afterwards, because nothing that happened up to now applies any more.
+        /// </summary>
+        public void Rebind(IGameServer server)
         {
             _server = server ?? throw new ArgumentNullException(nameof(server));
         }
@@ -61,6 +81,8 @@ namespace CoH.Presentation
             }
 
             CommandResult result = _server.Execute(command);
+
+            CommandExecuted?.Invoke(command, result);
 
             if (!result.IsAccepted)
             {

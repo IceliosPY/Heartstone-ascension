@@ -15,6 +15,7 @@ namespace CoH.Core.Cards
     public sealed class CardCatalog : ICardCatalog
     {
         private readonly Dictionary<CardId, CardDefinition> _definitionsById;
+        private readonly CardDefinition[] _ordered;
 
         public CardCatalog(IEnumerable<CardDefinition> definitions)
         {
@@ -40,9 +41,19 @@ namespace CoH.Core.Cards
 
                 _definitionsById.Add(definition.Id, definition);
             }
+
+            // Sorted once here rather than at every call site. A dictionary has
+            // no order worth relying on, and everything that reads a catalog as
+            // a sequence needs one that never changes.
+            _ordered = new CardDefinition[_definitionsById.Count];
+            _definitionsById.Values.CopyTo(_ordered, 0);
+            Array.Sort(_ordered, (left, right) => string.CompareOrdinal(left.Id.Value, right.Id.Value));
         }
 
         public int Count => _definitionsById.Count;
+
+        /// <inheritdoc />
+        public IReadOnlyList<CardDefinition> Cards => _ordered;
 
         public bool TryGet(CardId id, out CardDefinition definition) =>
             _definitionsById.TryGetValue(id, out definition);

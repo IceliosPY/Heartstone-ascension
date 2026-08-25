@@ -45,9 +45,20 @@ namespace CoH.Core.Random
         /// </summary>
         public ulong State => _state;
 
+        /// <summary>
+        /// How many raw values have been drawn. Diagnostics only.
+        ///
+        /// Counted here rather than derived from the state, because a step
+        /// count is what a divergence report can talk about without knowing
+        /// anything about how this generator works.
+        /// </summary>
+        public long DrawCount { get; private set; }
+
         /// <summary>Raw 32-bit output. Advances the generator by one step.</summary>
         public uint NextUInt32()
         {
+            DrawCount++;
+
             ulong previousState = _state;
             _state = unchecked(previousState * Multiplier + _increment);
 

@@ -18,5 +18,16 @@ namespace CoH.Core.Random
         /// Returns a uniformly distributed value in [0, exclusiveMax).
         /// </summary>
         int NextInt(int exclusiveMax);
+
+        /// <summary>
+        /// How many values have been drawn so far. Diagnostics only, and never
+        /// read by a rule.
+        ///
+        /// A count rather than the generator's internal state: what a
+        /// divergence report needs to know is whether randomness was consumed
+        /// at a different moment, and that question has the same answer
+        /// whichever generator is behind the interface.
+        /// </summary>
+        long DrawCount { get; }
     }
 }

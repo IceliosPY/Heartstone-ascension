@@ -4,7 +4,10 @@
     "references": [
         "CoH.Core",
         "CoH.Data",
-        "CoH.Presentation"
+        "CoH.Presentation",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -390,6 +390,21 @@ namespace CoH.Editor
                 ("playerTwoDeck", AssetDatabase.LoadAssetAtPath<DeckListAsset>(DeckPath)),
                 ("session", session), ("presenter", presenter));
 
+            // -- Developer tools --------------------------------------------
+            // Off screen until F1 asks for them, and they build their own
+            // interface at run time, so nothing of this reaches the scene file.
+            GameObject toolsObject = new GameObject("MatchDebugTools");
+            toolsObject.transform.SetParent(systems.transform, false);
+            MatchDebugTools debugTools = toolsObject.AddComponent<MatchDebugTools>();
+            Wire(debugTools,
+                ("bootstrap", bootstrap), ("session", session),
+                ("presenter", presenter), ("timing", timing));
+
+            GameObject overlayObject = new GameObject("DebugOverlay");
+            overlayObject.transform.SetParent(systems.transform, false);
+            DebugOverlay overlay = overlayObject.AddComponent<DebugOverlay>();
+            Wire(overlay, ("tools", debugTools));
+
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
 
