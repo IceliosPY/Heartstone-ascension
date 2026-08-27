@@ -541,6 +541,7 @@ namespace CoH.Presentation
 
                     CardPose pose = HandFanLayout.GetPose(position, laidOut, handLayout);
                     view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, scale);
+                    view.SetHandOrder(position);
                     position++;
                 }
 

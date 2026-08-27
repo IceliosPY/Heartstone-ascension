@@ -79,7 +79,12 @@ namespace CoH.Presentation.CardVisuals
                 model,
                 library != null ? library.ArtworkFor(id) : null,
                 library != null ? library.StyleFor(id) : CardVisualStyle.Default,
-                library != null ? library.ExpansionFor(id) : string.Empty);
+                library != null ? library.ExpansionFor(id) : string.Empty,
+
+                // The one place a card's identity is used for its appearance,
+                // and it is used to fetch data rather than to decide anything.
+                // What travels on is a set of optional numbers.
+                library != null ? library.OverridesFor(id) : null);
         }
 
         /// <summary>Composes a described card into a plan, reusing the plan.</summary>

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8237119055481180945}
   - component: {fileID: 1222011194527607836}
   - component: {fileID: 791536414886205049}
+  - component: {fileID: 3678085196954474002}
   - component: {fileID: 5764480646576289780}
   m_Layer: 0
   m_Name: P_Card
@@ -48,9 +49,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visuals: {fileID: 11400000, guid: 1954b1152d8ce6b43a19545902b2a22a, type: 2}
   painter: {fileID: 791536414886205049}
-  hoverLift: 0.5
-  hoverForward: 0.62
-  hoverScale: 1.24
+  hoverLift: 1.3
+  hoverForward: 0.95
+  hoverScale: 1.12
   poseSmoothing: 18
 --- !u!114 &791536414886205049
 MonoBehaviour:
@@ -66,7 +67,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteMaterial: {fileID: 0}
   font: {fileID: 0}
+  titleFont: {fileID: 11400000, guid: 7334879322a1d514e9908b09a78565e7, type: 2}
+  rulesFont: {fileID: 11400000, guid: 3a84e584967080c489c3a1aa3d7747a4, type: 2}
+  statFont: {fileID: 0}
+  tribeFont: {fileID: 0}
   dimStrength: 0.55
+  textDimStrength: 0.28
+--- !u!210 &3678085196954474002
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7682595485194201326}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
 --- !u!65 &5764480646576289780
 BoxCollider:
   m_ObjectHideFlags: 0

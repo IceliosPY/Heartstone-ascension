@@ -325,6 +325,39 @@ namespace CoH.Presentation.CardVisuals
         }
 
         internal void ClearEntries() => entries.Clear();
+
+        /// <summary>
+        /// Puts a picture in a slot, for exactly these cards.
+        ///
+        /// Replaces the sprite on the row with *identical* constraints, and adds
+        /// a row when none matches. Not "the row for this slot": a picture
+        /// authored for a card type and a picture authored for one class of that
+        /// type are two different claims, and collapsing them would make the
+        /// second one silently answer for cards it was never drawn for.
+        /// </summary>
+        internal void SetSprite(
+            CardVisualSlot slot, in CardVisualMatch match, Sprite sprite, string notes = "")
+        {
+            for (int index = 0; index < entries.Count; index++)
+            {
+                CardVisualEntry existing = entries[index];
+
+                if (existing != null && existing.slot == slot && SameConditions(existing.match, match))
+                {
+                    existing.sprite = sprite;
+                    existing.notes = notes;
+                    return;
+                }
+            }
+
+            entries.Add(new CardVisualEntry
+            {
+                slot = slot,
+                match = match,
+                sprite = sprite,
+                notes = notes
+            });
+        }
 #endif
     }
 }

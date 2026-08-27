@@ -45,6 +45,24 @@ namespace CoH.Editor
                 "Deal 1 damage to all enemy minions."), "spell-rare", written);
             Capture(factory, Card(CardType.Weapon, Rarity.Epic, "Test Blade", ""), "weapon-epic", written);
 
+            // The two that stress the dynamic layout rather than the pictures:
+            // a name longer than the banner was drawn for, and rules text long
+            // enough to need several lines inside the parchment.
+            Capture(factory, Card(CardType.Minion, Rarity.Rare, "Test Deathrattle Draw",
+                "Deathrattle: Draw a card."), "minion-long-name", written);
+
+            Capture(factory, Card(CardType.Minion, Rarity.Epic, "Test Battlecry Damage",
+                "Battlecry: Deal 2 damage to a chosen enemy character, then draw a card."),
+                "minion-long-text", written);
+
+            // Two digits everywhere, which is where a number last ran off its
+            // gem. A ten mana card is ordinary; a thirty health one is a hero.
+            Capture(factory, new CardVisualDescriptor(
+                CardType.Minion, CardClass.Neutral, Rarity.Legendary, Tribe.None,
+                artwork: null, name: "Test Colossus", rulesText: "Battlecry: Gain 10 Armor.",
+                manaCost: 10, attack: 12, health: 30,
+                showsCost: true, showsStatistics: true), "minion-two-digits", written);
+
             CardVisualDescriptor back = new CardVisualDescriptor(
                 CardType.None, CardClass.Neutral, faceDown: true);
             Capture(factory, back, "card-back", written);

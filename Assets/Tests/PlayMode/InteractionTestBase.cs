@@ -68,6 +68,43 @@ namespace CoH.Tests.PlayMode
                 "The scenario '" + scenarioId + "' could not be loaded.");
 
             yield return null;
+            yield return HandAtRest();
+        }
+
+        /// <summary>
+        /// Waits for the hand to arrive where the fan puts it.
+        ///
+        /// A scenario replaces the hand it was dealt, and the cards glide to
+        /// their new places rather than appearing there. A test that reaches
+        /// for a card during that glide is aiming at a card that has left: two
+        /// cards mid-flight can sit almost exactly on top of each other, and the
+        /// pointer then answers a question about a hand that no longer exists.
+        /// The coin test spent a while passing on the luck of that ordering.
+        /// </summary>
+        protected IEnumerator HandAtRest()
+        {
+            yield return WaitUntil(HandHasArrived);
+
+            Assert.That(HandHasArrived, Is.True,
+                "The hand never settled into the fan.");
+        }
+
+        private bool HandHasArrived()
+        {
+            foreach (CardInstance card in Active.Hand)
+            {
+                if (!Presenter.TryGetCardView(card.Id, out CardView view))
+                {
+                    continue;
+                }
+
+                if (Vector3.Distance(view.transform.localPosition, view.RestingLocalPosition) > 0.01f)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         protected IEnumerator Settle()

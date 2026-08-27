@@ -20,6 +20,11 @@ namespace CoH.Presentation.CardVisuals
 
         [Tooltip("Set symbol identifier, or empty for none.")]
         public string expansion = string.Empty;
+
+        [Tooltip(
+            "What this one card wants done differently from its recipe. Every field of it " +
+            "is optional, and a card with none set composes exactly as the recipe says.")]
+        public CardVisualOverrides overrides = new CardVisualOverrides();
     }
 
     /// <summary>
@@ -72,6 +77,22 @@ namespace CoH.Presentation.CardVisuals
             return binding == null || binding.style.IsNone
                 ? CardVisualStyle.Default
                 : binding.style;
+        }
+
+        /// <summary>
+        /// What one card wants done differently, or null.
+        ///
+        /// Null rather than an empty object, so that the composer can tell at a
+        /// glance that there is nothing to apply — and so that the overwhelming
+        /// majority of cards, which want nothing, cost nothing.
+        /// </summary>
+        public CardVisualOverrides OverridesFor(CardId id)
+        {
+            CardVisualBinding binding = Find(id);
+
+            return binding == null || binding.overrides == null || binding.overrides.IsEmpty
+                ? null
+                : binding.overrides;
         }
 
         public string ExpansionFor(CardId id)
@@ -170,6 +191,42 @@ namespace CoH.Presentation.CardVisuals
         }
 
         internal void SetFallbackArtwork(Sprite artwork) => fallbackArtwork = artwork;
+
+        /// <summary>
+        /// The overrides for a card, made if the card has no entry yet.
+        ///
+        /// Editor only, and deliberately the only way to get a writable set: a
+        /// card acquires an entry here the moment somebody polishes it, and not
+        /// before.
+        /// </summary>
+        internal CardVisualOverrides EstablishOverrides(string cardId)
+        {
+            if (string.IsNullOrEmpty(cardId))
+            {
+                return null;
+            }
+
+            for (int index = 0; index < cards.Count; index++)
+            {
+                if (cards[index] != null &&
+                    string.Equals(cards[index].cardId, cardId, StringComparison.Ordinal))
+                {
+                    cards[index].overrides ??= new CardVisualOverrides();
+                    return cards[index].overrides;
+                }
+            }
+
+            CardVisualBinding fresh = new CardVisualBinding
+            {
+                cardId = cardId,
+                overrides = new CardVisualOverrides()
+            };
+
+            cards.Add(fresh);
+            _byId = null;
+
+            return fresh.overrides;
+        }
 #endif
     }
 }

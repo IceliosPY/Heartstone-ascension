@@ -58,6 +58,16 @@ namespace CoH.Presentation.CardVisuals
         ExpansionEmblem = 12,
 
         /// <summary>The back of the card, for a hand nobody is allowed to read.</summary>
-        CardBack = 13
+        CardBack = 13,
+
+        /// <summary>
+        /// The shape the artwork is clipped to.
+        ///
+        /// Never drawn. It is a picture only so that it can be authored,
+        /// resolved and overridden exactly like every other component: a minion
+        /// window is an oval and a spell window is a rectangle, and that is a
+        /// fact about a kind of card rather than a branch in a renderer.
+        /// </summary>
+        ArtworkMask = 14
     }
 }

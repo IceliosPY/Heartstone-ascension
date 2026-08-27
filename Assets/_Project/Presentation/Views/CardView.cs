@@ -26,13 +26,19 @@ namespace CoH.Presentation
         [SerializeField] private CardVisualPainter painter;
 
         [Header("Hover")]
-        [Tooltip("How far a hovered card rises out of the hand.")]
-        [SerializeField] private float hoverLift = 0.5f;
+        [Tooltip(
+            "How far a hovered card rises out of the hand. With the cards overlapping, this is " +
+            "what actually reveals one: it has to clear the neighbours standing in front of it.")]
+        [SerializeField] private float hoverLift = 1.3f;
 
         [Tooltip("How far it comes toward the camera, which is what puts it in front of its neighbours.")]
-        [SerializeField] private float hoverForward = 0.62f;
+        [SerializeField] private float hoverForward = 0.95f;
 
-        [SerializeField] private float hoverScale = 1.24f;
+        [Tooltip(
+            "How much larger a hovered card is than its neighbours. Deliberately modest: what " +
+            "picks a card out of an overlapping hand is rising clear of it and standing in " +
+            "front, not swelling. Past a point more size only takes up more screen.")]
+        [SerializeField] private float hoverScale = 1.12f;
 
         [Tooltip("How quickly a card reaches its target pose. Higher is snappier.")]
         [SerializeField] private float poseSmoothing = 18f;
@@ -54,6 +60,8 @@ namespace CoH.Presentation
         private Transform _poseParent;
 
         private Collider _collider;
+        private UnityEngine.Rendering.SortingGroup _group;
+        private int _handOrder;
 
         /// <summary>Which card instance in the engine this view stands for.</summary>
         public EntityId EntityId { get; private set; }
@@ -84,6 +92,16 @@ namespace CoH.Presentation
         /// <summary>The composed stack, for the tests and the preview tool.</summary>
         internal CardVisualPlan Plan => _plan;
 
+        /// <summary>
+        /// The card this view is currently showing. Diagnostics and tests.
+        ///
+        /// Exposed so that a test can compose the very same card a second time,
+        /// through the same factory, and compare the two — which is the only way
+        /// to tell a difference in how a card is composed from a difference in
+        /// how it is drawn.
+        /// </summary>
+        internal CardVisualDescriptor Shown => _shown;
+
         private void Awake()
         {
             _collider = GetComponent<Collider>();
@@ -92,7 +110,94 @@ namespace CoH.Presentation
             {
                 painter = GetComponent<CardVisualPainter>();
             }
+
+            EnsureSortingGroup();
         }
+
+        /// <summary>
+        /// Makes the card sort as one object rather than as twenty loose
+        /// layers.
+        ///
+        /// This is the whole reason a hovered card used to come forward and
+        /// still be painted over. A card is a stack of sprites with sorting
+        /// orders from the backdrop up to the last label, and those orders are
+        /// global: every card's frame is order twenty and every card's name is
+        /// order a hundred and thirty, so the *neighbour's* name drew in front
+        /// of *this* card's frame whatever the two cards' depths were. Moving a
+        /// card toward the camera could not fix that, because depth was never
+        /// what decided it.
+        ///
+        /// A sorting group makes those orders private to the card. Inside, the
+        /// layers stack as the recipe says; outside, the card is one thing with
+        /// one order, and cards sort against each other — and against the board
+        /// and the hero behind them — by that.
+        /// </summary>
+        private void EnsureSortingGroup()
+        {
+            if (_group != null)
+            {
+                return;
+            }
+
+            _group = GetComponent<UnityEngine.Rendering.SortingGroup>();
+
+            if (_group == null)
+            {
+                _group = gameObject.AddComponent<UnityEngine.Rendering.SortingGroup>();
+            }
+
+            ApplySorting();
+        }
+
+        /// <summary>
+        /// Where this card stands in the hand, left to right.
+        ///
+        /// The later a card, the further forward it draws, which is what makes
+        /// an overlapping fan read as a fan.
+        /// </summary>
+        public void SetHandOrder(int order)
+        {
+            if (_handOrder == order)
+            {
+                return;
+            }
+
+            _handOrder = order;
+            ApplySorting();
+        }
+
+        private void ApplySorting()
+        {
+            if (_group == null)
+            {
+                return;
+            }
+
+            // The hand lives in front of the board and the heroes, so a hand
+            // that overlaps them covers them rather than being cut into by
+            // them. A card being read, or carried, comes further forward still.
+            int order = HandBase + Mathf.Clamp(_handOrder, 0, 99);
+
+            if (_isDragging)
+            {
+                order = CarriedOrder;
+            }
+            else if (_isHovered)
+            {
+                order = ReadOrder;
+            }
+
+            _group.sortingOrder = order;
+        }
+
+        /// <summary>The hand draws above the board and both heroes.</summary>
+        private const int HandBase = 100;
+
+        /// <summary>A card being read stands in front of the rest of the hand.</summary>
+        private const int ReadOrder = 300;
+
+        /// <summary>And one being carried stands in front of everything.</summary>
+        private const int CarriedOrder = 400;
 
         /// <summary>
         /// Records where the layout wants this card.
@@ -132,6 +237,7 @@ namespace CoH.Presentation
             }
 
             _isHovered = hovered;
+            ApplySorting();
             Repaint();
         }
 
@@ -144,6 +250,7 @@ namespace CoH.Presentation
         {
             _isDragging = true;
             _isHovered = false;
+            ApplySorting();
 
             if (dragLayer != null)
             {
@@ -177,6 +284,7 @@ namespace CoH.Presentation
         public void EndDrag(Transform handAnchor)
         {
             _isDragging = false;
+            ApplySorting();
 
             if (handAnchor != null)
             {
@@ -203,6 +311,15 @@ namespace CoH.Presentation
             // of the remaining distance covered per second, not per frame.
             ApplyPose(1f - Mathf.Exp(-poseSmoothing * Time.deltaTime));
         }
+
+        /// <summary>
+        /// Puts the card at its target pose at once, rather than easing there.
+        ///
+        /// For anything that has to see the finished result without a running
+        /// game: a still of a hovered card, or a test that would otherwise be
+        /// asserting on how far along an animation happened to be.
+        /// </summary>
+        internal void SnapToPose() => ApplyPose(1f);
 
         private void ApplyPose(float t)
         {
@@ -338,6 +455,24 @@ namespace CoH.Presentation
             bool lit = _isFaceDown || _isPlayable || _isHovered || _isDragging;
             painter.SetDimmed(!lit);
         }
+
+        /// <summary>
+        /// Where this card lies in the fan, left to right.
+        ///
+        /// Unlike <see cref="DrawOrder"/> this says nothing about being read or
+        /// carried, which is what makes it the right question to ask of a
+        /// pointer: a card being hovered draws in front of the whole hand, and
+        /// a pointer that took that as its answer would never be able to leave
+        /// it.
+        /// </summary>
+        internal int HandOrder => _handOrder;
+
+        /// <summary>
+        /// Where this card draws relative to everything else. Diagnostics and
+        /// tests: this is the number that decides whether a hovered card is
+        /// actually in front, and depth alone never did.
+        /// </summary>
+        internal int DrawOrder => _group == null ? 0 : _group.sortingOrder;
 
         /// <summary>Where this card's appearance comes from. Tooling and tests.</summary>
         internal CardVisualFactory Visuals => visuals;

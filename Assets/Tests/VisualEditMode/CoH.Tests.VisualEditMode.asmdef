@@ -4,6 +4,7 @@
     "references": [
         "CoH.Core",
         "CoH.Presentation",
+        "CoH.Editor",
         "Unity.TextMeshPro",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

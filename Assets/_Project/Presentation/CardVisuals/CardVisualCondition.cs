@@ -133,6 +133,67 @@ namespace CoH.Presentation.CardVisuals
             return true;
         }
 
+        /// <summary>
+        /// Whether these two can never hold at once.
+        ///
+        /// Two cases, both certain, both about the same field:
+        ///
+        ///     is a minion   /  is a spell        two values, one field
+        ///     is a spell    /  is not a spell    a value and its negation
+        ///
+        /// A card is one type, so layers carrying either pair never meet and
+        /// their order never comes up. Anything subtler is reported as "no",
+        /// because a wrong yes here would hide a real ambiguity — and a false
+        /// warning costs a moment while a missed one costs a card that looks
+        /// different depending on the order a list happens to be in.
+        /// </summary>
+        public bool ExcludesTheSameCardAs(in CardVisualCondition other)
+        {
+            if (field != other.field)
+            {
+                return false;
+            }
+
+            bool bothPin =
+                comparison == CardVisualComparison.Equals &&
+                other.comparison == CardVisualComparison.Equals;
+
+            if (bothPin)
+            {
+                return value != other.value;
+            }
+
+            bool onePinsAndOneRejects =
+                (comparison == CardVisualComparison.Equals &&
+                 other.comparison == CardVisualComparison.NotEquals) ||
+                (comparison == CardVisualComparison.NotEquals &&
+                 other.comparison == CardVisualComparison.Equals);
+
+            return onePinsAndOneRejects && value == other.value;
+        }
+
+        /// <summary>True when no card could satisfy both lists.</summary>
+        public static bool MutuallyExclusive(CardVisualCondition[] left, CardVisualCondition[] right)
+        {
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            for (int a = 0; a < left.Length; a++)
+            {
+                for (int b = 0; b < right.Length; b++)
+                {
+                    if (left[a].ExcludesTheSameCardAs(right[b]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public string Describe() => field + " " + comparison + " " + value;
 
         public override string ToString() => Describe();

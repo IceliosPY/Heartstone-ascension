@@ -20,6 +20,37 @@ namespace CoH.Presentation.CardVisuals
         Always = 2
     }
 
+    /// <summary>How a picture fills the rectangle it is drawn into.</summary>
+    public enum CardVisualFill
+    {
+        /// <summary>
+        /// Stretched to the rectangle exactly. Right for a component drawn at
+        /// its own size, which every downloaded one is.
+        /// </summary>
+        Stretch = 0,
+
+        /// <summary>
+        /// Scaled up until it covers the rectangle, keeping its proportions,
+        /// and allowed to overflow. Right for artwork, which is a painting of
+        /// unknown shape that has to fill a window without being squashed —
+        /// and which a mask then crops.
+        /// </summary>
+        Cover = 1,
+
+        /// <summary>Scaled down until it fits inside, keeping its proportions.</summary>
+        Contain = 2
+    }
+
+    /// <summary>Where a label sits inside its rectangle.</summary>
+    public enum CardVisualAlignment
+    {
+        Center = 0,
+        Top = 1,
+        Bottom = 2,
+        Left = 3,
+        Right = 4
+    }
+
     /// <summary>
     /// One layer of a card: where a picture or a label goes, and when.
     ///
@@ -59,10 +90,33 @@ namespace CoH.Presentation.CardVisuals
         [Tooltip("Degrees, clockwise.")]
         public float rotation;
 
-        [Tooltip("Largest point size for a text layer. Text always shrinks to fit.")]
+        [Tooltip("How the picture fills its rectangle.")]
+        public CardVisualFill fill = CardVisualFill.Stretch;
+
+        [Tooltip(
+            "Clip this layer to the shape of the picture in another slot. None for no clipping. " +
+            "Used for artwork, which is a rectangle that has to sit inside a frame's window.")]
+        public CardVisualSlot maskSlot = CardVisualSlot.None;
+
+        [Header("Text")]
+        [Tooltip(
+            "Which of the recipe's text styles this label is set in. Empty falls back to a " +
+            "plain style chosen from the text slot, which is what every layer authored before " +
+            "styles existed still gets.")]
+        public string textStyle = string.Empty;
+
+        [Tooltip("Largest point size. Text shrinks from here to fit its rectangle.")]
         public float fontSize = 3f;
 
+        [Tooltip("Smallest it may shrink to before it is allowed to overflow instead.")]
+        public float fontSizeMin = 0.6f;
+
         public bool bold;
+
+        public CardVisualAlignment alignment = CardVisualAlignment.Center;
+
+        [Tooltip("Whether a long line wraps. Off for a number, on for a sentence.")]
+        public bool wrap = true;
 
         public Color tint = Color.white;
 
@@ -79,6 +133,24 @@ namespace CoH.Presentation.CardVisuals
 
         public bool AppliesTo(in CardVisualDescriptor card) =>
             ShowsOn(card.IsFaceDown) && CardVisualCondition.AllMatch(conditions, card);
+
+        /// <summary>Why this layer applies, in words. For the reports.</summary>
+        public string Describe()
+        {
+            if (conditions == null || conditions.Length == 0)
+            {
+                return face == CardVisualFace.FaceUp ? "always" : face.ToString();
+            }
+
+            string[] parts = new string[conditions.Length];
+
+            for (int index = 0; index < conditions.Length; index++)
+            {
+                parts[index] = conditions[index].Describe();
+            }
+
+            return string.Join(" and ", parts);
+        }
 
         public bool ShowsOn(bool faceDown) =>
             face == CardVisualFace.Always ||
@@ -111,9 +183,65 @@ namespace CoH.Presentation.CardVisuals
 
         [SerializeField] private List<CardVisualLayerDefinition> layers = new List<CardVisualLayerDefinition>();
 
+        [Tooltip(
+            "How each kind of writing on a card looks. Layers select one by name, so a minion " +
+            "title and a spell title are two rows here rather than two code paths.")]
+        [SerializeField] private List<CardTextStyleDefinition> textStyles = new List<CardTextStyleDefinition>();
+
         public CardVisualStyle Style => style;
 
         public IReadOnlyList<CardVisualLayerDefinition> Layers => layers;
+
+        public IReadOnlyList<CardTextStyleDefinition> TextStyles => textStyles;
+
+        /// <summary>
+        /// The style a layer asks for, or the fallback for its text slot.
+        ///
+        /// Never null and never an exception. A recipe that names a style it
+        /// does not define is an authoring mistake the validator reports by
+        /// name; the card still draws in the meantime, in a plain style, rather
+        /// than losing its title because of a typo.
+        /// </summary>
+        public CardTextStyle ResolveTextStyle(CardVisualLayerDefinition layer)
+        {
+            if (layer == null)
+            {
+                return CardTextStyle.For(CardVisualTextSlot.None);
+            }
+
+            if (string.IsNullOrEmpty(layer.textStyle))
+            {
+                return CardTextStyle.For(layer.text);
+            }
+
+            CardTextStyleDefinition found = FindTextStyle(layer.textStyle);
+
+            return found == null
+                ? CardTextStyle.For(layer.text)
+                : CardTextStyle.From(found, layer.text);
+        }
+
+        /// <summary>The named style, or null. Editor tooling and the validator.</summary>
+        public CardTextStyleDefinition FindTextStyle(string wanted)
+        {
+            if (string.IsNullOrEmpty(wanted))
+            {
+                return null;
+            }
+
+            for (int index = 0; index < textStyles.Count; index++)
+            {
+                CardTextStyleDefinition candidate = textStyles[index];
+
+                if (candidate != null &&
+                    string.Equals(candidate.name, wanted, StringComparison.OrdinalIgnoreCase))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Checks the recipe on its own, without a catalog.
@@ -135,7 +263,29 @@ namespace CoH.Presentation.CardVisuals
                 problems.Add(name + ": the recipe has no style, so no card will ever select it.");
             }
 
-            HashSet<int> orders = new HashSet<int>();
+            HashSet<string> named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            for (int index = 0; index < textStyles.Count; index++)
+            {
+                CardTextStyleDefinition definition = textStyles[index];
+
+                if (definition == null)
+                {
+                    problems.Add(name + ": text style " + index + " is empty.");
+                    continue;
+                }
+
+                definition.Validate(name, problems);
+
+                if (!string.IsNullOrWhiteSpace(definition.name) && !named.Add(definition.name))
+                {
+                    problems.Add(name + ": two text styles are both called '" + definition.name +
+                        "', so which one a layer gets depends on list order.");
+                }
+            }
+
+            Dictionary<int, List<CardVisualLayerDefinition>> atDepth =
+                new Dictionary<int, List<CardVisualLayerDefinition>>();
 
             for (int index = 0; index < layers.Count; index++)
             {
@@ -171,12 +321,63 @@ namespace CoH.Presentation.CardVisuals
                     problems.Add(where + " is a text layer marked required, which means nothing.");
                 }
 
-                if (!orders.Add(layer.sortingOrder))
+                if (layer.IsText && layer.fontSizeMin > layer.fontSize)
                 {
                     problems.Add(
-                        where + " shares sorting order " + layer.sortingOrder +
-                        " with another layer, so which one draws in front depends on list order.");
+                        where + " may not shrink below " + layer.fontSizeMin +
+                        " but starts at " + layer.fontSize + ", so it can only grow.");
                 }
+
+                if (!string.IsNullOrEmpty(layer.textStyle))
+                {
+                    if (!layer.IsText)
+                    {
+                        problems.Add(where + " is a picture that names a text style.");
+                    }
+                    else if (FindTextStyle(layer.textStyle) == null)
+                    {
+                        problems.Add(where + " asks for the text style '" + layer.textStyle +
+                            "', which this recipe does not define.");
+                    }
+                }
+
+                if (layer.maskSlot != CardVisualSlot.None && layer.IsText)
+                {
+                    problems.Add(where + " is a label with a mask, which does nothing.");
+                }
+
+                if (layer.maskSlot == layer.slot && layer.slot != CardVisualSlot.None)
+                {
+                    problems.Add(where + " is masked by itself.");
+                }
+
+                // Two layers at one depth only matter if a card could ever
+                // have both. A slot whose picture and rectangle differ by card
+                // type is written as several layers, and a card is one type, so
+                // they never meet and their order never comes up.
+                //
+                // Compared against everything already at that depth rather than
+                // against the first one: three layers where only two of them
+                // exclude each other is still an ambiguity, and checking only
+                // the first would miss exactly that.
+                if (!atDepth.TryGetValue(layer.sortingOrder, out List<CardVisualLayerDefinition> neighbours))
+                {
+                    neighbours = new List<CardVisualLayerDefinition>();
+                    atDepth[layer.sortingOrder] = neighbours;
+                }
+
+                for (int other = 0; other < neighbours.Count; other++)
+                {
+                    if (!CardVisualCondition.MutuallyExclusive(layer.conditions, neighbours[other].conditions))
+                    {
+                        problems.Add(
+                            where + " shares sorting order " + layer.sortingOrder + " with '" +
+                            neighbours[other].name + "', and a card could have both, so which draws " +
+                            "in front depends on list order.");
+                    }
+                }
+
+                neighbours.Add(layer);
             }
         }
 
@@ -186,6 +387,59 @@ namespace CoH.Presentation.CardVisuals
         {
             style = newStyle;
             layers = new List<CardVisualLayerDefinition>(newLayers);
+        }
+
+        /// <summary>
+        /// Replaces the text styles, leaving every layer alone.
+        ///
+        /// Separate from <see cref="Author"/> on purpose. Rebuilding a recipe
+        /// throws away the rectangles somebody spent an evening nudging into
+        /// place; adding the styles the layers refer to must not, so the two are
+        /// not the same operation and cannot be confused for one another.
+        /// </summary>
+        internal void AuthorTextStyles(IEnumerable<CardTextStyleDefinition> newStyles)
+        {
+            textStyles = new List<CardTextStyleDefinition>(newStyles);
+        }
+
+        /// <summary>
+        /// Sets how tall one label's box is, keeping it centred where it was.
+        ///
+        /// Height alone, and re-centred rather than moved: how tall a title's
+        /// box is decides how big the title is, and is therefore a typographic
+        /// number rather than a placement one. Where the banner sits across the
+        /// card stays whatever it was tuned to.
+        /// </summary>
+        internal void SetTextHeight(string layerName, float height)
+        {
+            for (int index = 0; index < layers.Count; index++)
+            {
+                CardVisualLayerDefinition layer = layers[index];
+
+                if (layer == null ||
+                    !string.Equals(layer.name, layerName, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                float middle = layer.y + layer.height * 0.5f;
+
+                layer.height = height;
+                layer.y = middle - height * 0.5f;
+            }
+        }
+
+        /// <summary>Points one layer at a style, leaving its geometry alone.</summary>
+        internal void AssignTextStyle(string layerName, string styleName)
+        {
+            for (int index = 0; index < layers.Count; index++)
+            {
+                if (layers[index] != null &&
+                    string.Equals(layers[index].name, layerName, StringComparison.Ordinal))
+                {
+                    layers[index].textStyle = styleName;
+                }
+            }
         }
 #endif
     }

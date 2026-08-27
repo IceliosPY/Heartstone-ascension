@@ -60,5 +60,6 @@ desktop.ini
 # Stills the editor writes to the project root to check framing.
 match-preview.png
 CardCaptures/
+hand-*.png
 interaction-drag.png
 interaction-aim.png

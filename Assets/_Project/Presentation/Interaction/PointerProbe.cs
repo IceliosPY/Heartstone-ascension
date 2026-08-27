@@ -78,6 +78,51 @@ namespace CoH.Presentation
         }
 
         /// <summary>
+        /// The hand card lying over the others at this point.
+        ///
+        /// Not the nearest one. A hand is a stack of overlapping cards, and
+        /// distance is a poor proxy for which is on top: the cards sit on a
+        /// tilted arc and the ray arrives at an angle, so it can meet a card's
+        /// plane a few centimetres before the plane of the card lying across
+        /// it. Once the fan overlapped by a fifth that stopped being an edge
+        /// case, and clicking a card picked up its left-hand neighbour.
+        ///
+        /// The rule is the fan's own: later cards lie over earlier ones. That
+        /// is <see cref="CardView.HandOrder"/> and deliberately not
+        /// <see cref="CardView.DrawOrder"/>, which also carries whether a card
+        /// is being read or carried. Asking for the highest drawn card would
+        /// make the answer stick: a hovered card draws in front of the entire
+        /// hand, so it would keep winning every probe and the pointer could
+        /// never move off it.
+        /// </summary>
+        public bool TryFindTopmostHandCard(out PointerHit found)
+        {
+            found = default;
+
+            bool any = false;
+            int topmost = int.MinValue;
+
+            for (int index = 0; index < _hits.Count; index++)
+            {
+                PointerHit hit = _hits[index];
+
+                if (hit.Kind != PointerTargetKind.HandCard || hit.Card == null)
+                {
+                    continue;
+                }
+
+                if (!any || hit.Card.HandOrder > topmost)
+                {
+                    found = hit;
+                    topmost = hit.Card.HandOrder;
+                    any = true;
+                }
+            }
+
+            return any;
+        }
+
+        /// <summary>
         /// The nearest thing that could be attacked: any minion or hero,
         /// friendly or not. Whether it is a legal target is asked separately, so
         /// that releasing on a friendly minion cancels rather than doing nothing

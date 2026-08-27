@@ -348,7 +348,7 @@ namespace CoH.Presentation
 
         private void BeginInteraction(Ray ray)
         {
-            if (_probe.TryFind(PointerTargetKind.HandCard, out PointerHit card))
+            if (_probe.TryFindTopmostHandCard(out PointerHit card))
             {
                 BeginCardDrag(card, ray);
                 return;
@@ -431,7 +431,7 @@ namespace CoH.Presentation
 
         private void UpdateCardHover()
         {
-            EntityId under = _probe.TryFind(PointerTargetKind.HandCard, out PointerHit card)
+            EntityId under = _probe.TryFindTopmostHandCard(out PointerHit card)
                 ? card.EntityId
                 : EntityId.None;
 
@@ -704,6 +704,16 @@ namespace CoH.Presentation
         }
 
         /// <summary>Drops whatever is held, changing nothing about the match.</summary>
+        /// <summary>
+        /// Drops whatever is being held, the way pressing Escape does.
+        ///
+        /// Exposed for the tests that pick a card up only to check which one
+        /// they got: without it they would have to play it or drop it
+        /// somewhere, and either changes the hand they are halfway through
+        /// walking.
+        /// </summary>
+        internal void CancelForTests() => CancelInteraction();
+
         private void CancelInteraction()
         {
             switch (_state)
@@ -787,7 +797,47 @@ namespace CoH.Presentation
         private void Probe(Ray ray)
         {
             _probe.Probe(ray, clickMask, session.State, session.State.CurrentPlayer);
-            LastHit = _probe.Hits.Count > 0 ? _probe.Nearest.Describe() : "nothing";
+            LastHit = DescribeHits();
+        }
+
+        /// <summary>
+        /// Everything the last ray met, nearest first, with the order each card
+        /// draws in.
+        ///
+        /// The whole list rather than the nearest hit. Which card a click lands
+        /// on is decided by comparing candidates, so a report naming only the
+        /// winner says nothing about why it won — and "the pointer landed on a
+        /// hand card" was exactly the useless message that made an overlapping
+        /// hand hard to reason about.
+        /// </summary>
+        private string DescribeHits()
+        {
+            if (_probe.Hits.Count == 0)
+            {
+                return "nothing";
+            }
+
+            System.Text.StringBuilder text = new System.Text.StringBuilder();
+
+            for (int index = 0; index < _probe.Hits.Count; index++)
+            {
+                PointerHit hit = _probe.Hits[index];
+
+                if (index > 0)
+                {
+                    text.Append(", ");
+                }
+
+                text.Append(hit.Describe());
+                text.Append(" at ").Append(hit.Distance.ToString("0.00"));
+
+                if (hit.Card != null)
+                {
+                    text.Append(" order ").Append(hit.Card.DrawOrder);
+                }
+            }
+
+            return text.ToString();
         }
 
         /// <summary>

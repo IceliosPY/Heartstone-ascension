@@ -38,6 +38,32 @@ namespace CoH.Editor
         /// still never runs Awake or LateUpdate, so a preview has to place what
         /// the game would have eased into.
         /// </summary>
+        /// <summary>
+        /// One still per hand size, so a change to the fan can be judged at the
+        /// sizes that actually stress it: one card centred, a normal hand, and a
+        /// full one overlapping.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Capture Hand Sizes")]
+        public static void CaptureHandSizes()
+        {
+            foreach (int count in new[] { 1, 3, 5, 10 })
+            {
+                CaptureTo("hand-" + count + ".png", 1920, 1080, count);
+            }
+        }
+
+        /// <summary>
+        /// A hand with its middle card being read, which is the case the fan
+        /// exists to survive: the most buried card in the hand, and the one a
+        /// hover has the most work to do on.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Capture Hovered Card")]
+        public static void CaptureHovered()
+        {
+            CaptureTo("hand-hover.png", 1920, 1080, 6, hovered: 3);
+            CaptureTo("hand-hover-edge.png", 1920, 1080, 6, hovered: 5);
+        }
+
         [MenuItem("Conquest of Hearthstone/Capture Interaction Preview")]
         public static void CaptureInteraction()
         {
@@ -249,7 +275,8 @@ namespace CoH.Editor
             Debug.Log("Preview written to " + outputPath);
         }
 
-        public static void CaptureTo(string outputPath, int width, int height)
+        public static void CaptureTo(
+            string outputPath, int width, int height, int nearHandCount = 6, int hovered = -1)
         {
             Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
@@ -267,7 +294,7 @@ namespace CoH.Editor
 
             // The near side belongs to whoever is acting, so the preview shows a
             // readable hand there and card backs on the far side.
-            PopulateHand(anchors.Hand(true), card, 6, 1f, "Test Soldier", "2", "2", "3");
+            PopulateHand(anchors.Hand(true), card, nearHandCount, 1f, "Test Soldier", "2", "2", "3", hovered);
             PopulateHand(anchors.Hand(false), card, 5, 0.55f, null, null, null, null);
 
             PopulateBoard(anchors.Board(true), minion, 4);
@@ -319,18 +346,151 @@ namespace CoH.Editor
             EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
         }
 
+        /// <summary>
+        /// One card in a made up hand: what it is called and what kind of card
+        /// it is.
+        ///
+        /// A hand of identical cards was enough while the question was where the
+        /// cards go. It stopped being enough the moment the question became how
+        /// the writing on them looks, because a short name, a long name and a
+        /// spell are set differently on purpose and a still of five identical
+        /// minions shows none of that.
+        /// </summary>
+        private readonly struct MadeUpCard
+        {
+            public MadeUpCard(string name, CardType type, int cost, int attack, int health)
+            {
+                Name = name;
+                Type = type;
+                Cost = cost;
+                Attack = attack;
+                Health = health;
+            }
+
+            public string Name { get; }
+
+            public CardType Type { get; }
+
+            public int Cost { get; }
+
+            public int Attack { get; }
+
+            public int Health { get; }
+
+            public CardVisualDescriptor Describe() =>
+                new CardVisualDescriptor(
+                    Type,
+                    CardClass.Neutral,
+                    Rarity.Free,
+                    Tribe.None,
+                    artwork: null,
+                    name: Name,
+                    rulesText: Type == CardType.Spell ? "Gain 1 Mana Crystal this turn only." : string.Empty,
+                    manaCost: Cost,
+                    attack: Attack,
+                    health: Health,
+                    showsCost: true,
+                    showsStatistics: Type == CardType.Minion || Type == CardType.Weapon);
+        }
+
+        [MenuItem("Conquest of Hearthstone/Capture Title Showcase")]
+        public static void CaptureTitleShowcase()
+        {
+            CaptureHand(
+                "hand-titles.png", 1920, 1080,
+                new MadeUpCard("Test Soldier", CardType.Minion, 2, 2, 3),
+                new MadeUpCard("Test Quartermaster", CardType.Minion, 3, 1, 2),
+                new MadeUpCard("The Coin", CardType.Spell, 0, 0, 0),
+                new MadeUpCard("Test Deathrattle Draw", CardType.Minion, 2, 1, 2),
+                new MadeUpCard("Test Scribe", CardType.Minion, 2, 1, 2));
+        }
+
+        /// <summary>Renders one still of a hand made of the given cards.</summary>
+        private static void CaptureHand(
+            string outputPath, int width, int height, params MadeUpCard[] cards)
+        {
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+
+            BoardAnchors anchors = Object.FindFirstObjectByType<BoardAnchors>();
+            Camera camera = Object.FindFirstObjectByType<Camera>();
+
+            if (anchors == null || camera == null)
+            {
+                Debug.LogError("The match scene is missing its anchors or its camera.");
+                return;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CardPrefab);
+
+            PopulateNamedHand(anchors.Hand(true), prefab, cards);
+            PopulateHand(anchors.Hand(false), prefab, 5, 0.55f, null, null, null, null);
+
+            PopulateHero("NearHeroView", "PLAYER 1", "30", "deck 22   hand 5", null);
+            PopulateHero("FarHeroView", "PLAYER 2", "24", "deck 21   hand 5", "5");
+
+            Render(camera, outputPath, width, height);
+
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        }
+
+        private static void PopulateNamedHand(
+            Transform anchor, GameObject prefab, MadeUpCard[] cards)
+        {
+            HandFanSettings settings = new HandFanSettings
+            {
+                Scale = 1.45f,
+                Spacing = 0.765f,
+                MaxWidth = 7.56f,
+                PivotDistance = 15.0f,
+                DepthStep = 0.035f
+            };
+
+            for (int index = 0; index < cards.Length; index++)
+            {
+                GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, anchor);
+                CardPose pose = HandFanLayout.GetPose(index, cards.Length, settings);
+
+                CardView view = instance.GetComponent<CardView>();
+
+                if (view == null)
+                {
+                    continue;
+                }
+
+                view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, pose.Scale);
+                view.SetHandOrder(index);
+
+                CardVisualFactory factory = view.Visuals;
+
+                if (factory != null)
+                {
+                    CardVisualPlan plan = new CardVisualPlan();
+                    factory.Compose(cards[index].Describe(), plan);
+
+                    CardVisualPainter painter = instance.GetComponent<CardVisualPainter>();
+
+                    if (painter != null)
+                    {
+                        painter.Apply(plan);
+                    }
+                }
+
+                view.SnapToPose();
+            }
+        }
+
         private static void PopulateHand(
             Transform anchor, GameObject prefab, int count, float sideScale,
-            string name, string mana, string attack, string health)
+            string name, string mana, string attack, string health, int hovered = -1)
         {
             // Same numbers the scene wires into the presenter.
             HandFanSettings settings = new HandFanSettings
             {
-                PivotDistance = 7f,
-                AnglePerCard = 6.5f,
-                MaxSpreadAngle = 38f,
-                DepthStep = 0.035f,
-                Scale = 0.9f
+                Scale = 1.45f,
+                Spacing = 0.765f,
+                MaxWidth = 7.56f,
+                PivotDistance = 15.0f,
+                DepthStep = 0.035f
             };
 
             bool faceUp = name != null;
@@ -361,16 +521,32 @@ namespace CoH.Editor
                 GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, anchor);
                 CardPose pose = HandFanLayout.GetPose(index, count, settings);
 
-                instance.transform.localPosition = pose.LocalPosition;
-                instance.transform.localRotation = pose.LocalRotation;
-                instance.transform.localScale = Vector3.one * pose.Scale * sideScale;
-
                 CardView view = instance.GetComponent<CardView>();
 
                 if (view == null)
                 {
                     continue;
                 }
+
+                // Told where it belongs rather than put there. Setting the
+                // transform by hand leaves the card with no resting pose, and
+                // the first thing that asks it to pose itself — a hover, say —
+                // sends it back to the anchor's origin, which is how a still of
+                // a five card hand came out as one card in the middle.
+                view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, pose.Scale * sideScale);
+
+                // The same order the presenter gives them, so a still shows the
+                // stacking the game would.
+                view.SetHandOrder(index);
+
+                if (index == hovered)
+                {
+                    view.SetHovered(true);
+                }
+
+                // A pose is eased into over frames, and a batch capture has
+                // none of those.
+                view.SnapToPose();
 
                 if (faceUp)
                 {

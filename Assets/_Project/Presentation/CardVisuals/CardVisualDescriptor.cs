@@ -36,7 +36,8 @@ namespace CoH.Presentation.CardVisuals
             CardVisualStyle style = default,
             CardClass secondaryClass = CardClass.Neutral,
             string expansion = "",
-            bool faceDown = false)
+            bool faceDown = false,
+            CardVisualOverrides overrides = null)
         {
             IsFaceDown = faceDown;
             Type = type;
@@ -54,6 +55,7 @@ namespace CoH.Presentation.CardVisuals
             ShowsStatistics = showsStatistics;
             Style = style.IsNone ? CardVisualStyle.Default : style;
             Expansion = expansion ?? string.Empty;
+            Overrides = overrides;
         }
 
         /// <summary>
@@ -64,6 +66,16 @@ namespace CoH.Presentation.CardVisuals
         /// vary by style and class exactly as the front does.
         /// </summary>
         public bool IsFaceDown { get; }
+
+        /// <summary>
+        /// What this one card wants done differently from its recipe, or null.
+        ///
+        /// Resolved data rather than an identity. Whatever built this looked the
+        /// card up once, by its id, and what travels on from here is a set of
+        /// optional numbers — so there is still nowhere downstream to ask which
+        /// card is being drawn, and nowhere to write a special case for one.
+        /// </summary>
+        public CardVisualOverrides Overrides { get; }
 
         public CardType Type { get; }
 
@@ -142,25 +154,49 @@ namespace CoH.Presentation.CardVisuals
             IsFaceDown == other.IsFaceDown &&
             Style.Equals(other.Style) &&
             string.Equals(Expansion, other.Expansion, System.StringComparison.Ordinal) &&
-            HasRulesText == other.HasRulesText;
+            HasRulesText == other.HasRulesText &&
+
+            // By reference. Two cards polished the same way still compose the
+            // same, and one whose polish was just edited must not: the tool
+            // rewrites the object in place, so anything comparing its contents
+            // would decide nothing had changed and the preview would freeze.
+            ReferenceEquals(Overrides, other.Overrides);
 
         /// <summary>The same card with a different painting.</summary>
         public CardVisualDescriptor With(Sprite newArtwork) =>
             new CardVisualDescriptor(
                 Type, Class, Rarity, Tribe, newArtwork, Name, RulesText,
                 ManaCost, Attack, Health, ShowsCost, ShowsStatistics,
-                Style, SecondaryClass, Expansion, IsFaceDown);
+                Style, SecondaryClass, Expansion, IsFaceDown, Overrides);
+
+        /// <summary>
+        /// The same card as its recipe alone would draw it.
+        ///
+        /// What a polishing tool needs in order to say what a number is being
+        /// overridden *from*. Reading the adjusted plan instead would report
+        /// each override as though it were inherited, and the figures would
+        /// creep every time the panel redrew.
+        /// </summary>
+        public CardVisualDescriptor WithoutOverrides() =>
+            new CardVisualDescriptor(
+                Type, Class, Rarity, Tribe, Artwork, Name, RulesText,
+                ManaCost, Attack, Health, ShowsCost, ShowsStatistics,
+                Style, SecondaryClass, Expansion, IsFaceDown, null);
 
         /// <summary>The same card, seen from the other side.</summary>
         public CardVisualDescriptor Reversed(bool faceDown) =>
             new CardVisualDescriptor(
                 Type, Class, Rarity, Tribe, Artwork, Name, RulesText,
                 ManaCost, Attack, Health, ShowsCost, ShowsStatistics,
-                Style, SecondaryClass, Expansion, faceDown);
+                Style, SecondaryClass, Expansion, faceDown, Overrides);
 
         /// <summary>Builds a description of a card in a hand during a match.</summary>
         public static CardVisualDescriptor FromViewModel(
-            in CardViewModel model, Sprite artwork, CardVisualStyle style = default, string expansion = "") =>
+            in CardViewModel model,
+            Sprite artwork,
+            CardVisualStyle style = default,
+            string expansion = "",
+            CardVisualOverrides overrides = null) =>
             new CardVisualDescriptor(
                 model.CardType,
                 model.CardClass,

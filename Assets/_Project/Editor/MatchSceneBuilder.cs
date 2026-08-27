@@ -53,9 +53,21 @@ namespace CoH.Editor
         private const float CameraPitch = 54f;
 
         // --- The board, front to back ------------------------------------
-        private const float NearHandZ = -4.2f;
-        private const float NearHandY = 1.15f;
-        private const float NearHeroZ = -2.6f;
+        // The hand sits low and close, and is allowed to cover the hero behind
+        // it. A hand of cards is the loudest thing on a card game's screen, and
+        // one arranged to avoid everything else looks tucked away rather than
+        // held. Sorting keeps it in front, so it no longer has to earn its
+        // place by staying out of the way.
+        //
+        // The bottom of a card may fall past the edge of the view: a card is
+        // read from its top — cost, art, name — and losing the last of its
+        // border buys enough size to read the rest of it.
+        private const float NearHandZ = -4.75f;
+        private const float NearHandY = 1.32f;
+        // Pushed a little further from the player than the board needs, so the
+        // hand rising in front of it has somewhere to be. Not a redesign of the
+        // hero: the plate simply stops sharing screen space with the cards.
+        private const float NearHeroZ = -2.3f;
         private const float NearRowZ = -1.05f;
         private const float CentreZ = 0.25f;
         private const float FarRowZ = 1.55f;
@@ -95,6 +107,11 @@ namespace CoH.Editor
 
             CardView view = root.AddComponent<CardView>();
             CardVisualPainter painter = root.AddComponent<CardVisualPainter>();
+
+            // A card sorts as one card. Without this its twenty layers sort
+            // against every other card's twenty layers, and a neighbour's name
+            // banner paints over this card's frame however far forward it comes.
+            root.AddComponent<UnityEngine.Rendering.SortingGroup>();
 
             BoxCollider collider = root.AddComponent<BoxCollider>();
             collider.size = new Vector3(CardWidth, CardHeight, 0.06f);
@@ -317,12 +334,19 @@ namespace CoH.Editor
                 ("nearHero", nearHero), ("farHero", farHero),
                 ("dragLayer", dragLayer.transform), ("insertionMarker", marker));
 
+            // A hand of cards rather than a row of them.
+            //
+            // Cards half again as large as they were, sitting 40 percent of
+            // their width apart so they overlap properly, on an arc flat enough
+            // that the outer ones lean about fifteen degrees rather than lying
+            // down. The fan spreads until it is 6.4 units wide and then stops:
+            // an eleventh card overlaps harder instead of reaching the decks.
             WireNumbers(presenter,
-                ("handLayout.PivotDistance", 7f),
-                ("handLayout.AnglePerCard", 6.5f),
-                ("handLayout.MaxSpreadAngle", 38f),
+                ("handLayout.Scale", 1.45f),
+                ("handLayout.Spacing", 0.765f),
+                ("handLayout.MaxWidth", 7.56f),
+                ("handLayout.PivotDistance", 15.0f),
                 ("handLayout.DepthStep", 0.035f),
-                ("handLayout.Scale", 0.9f),
                 ("boardSpacing", 1.2f),
                 ("farHandScale", 0.55f));
 

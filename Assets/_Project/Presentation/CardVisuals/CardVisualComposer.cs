@@ -64,9 +64,17 @@ namespace CoH.Presentation.CardVisuals
                     continue;
                 }
 
+                // A mask is a shape to clip by, never a picture to show. A
+                // recipe that listed one as a layer would paint it over the
+                // card, so the slot is refused here rather than trusted.
+                if (layer.slot == CardVisualSlot.ArtworkMask)
+                {
+                    continue;
+                }
+
                 if (layer.IsText)
                 {
-                    AddText(card, layer, plan);
+                    AddText(card, layer, recipe, plan);
                     continue;
                 }
 
@@ -100,24 +108,39 @@ namespace CoH.Presentation.CardVisuals
                 return;
             }
 
+            // The shape to clip to is looked up exactly like the picture is,
+            // so a minion's oval window and a spell's rectangular one are two
+            // rows in the catalog rather than two branches anywhere.
+            Sprite mask = layer.maskSlot == CardVisualSlot.None || catalog == null
+                ? null
+                : catalog.Resolve(layer.maskSlot, card).Sprite;
+
             plan.Add(new CardVisualPlannedLayer
             {
                 Slot = layer.slot,
                 TextSlot = CardVisualTextSlot.None,
                 Sprite = sprite,
+                Mask = mask,
                 Text = null,
                 SortingOrder = layer.sortingOrder,
                 Rect = new Rect(layer.x, layer.y, layer.width, layer.height),
                 Rotation = layer.rotation,
+                Fill = layer.fill,
                 FontSize = 0f,
+                FontSizeMin = 0f,
                 Bold = false,
-                Tint = layer.tint
+                Wrap = false,
+                Alignment = CardVisualAlignment.Center,
+                Tint = layer.tint,
+                LayerName = layer.name,
+                Reason = layer.Describe()
             });
         }
 
         private static void AddText(
             in CardVisualDescriptor card,
             CardVisualLayerDefinition layer,
+            CardVisualRecipeAsset recipe,
             CardVisualPlan plan)
         {
             string value = Read(card, layer.text);
@@ -130,6 +153,33 @@ namespace CoH.Presentation.CardVisuals
                 return;
             }
 
+            Rect rect = new Rect(layer.x, layer.y, layer.width, layer.height);
+            float fontSize = layer.fontSize;
+
+            // Which style this label is set in is a question about the recipe,
+            // so it is answered here rather than left for whatever draws the
+            // plan to look up.
+            CardTextStyle style = recipe.ResolveTextStyle(layer);
+
+            // And then, for the handful of cards that have been polished by
+            // hand, what that card wants done differently. The recipe is still
+            // what decided everything above; this only nudges it, and a card
+            // that asks for nothing is composed exactly as though none of this
+            // were here.
+            //
+            // Note what is *not* available at this point: which card it is.
+            // Whatever built the description looked the overrides up by id and
+            // handed them over as data, so there is nowhere below to write a
+            // special case for one card.
+            CardTextOverride polish = card.Overrides?.For(layer.text);
+
+            if (polish != null)
+            {
+                rect = polish.Placed(rect);
+                fontSize = polish.Sized(fontSize);
+                style = polish.Styled(style);
+            }
+
             plan.Add(new CardVisualPlannedLayer
             {
                 Slot = CardVisualSlot.None,
@@ -137,11 +187,18 @@ namespace CoH.Presentation.CardVisuals
                 Sprite = null,
                 Text = value,
                 SortingOrder = layer.sortingOrder,
-                Rect = new Rect(layer.x, layer.y, layer.width, layer.height),
+                Rect = rect,
                 Rotation = layer.rotation,
-                FontSize = layer.fontSize,
+                Fill = CardVisualFill.Stretch,
+                FontSize = fontSize,
+                FontSizeMin = Mathf.Min(layer.fontSizeMin, fontSize),
                 Bold = layer.bold,
-                Tint = layer.tint
+                Wrap = layer.wrap,
+                Alignment = layer.alignment,
+                Tint = layer.tint,
+                TextStyle = style,
+                LayerName = layer.name,
+                Reason = layer.Describe()
             });
         }
 

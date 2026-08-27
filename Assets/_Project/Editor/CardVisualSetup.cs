@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using CoH.Core.Cards;
 using CoH.Presentation.CardVisuals;
 using UnityEditor;
 using UnityEngine;
@@ -38,6 +39,9 @@ namespace CoH.Editor
         /// <summary>Where the finished factory lives, for whatever needs to load it.</summary>
         public static string FactoryAssetPath => FactoryPath;
 
+        /// <summary>Where the catalog lives, for whatever fills it in.</summary>
+        public static string CatalogAssetPath => CatalogPath;
+
         [MenuItem("Conquest of Hearthstone/Rebuild Card Visuals")]
         public static void Rebuild()
         {
@@ -63,11 +67,19 @@ namespace CoH.Editor
                 Debug.Log(
                     "Card visuals rebuilt: " + recipe.Layers.Count + " layers, " +
                     catalog.Entries.Count + " catalog entries.");
-                return;
+            }
+            else
+            {
+                Debug.LogWarning("Card visuals rebuilt with " + problems.Count + " problem(s):\n - " +
+                    string.Join("\n - ", problems));
             }
 
-            Debug.LogWarning("Card visuals rebuilt with " + problems.Count + " problem(s):\n - " +
-                string.Join("\n - ", problems));
+            // Rebuilding starts the catalog again from scaffolding, so
+            // anything already downloaded has to be laid back over the top
+            // of it. Doing that here rather than leaving it to be
+            // remembered is the difference between two commands that
+            // compose and two commands where one silently undoes the other.
+            CardVisualImport.Import();
         }
 
         // ------------------------------------------------------------------
@@ -77,70 +89,202 @@ namespace CoH.Editor
         private static CardVisualRecipeAsset BuildRecipe()
         {
             CardVisualRecipeAsset recipe = Load<CardVisualRecipeAsset>(RecipePath);
+            HearthCardsManifestFile manifest = HearthCardsManifest.LoadOrEmpty();
 
             List<CardVisualLayerDefinition> layers = new List<CardVisualLayerDefinition>
             {
                 // --- the back of the card ---------------------------------
-                Picture("CardBack", CardVisualSlot.CardBack, 120, 0, 0, 800, 1100,
+                Picture("CardBack", CardVisualSlot.CardBack, 120, WholeCard,
                     face: CardVisualFace.FaceDown, required: true),
 
                 // --- the front, back to front -----------------------------
-                Picture("Backdrop", CardVisualSlot.Backdrop, 0, 0, 0, 800, 1100),
+                //
+                // Every rectangle below comes from the renderer's own layer
+                // template by way of the manifest, and a slot that differs by
+                // card type is two layers rather than one layer that decides.
+                // A minion frame is 669x1007 at y 92; a spell frame is 669x947
+                // at y 150. One rectangle could not have been right for both,
+                // and putting the choice in code would have made the composer
+                // know what a spell is.
+                Picture("Backdrop (minion)", CardVisualSlot.Backdrop, 0,
+                    Rect(manifest, CardVisualSlot.Backdrop, CardType.Minion, WholeCard),
+                    conditions: new[] { CardVisualCondition.Is(CardType.Minion) }),
 
-                // Under the frame, because the frame is a window rather than a
-                // picture: it has a hole in it and the painting shows through.
-                Picture("Artwork", CardVisualSlot.Artwork, 10, 186, 185, 434, 420,
-                    conditions: new[] { CardVisualCondition.True(CardVisualField.HasArtwork) }),
+                Picture("Backdrop (spell)", CardVisualSlot.Backdrop, 0,
+                    Rect(manifest, CardVisualSlot.Backdrop, CardType.Spell, WholeCard),
+                    conditions: new[] { CardVisualCondition.Is(CardType.Spell) }),
 
-                // The one layer a card cannot do without. Everything else is
-                // allowed to be missing; a card with no frame is not a card.
-                Picture("Frame", CardVisualSlot.Frame, 20, 66, 92, 669, 1007, required: true),
+                // Under the frame, because a frame is a window rather than a
+                // picture, and clipped to that window's shape. The rectangles
+                // are the renderer's own art masks: an ellipse for a minion, a
+                // rectangle for a spell.
+                //
+                // Cover rather than Stretch: a painting is whatever shape it
+                // was painted, and squashing it into a window is never the
+                // right answer. It fills the window, overflows, and the mask
+                // crops the overflow.
+                Picture("Artwork (spell)", CardVisualSlot.Artwork, 10, SpellArtwork,
+                    fill: CardVisualFill.Cover,
+                    maskSlot: CardVisualSlot.ArtworkMask,
+                    conditions: new[]
+                    {
+                        CardVisualCondition.Is(CardType.Spell),
+                        CardVisualCondition.True(CardVisualField.HasArtwork)
+                    }),
 
-                Picture("EliteFrame", CardVisualSlot.EliteFrame, 30, 40, 60, 720, 1075,
-                    conditions: new[] { CardVisualCondition.True(CardVisualField.IsElite) }),
+                // Everything else, so a weapon or a hero shows its painting
+                // rather than a hole.
+                Picture("Artwork (other)", CardVisualSlot.Artwork, 10, MinionArtwork,
+                    fill: CardVisualFill.Cover,
+                    maskSlot: CardVisualSlot.ArtworkMask,
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell),
+                        CardVisualCondition.True(CardVisualField.HasArtwork)
+                    }),
 
-                // Optional on purpose: a finished frame usually draws its own
-                // banner and panel, and then these two simply find nothing and
-                // are skipped. That is not a gap, it is the frame doing the job.
-                Picture("NameBanner", CardVisualSlot.NameBanner, 40, 92, 572, 624, 159),
+                // The one layer a card cannot do without.
+                Picture("Frame (spell)", CardVisualSlot.Frame, 20,
+                    Rect(manifest, CardVisualSlot.Frame, CardType.Spell, MinionFrame),
+                    required: true,
+                    conditions: new[] { CardVisualCondition.Is(CardType.Spell) }),
 
-                Picture("RulesPanel", CardVisualSlot.RulesPanel, 50, 113, 718, 580, 341,
-                    conditions: new[] { CardVisualCondition.True(CardVisualField.HasRulesText) }),
+                Picture("Frame (other)", CardVisualSlot.Frame, 20,
+                    Rect(manifest, CardVisualSlot.Frame, CardType.Minion, MinionFrame),
+                    required: true,
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell)
+                    }),
 
-                Picture("ManaGem", CardVisualSlot.ManaGem, 60, 25, 106, 195, 197,
+                Picture("EliteFrame (minion)", CardVisualSlot.EliteFrame, 30,
+                    Rect(manifest, CardVisualSlot.EliteFrame, CardType.Minion, MinionFrame),
+                    conditions: new[]
+                    {
+                        CardVisualCondition.Is(CardType.Minion),
+                        CardVisualCondition.True(CardVisualField.IsElite)
+                    }),
+
+                Picture("EliteFrame (spell)", CardVisualSlot.EliteFrame, 30,
+                    Rect(manifest, CardVisualSlot.EliteFrame, CardType.Spell, MinionFrame),
+                    conditions: new[]
+                    {
+                        CardVisualCondition.Is(CardType.Spell),
+                        CardVisualCondition.True(CardVisualField.IsElite)
+                    }),
+
+                Picture("NameBanner (spell)", CardVisualSlot.NameBanner, 40,
+                    Rect(manifest, CardVisualSlot.NameBanner, CardType.Spell, MinionNameBanner),
+                    conditions: new[] { CardVisualCondition.Is(CardType.Spell) }),
+
+                Picture("NameBanner (other)", CardVisualSlot.NameBanner, 40,
+                    Rect(manifest, CardVisualSlot.NameBanner, CardType.Minion, MinionNameBanner),
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell)
+                    }),
+
+                Picture("RulesPanel (spell)", CardVisualSlot.RulesPanel, 50,
+                    Rect(manifest, CardVisualSlot.RulesPanel, CardType.Spell, MinionRulesPanel),
+                    conditions: new[]
+                    {
+                        CardVisualCondition.Is(CardType.Spell),
+                        CardVisualCondition.True(CardVisualField.HasRulesText)
+                    }),
+
+                Picture("RulesPanel (other)", CardVisualSlot.RulesPanel, 50,
+                    Rect(manifest, CardVisualSlot.RulesPanel, CardType.Minion, MinionRulesPanel),
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell),
+                        CardVisualCondition.True(CardVisualField.HasRulesText)
+                    }),
+
+                // Shared: the spell template reuses the minion's mana gem, so
+                // one rectangle and one file serve every card.
+                Picture("ManaGem", CardVisualSlot.ManaGem, 60,
+                    Rect(manifest, CardVisualSlot.ManaGem, CardType.Minion, MinionManaGem),
                     conditions: new[] { CardVisualCondition.True(CardVisualField.ShowsCost) }),
 
-                Picture("AttackGem", CardVisualSlot.AttackGem, 70, 8, 885, 210, 215,
+                Picture("AttackGem", CardVisualSlot.AttackGem, 70,
+                    Rect(manifest, CardVisualSlot.AttackGem, CardType.Minion, MinionAttackGem),
                     conditions: new[] { CardVisualCondition.True(CardVisualField.ShowsStatistics) }),
 
-                Picture("HealthGem", CardVisualSlot.HealthGem, 80, 582, 885, 210, 215,
+                Picture("HealthGem", CardVisualSlot.HealthGem, 80,
+                    Rect(manifest, CardVisualSlot.HealthGem, CardType.Minion, MinionHealthGem),
                     conditions: new[] { CardVisualCondition.True(CardVisualField.ShowsStatistics) }),
 
                 // A basic card wears no rarity stone, which is a rule about
                 // rarity and therefore a condition rather than a missing asset.
-                Picture("RarityGem", CardVisualSlot.RarityGem, 90, 347, 663, 122, 92,
+                Picture("RarityGem (spell)", CardVisualSlot.RarityGem, 90,
+                    Rect(manifest, CardVisualSlot.RarityGem, CardType.Spell, MinionRarityGem),
+                    conditions: new[]
+                    {
+                        CardVisualCondition.Is(CardType.Spell),
+                        NotBasic
+                    }),
+
+                Picture("RarityGem (other)", CardVisualSlot.RarityGem, 90,
+                    Rect(manifest, CardVisualSlot.RarityGem, CardType.Minion, MinionRarityGem),
                     conditions: new[]
                     {
                         new CardVisualCondition(
-                            CardVisualField.Rarity, CardVisualComparison.NotEquals,
-                            (int)Core.Cards.Rarity.Free)
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell),
+                        NotBasic
                     }),
 
-                Picture("TribeBanner", CardVisualSlot.TribeBanner, 100, 145, 975, 511, 97,
+                Picture("TribeBanner", CardVisualSlot.TribeBanner, 100,
+                    Rect(manifest, CardVisualSlot.TribeBanner, CardType.Minion, MinionTribeBanner),
                     conditions: new[] { CardVisualCondition.True(CardVisualField.HasTribe) }),
 
-                // Nothing fills this slot yet, and nothing has to: a card
-                // simply has no set symbol until one exists.
-                Picture("ExpansionEmblem", CardVisualSlot.ExpansionEmblem, 110, 360, 890, 80, 80),
+                // Nothing fills this slot: the renderer draws card fronts and
+                // has no set symbol of its own. A card simply has none.
+                Picture("ExpansionEmblem", CardVisualSlot.ExpansionEmblem, 110,
+                    new Rect(360f, 890f, 80f, 80f)),
 
                 // --- the words --------------------------------------------
-                Label("NameText", CardVisualTextSlot.Name, 130, 110, 590, 588, 122, 3.4f, bold: true),
-                Label("ManaText", CardVisualTextSlot.ManaCost, 140, 25, 116, 195, 177, 7.5f, bold: true),
-                Label("RulesText", CardVisualTextSlot.RulesText, 150, 150, 760, 500, 200, 2.1f,
-                    tint: new Color(0.12f, 0.09f, 0.06f)),
-                Label("AttackText", CardVisualTextSlot.Attack, 160, 8, 895, 210, 195, 7.5f, bold: true),
-                Label("HealthText", CardVisualTextSlot.Health, 170, 582, 895, 210, 195, 7.5f, bold: true),
-                Label("TribeText", CardVisualTextSlot.Tribe, 180, 145, 985, 511, 77, 2.1f)
+                //
+                // Each label sits on the component it belongs to, so moving a
+                // gem moves its number with it.
+                Label("NameText (spell)", CardVisualTextSlot.Name, 130, SpellNameText,
+                    Ceiling, NameFloor, bold: true, wrap: false,
+                    conditions: new[] { CardVisualCondition.Is(CardType.Spell) }),
+
+                Label("NameText (other)", CardVisualTextSlot.Name, 130, MinionNameText,
+                    Ceiling, NameFloor, bold: true, wrap: false,
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell)
+                    }),
+
+                Label("ManaText", CardVisualTextSlot.ManaCost, 140, ManaNumber,
+                    Ceiling, NumberFloor, bold: true, wrap: false),
+
+                Label("RulesText (spell)", CardVisualTextSlot.RulesText, 150, SpellRulesText,
+                    RulesCeiling, RulesFloor, tint: RulesInk,
+                    conditions: new[] { CardVisualCondition.Is(CardType.Spell) }),
+
+                Label("RulesText (other)", CardVisualTextSlot.RulesText, 150, MinionRulesText,
+                    RulesCeiling, RulesFloor, tint: RulesInk,
+                    conditions: new[]
+                    {
+                        new CardVisualCondition(
+                            CardVisualField.CardType, CardVisualComparison.NotEquals, (int)CardType.Spell)
+                    }),
+
+                Label("AttackText", CardVisualTextSlot.Attack, 160, AttackNumber,
+                    Ceiling, NumberFloor, bold: true, wrap: false),
+
+                Label("HealthText", CardVisualTextSlot.Health, 170, HealthNumber,
+                    Ceiling, NumberFloor, bold: true, wrap: false),
+
+                Label("TribeText", CardVisualTextSlot.Tribe, 180, TribeName,
+                    Ceiling, TribeFloor, wrap: false)
             };
 
             recipe.Author(CardVisualStyle.Default, layers);
@@ -148,11 +292,105 @@ namespace CoH.Editor
             return recipe;
         }
 
+        // The card space every rectangle is written in: the renderer's own
+        // 800 x 1100 canvas, origin top left, y running down. No conversion is
+        // needed anywhere, and every component image is exactly the size of its
+        // rectangle, so nothing is scaled either.
+        private static readonly Rect WholeCard = new Rect(0f, 0f, CardCanvas.Width, CardCanvas.Height);
+
+        // Fallbacks, used only when the manifest has no measurement for a slot.
+        private static readonly Rect MinionFrame = new Rect(66f, 92f, 669f, 1007f);
+        // The art window, and its shape: an ellipse for a minion, a rectangle
+        // for a spell. The painting fills these and is clipped to them.
+        //
+        // The minion ellipse is measured off the frame's own transparent hole
+        // rather than taken from the template's artMask, which is smaller and
+        // sits high. Theirs is a default crop for art a user can then pan and
+        // zoom; ours has to fill the window on its own, and a painting floating
+        // in the middle of a hole with shadow all round it looks unfinished
+        // rather than deliberate.
+        private static readonly Rect MinionArtwork = new Rect(198f, 120f, 409f, 563f);
+        private static readonly Rect SpellArtwork = new Rect(140f, 195f, 525f, 400f);
+        private static readonly Rect MinionNameBanner = new Rect(92f, 572f, 624f, 159f);
+        private static readonly Rect MinionRulesPanel = new Rect(113f, 718f, 580f, 341f);
+        private static readonly Rect MinionManaGem = new Rect(33f, 114f, 179f, 181f);
+        private static readonly Rect MinionAttackGem = new Rect(0f, 893f, 222f, 245f);
+        private static readonly Rect MinionHealthGem = new Rect(590f, 906f, 170f, 231f);
+        private static readonly Rect MinionRarityGem = new Rect(347f, 663f, 122f, 92f);
+        private static readonly Rect MinionTribeBanner = new Rect(145f, 975f, 511f, 97f);
+
+        // Text size is decided by the box it has to fit in, not by a number
+        // chosen to look right. The ceiling is deliberately far above anything
+        // that will be used: it lets the box do the deciding, and a label only
+        // stops shrinking at its floor, where it would rather overflow than
+        // become unreadable.
+        private const float Ceiling = 12f;
+        // Low enough that a name half again as long as "Test Soldier" still
+        // fits between the curls of the banner. A name does not wrap - a card
+        // name on two lines is a mistake, not a layout - so shrinking is the
+        // only room it has, and the floor is what decides how much.
+        private const float NameFloor = 0.55f;
+        // Two digits have to fit where one does. A ten mana card is ordinary
+        // and a thirty health hero is not exotic either, so the floor is set by
+        // the widest number a card can carry rather than by the prettiest.
+        // Single digits are unaffected: they are limited by the box long before
+        // they reach this.
+        private const float NumberFloor = 1.6f;
+        private const float RulesCeiling = 2.4f;
+
+        // Low enough that a card with four lines of rules shrinks to fit rather
+        // than wrapping past the edges of its parchment. A floor is a promise
+        // about readability, and this is where that promise stops being one.
+        private const float RulesFloor = 0.45f;
+        private const float TribeFloor = 0.9f;
+
+        // The numbers, each centred on the gem it belongs to and sized to a
+        // little over half its height — which is where a Hearthstone number
+        // sits, and leaves room for two digits without touching the rim.
+        private static readonly Rect ManaNumber = new Rect(42f, 152f, 161f, 105f);
+        private static readonly Rect AttackNumber = new Rect(20f, 958f, 178f, 115f);
+        private static readonly Rect HealthNumber = new Rect(600f, 968f, 151f, 108f);
+        private static readonly Rect TribeName = new Rect(220f, 996f, 360f, 56f);
+
+        // Where the renderer prints a card's rules, from its templates'
+        // descriptionBox: a box centred at y 880 for a minion and 877 for a
+        // spell, 240 tall, starting at x 137 and x 162. Their box narrows
+        // toward the bottom to clear the attack and health gems; ours is the
+        // widest part of it, which is the same shape until the text is long
+        // enough to reach the gems.
+        private static readonly Rect MinionRulesText = new Rect(150f, 772f, 506f, 232f);
+        private static readonly Rect SpellRulesText = new Rect(172f, 768f, 460f, 214f);
+
+        // The name. The renderer sets it along a curve, which a flat label
+        // cannot follow, so ours is centred on the banner's writing area
+        // instead — inset from the scroll's curled ends.
+        private static readonly Rect MinionNameText = new Rect(160f, 618f, 490f, 68f);
+        private static readonly Rect SpellNameText = new Rect(150f, 618f, 510f, 72f);
+
+        private static readonly Color RulesInk = new Color(0.12f, 0.09f, 0.06f);
+
+        private static readonly CardVisualCondition NotBasic = new CardVisualCondition(
+            CardVisualField.Rarity, CardVisualComparison.NotEquals, (int)Core.Cards.Rarity.Free);
+
+        /// <summary>The measured rectangle for a slot and a type, or the fallback.</summary>
+        private static Rect Rect(
+            HearthCardsManifestFile manifest, CardVisualSlot slot, CardType type, Rect fallback) =>
+            HearthCardsManifest.TryFindRect(manifest, slot, type, out Rect measured) ? measured : fallback;
+
+        /// <summary>A rectangle pulled in from the edges of the thing it sits on.</summary>
+        private static Rect Inset(Rect rect, float horizontal, float vertical) =>
+            new Rect(
+                rect.x + horizontal,
+                rect.y + vertical,
+                Mathf.Max(1f, rect.width - horizontal * 2f),
+                Mathf.Max(1f, rect.height - vertical * 2f));
+
         private static CardVisualLayerDefinition Picture(
-            string name, CardVisualSlot slot, int order,
-            float x, float y, float width, float height,
+            string name, CardVisualSlot slot, int order, Rect rect,
             CardVisualFace face = CardVisualFace.FaceUp,
             bool required = false,
+            CardVisualFill fill = CardVisualFill.Stretch,
+            CardVisualSlot maskSlot = CardVisualSlot.None,
             CardVisualCondition[] conditions = null) =>
             new CardVisualLayerDefinition
             {
@@ -161,19 +399,22 @@ namespace CoH.Editor
                 text = CardVisualTextSlot.None,
                 face = face,
                 sortingOrder = order,
-                x = x,
-                y = y,
-                width = width,
-                height = height,
+                x = rect.x,
+                y = rect.y,
+                width = rect.width,
+                height = rect.height,
                 required = required,
+                fill = fill,
+                maskSlot = maskSlot,
                 tint = Color.white,
                 conditions = conditions ?? System.Array.Empty<CardVisualCondition>()
             };
 
         private static CardVisualLayerDefinition Label(
-            string name, CardVisualTextSlot slot, int order,
-            float x, float y, float width, float height, float fontSize,
-            bool bold = false, Color? tint = null) =>
+            string name, CardVisualTextSlot slot, int order, Rect rect,
+            float ceiling, float floor,
+            bool bold = false, bool wrap = true, Color? tint = null,
+            CardVisualCondition[] conditions = null) =>
             new CardVisualLayerDefinition
             {
                 name = name,
@@ -181,14 +422,17 @@ namespace CoH.Editor
                 text = slot,
                 face = CardVisualFace.FaceUp,
                 sortingOrder = order,
-                x = x,
-                y = y,
-                width = width,
-                height = height,
-                fontSize = fontSize,
+                x = rect.x,
+                y = rect.y,
+                width = rect.width,
+                height = rect.height,
+                fontSize = ceiling,
+                fontSizeMin = floor,
                 bold = bold,
+                wrap = wrap,
+                alignment = CardVisualAlignment.Center,
                 tint = tint ?? Color.white,
-                conditions = System.Array.Empty<CardVisualCondition>()
+                conditions = conditions ?? System.Array.Empty<CardVisualCondition>()
             };
 
         // ------------------------------------------------------------------
@@ -214,6 +458,14 @@ namespace CoH.Editor
             // a hero card would compose with a hole where its frame goes, and
             // the report would say so rather than the card looking odd.
             catalog.AddEntry(Entry(CardVisualSlot.Frame, Frame("Frame_Default", 0.38f, 0.34f, 0.30f)));
+
+            // The shape the artwork is clipped to. Ours rather than
+            // HearthCards': a mask is geometry, not artwork, and the geometry
+            // is stated in their template as an ellipse for a minion and a
+            // rectangle for a spell.
+            catalog.AddEntry(Entry(CardVisualSlot.ArtworkMask, Ellipse("Mask_Ellipse")));
+            catalog.AddEntry(Entry(CardVisualSlot.ArtworkMask, RoundedRectangle("Mask_Rectangle"),
+                type: Core.Cards.CardType.Spell));
 
             catalog.AddEntry(Entry(CardVisualSlot.Backdrop, Solid("Backdrop", 0.05f, 0.04f, 0.03f, 0.75f)));
             catalog.AddEntry(Entry(CardVisualSlot.CardBack, Solid("CardBack", 0.18f, 0.13f, 0.26f, 1f)));
@@ -350,6 +602,64 @@ namespace CoH.Editor
 
                 bool insideWindow = u > left && u < right && v > bottom && v < top;
                 return insideWindow ? Color.clear : new Color(r, g, b, 1f);
+            });
+        }
+
+        /// <summary>
+        /// A filled ellipse, transparent outside it. Only the alpha is read.
+        ///
+        /// Kept a pixel clear of the edge so that a painting scaled up past the
+        /// window has somewhere transparent to be clamped against: without that
+        /// border the outermost row would repeat outwards and the crop would
+        /// smear instead of stopping.
+        /// </summary>
+        private static Sprite Ellipse(string name)
+        {
+            return Make(name, 256, 256, (x, y, width, height) =>
+            {
+                float dx = (x + 0.5f) / width - 0.5f;
+                float dy = (y + 0.5f) / height - 0.5f;
+
+                // A hair under a half, so the shape never touches the border.
+                float inside = dx * dx + dy * dy <= 0.2465f ? 1f : 0f;
+                return new Color(1f, 1f, 1f, inside);
+            });
+        }
+
+        /// <summary>A filled rectangle with softened corners, transparent outside.</summary>
+        private static Sprite RoundedRectangle(string name)
+        {
+            return Make(name, 256, 256, (x, y, width, height) =>
+            {
+                float u = (x + 0.5f) / width;
+                float v = (y + 0.5f) / height;
+
+                const float margin = 0.008f;
+                const float radius = 0.04f;
+
+                bool outside = u < margin || u > 1f - margin || v < margin || v > 1f - margin;
+
+                if (outside)
+                {
+                    return new Color(1f, 1f, 1f, 0f);
+                }
+
+                // Corners, measured from the nearest one.
+                float cornerX = Mathf.Min(u - margin, 1f - margin - u);
+                float cornerY = Mathf.Min(v - margin, 1f - margin - v);
+
+                if (cornerX < radius && cornerY < radius)
+                {
+                    float dx = radius - cornerX;
+                    float dy = radius - cornerY;
+
+                    if (dx * dx + dy * dy > radius * radius)
+                    {
+                        return new Color(1f, 1f, 1f, 0f);
+                    }
+                }
+
+                return Color.white;
             });
         }
 

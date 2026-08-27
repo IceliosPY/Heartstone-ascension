@@ -25,45 +25,144 @@ MonoBehaviour:
     width: 800
     height: 1100
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 1
     conditions: []
-  - name: Backdrop
+  - name: Backdrop (minion)
     slot: 1
     text: 0
     face: 0
     sortingOrder: 0
-    x: 0
-    y: 0
-    width: 800
-    height: 1100
+    x: 186
+    y: 107
+    width: 429
+    height: 585
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
-    conditions: []
-  - name: Artwork
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 1
+  - name: Backdrop (spell)
+    slot: 1
+    text: 0
+    face: 0
+    sortingOrder: 0
+    x: 144
+    y: 198
+    width: 517
+    height: 421
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+  - name: Artwork (spell)
     slot: 2
     text: 0
     face: 0
     sortingOrder: 10
-    x: 186
-    y: 185
-    width: 434
-    height: 420
+    x: 140
+    y: 195
+    width: 525
+    height: 400
     rotation: 0
+    fill: 1
+    maskSlot: 14
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
+    - field: 0
+      comparison: 0
+      value: 2
     - field: 7
       comparison: 0
       value: 1
-  - name: Frame
+  - name: Artwork (other)
+    slot: 2
+    text: 0
+    face: 0
+    sortingOrder: 10
+    x: 198
+    y: 120
+    width: 409
+    height: 563
+    rotation: 0
+    fill: 1
+    maskSlot: 14
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 1
+      value: 2
+    - field: 7
+      comparison: 0
+      value: 1
+  - name: Frame (spell)
+    slot: 3
+    text: 0
+    face: 0
+    sortingOrder: 20
+    x: 66
+    y: 150
+    width: 669
+    height: 947
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 1
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+  - name: Frame (other)
     slot: 3
     text: 0
     face: 0
@@ -73,30 +172,99 @@ MonoBehaviour:
     width: 669
     height: 1007
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 1
-    conditions: []
-  - name: EliteFrame
+    conditions:
+    - field: 0
+      comparison: 1
+      value: 2
+  - name: EliteFrame (minion)
     slot: 4
     text: 0
     face: 0
     sortingOrder: 30
-    x: 40
-    y: 60
-    width: 720
-    height: 1075
+    x: 208
+    y: 30
+    width: 560
+    height: 402
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
+    - field: 0
+      comparison: 0
+      value: 1
     - field: 9
       comparison: 0
       value: 1
-  - name: NameBanner
+  - name: EliteFrame (spell)
+    slot: 4
+    text: 0
+    face: 0
+    sortingOrder: 30
+    x: 216
+    y: 90
+    width: 609
+    height: 333
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+    - field: 9
+      comparison: 0
+      value: 1
+  - name: NameBanner (spell)
+    slot: 5
+    text: 0
+    face: 0
+    sortingOrder: 40
+    x: 82
+    y: 563
+    width: 647
+    height: 199
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+  - name: NameBanner (other)
     slot: 5
     text: 0
     face: 0
@@ -106,12 +274,48 @@ MonoBehaviour:
     width: 624
     height: 159
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
-    conditions: []
-  - name: RulesPanel
+    conditions:
+    - field: 0
+      comparison: 1
+      value: 2
+  - name: RulesPanel (spell)
+    slot: 6
+    text: 0
+    face: 0
+    sortingOrder: 50
+    x: 143
+    y: 722
+    width: 518
+    height: 301
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+    - field: 8
+      comparison: 0
+      value: 1
+  - name: RulesPanel (other)
     slot: 6
     text: 0
     face: 0
@@ -121,11 +325,20 @@ MonoBehaviour:
     width: 580
     height: 341
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
+    - field: 0
+      comparison: 1
+      value: 2
     - field: 8
       comparison: 0
       value: 1
@@ -134,13 +347,19 @@ MonoBehaviour:
     text: 0
     face: 0
     sortingOrder: 60
-    x: 25
-    y: 106
-    width: 195
-    height: 197
+    x: 33
+    y: 114
+    width: 179
+    height: 181
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
@@ -152,13 +371,19 @@ MonoBehaviour:
     text: 0
     face: 0
     sortingOrder: 70
-    x: 8
-    y: 885
-    width: 210
-    height: 215
+    x: 0
+    y: 893
+    width: 222
+    height: 245
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
@@ -170,20 +395,53 @@ MonoBehaviour:
     text: 0
     face: 0
     sortingOrder: 80
-    x: 582
-    y: 885
-    width: 210
-    height: 215
+    x: 590
+    y: 906
+    width: 170
+    height: 231
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
     - field: 4
       comparison: 0
       value: 1
-  - name: RarityGem
+  - name: RarityGem (spell)
+    slot: 10
+    text: 0
+    face: 0
+    sortingOrder: 90
+    x: 320
+    y: 669
+    width: 171
+    height: 94
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
+    fontSize: 3
+    fontSizeMin: 0.6
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+    - field: 2
+      comparison: 1
+      value: 0
+  - name: RarityGem (other)
     slot: 10
     text: 0
     face: 0
@@ -193,11 +451,20 @@ MonoBehaviour:
     width: 122
     height: 92
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
+    - field: 0
+      comparison: 1
+      value: 2
     - field: 2
       comparison: 1
       value: 0
@@ -211,8 +478,14 @@ MonoBehaviour:
     width: 511
     height: 97
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions:
@@ -229,68 +502,152 @@ MonoBehaviour:
     width: 80
     height: 80
     rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: 
     fontSize: 3
+    fontSizeMin: 0.6
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: NameText
+  - name: NameText (spell)
     slot: 0
     text: 1
     face: 0
     sortingOrder: 130
-    x: 110
-    y: 590
-    width: 588
-    height: 122
+    x: 154
+    y: 562
+    width: 510
+    height: 100
     rotation: 0
-    fontSize: 3.4
+    fill: 0
+    maskSlot: 0
+    textStyle: SpellTitle
+    fontSize: 11
+    fontSizeMin: 0.55
     bold: 1
+    alignment: 0
+    wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
-    conditions: []
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+  - name: NameText (other)
+    slot: 0
+    text: 1
+    face: 0
+    sortingOrder: 130
+    x: 173
+    y: 591
+    width: 490
+    height: 132
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: AllyTitle
+    fontSize: 1
+    fontSizeMin: 0.55
+    bold: 1
+    alignment: 0
+    wrap: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 1
+      value: 2
   - name: ManaText
     slot: 0
     text: 3
     face: 0
     sortingOrder: 140
-    x: 25
-    y: 116
-    width: 195
-    height: 177
+    x: 42
+    y: 141
+    width: 161
+    height: 105
     rotation: 0
-    fontSize: 7.5
+    fill: 0
+    maskSlot: 0
+    textStyle: StatNumber
+    fontSize: 12
+    fontSizeMin: 1.6
     bold: 1
+    alignment: 0
+    wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: RulesText
+  - name: RulesText (spell)
+    slot: 0
+    text: 2
+    face: 0
+    sortingOrder: 150
+    x: 172
+    y: 768
+    width: 460
+    height: 214
+    rotation: 0
+    fill: 0
+    maskSlot: 0
+    textStyle: RulesBody
+    fontSize: 2.4
+    fontSizeMin: 0.45
+    bold: 0
+    alignment: 0
+    wrap: 1
+    tint: {r: 0.12, g: 0.09, b: 0.06, a: 1}
+    required: 0
+    conditions:
+    - field: 0
+      comparison: 0
+      value: 2
+  - name: RulesText (other)
     slot: 0
     text: 2
     face: 0
     sortingOrder: 150
     x: 150
-    y: 760
-    width: 500
-    height: 200
+    y: 772
+    width: 506
+    height: 232
     rotation: 0
-    fontSize: 2.1
+    fill: 0
+    maskSlot: 0
+    textStyle: RulesBody
+    fontSize: 2.4
+    fontSizeMin: 0.45
     bold: 0
+    alignment: 0
+    wrap: 1
     tint: {r: 0.12, g: 0.09, b: 0.06, a: 1}
     required: 0
-    conditions: []
+    conditions:
+    - field: 0
+      comparison: 1
+      value: 2
   - name: AttackText
     slot: 0
     text: 4
     face: 0
     sortingOrder: 160
-    x: 8
-    y: 895
-    width: 210
-    height: 195
+    x: 50
+    y: 947
+    width: 178
+    height: 115
     rotation: 0
-    fontSize: 7.5
+    fill: 0
+    maskSlot: 0
+    textStyle: StatNumber
+    fontSize: 12
+    fontSizeMin: 1.6
     bold: 1
+    alignment: 0
+    wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
@@ -299,13 +656,19 @@ MonoBehaviour:
     text: 5
     face: 0
     sortingOrder: 170
-    x: 582
-    y: 895
-    width: 210
-    height: 195
+    x: 616
+    y: 949
+    width: 151
+    height: 108
     rotation: 0
-    fontSize: 7.5
+    fill: 0
+    maskSlot: 0
+    textStyle: StatNumber
+    fontSize: 12
+    fontSizeMin: 1.6
     bold: 1
+    alignment: 0
+    wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
@@ -314,13 +677,90 @@ MonoBehaviour:
     text: 6
     face: 0
     sortingOrder: 180
-    x: 145
-    y: 985
-    width: 511
-    height: 77
+    x: 220
+    y: 996
+    width: 360
+    height: 56
     rotation: 0
-    fontSize: 2.1
+    fill: 0
+    maskSlot: 0
+    textStyle: TribePlate
+    fontSize: 12
+    fontSizeMin: 0.9
     bold: 0
+    alignment: 0
+    wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
+  textStyles:
+  - name: AllyTitle
+    role: 0
+    renderMode: 2
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
+    outlineWidth: 0.44
+    tracking: -3
+    lineSpacing: 0
+    minCondense: 0.62
+    stretch: 0.97
+    taper: 0
+    curveControlA: {x: 0.33333334, y: -0.0115855895}
+    curveControlB: {x: 0.6666667, y: -0.17895429}
+    curveEnd: {x: 1, y: -0.03}
+  - name: SpellTitle
+    role: 0
+    renderMode: 1
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
+    outlineWidth: 0.19
+    tracking: 0
+    lineSpacing: 0
+    minCondense: 0.62
+    stretch: 0.84
+    taper: 0
+    curveControlA: {x: 0.33333334, y: -0.11451488}
+    curveControlB: {x: 0.6666667, y: -0.12986508}
+    curveEnd: {x: 1, y: 0.005}
+  - name: RulesBody
+    role: 1
+    renderMode: 0
+    fillColor: {r: 0.11764706, g: 0.09019608, b: 0.0627451, a: 1}
+    outlineColor: {r: 0.11764706, g: 0.09019608, b: 0.0627451, a: 1}
+    outlineWidth: 0
+    tracking: 0
+    lineSpacing: 0
+    minCondense: 1
+    stretch: 1
+    taper: 0
+    curveControlA: {x: 0.333, y: 0}
+    curveControlB: {x: 0.667, y: 0}
+    curveEnd: {x: 1, y: 0}
+  - name: StatNumber
+    role: 2
+    renderMode: 0
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.039215688, g: 0.03137255, b: 0.019607844, a: 1}
+    outlineWidth: 0.14
+    tracking: 0
+    lineSpacing: 0
+    minCondense: 1
+    stretch: 1
+    taper: 0
+    curveControlA: {x: 0.333, y: 0}
+    curveControlB: {x: 0.667, y: 0}
+    curveEnd: {x: 1, y: 0}
+  - name: TribePlate
+    role: 3
+    renderMode: 0
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    outlineColor: {r: 0.039215688, g: 0.03137255, b: 0.019607844, a: 1}
+    outlineWidth: 0.12
+    tracking: 0
+    lineSpacing: 0
+    minCondense: 1
+    stretch: 1
+    taper: 0
+    curveControlA: {x: 0.333, y: 0}
+    curveControlB: {x: 0.667, y: 0}
+    curveEnd: {x: 1, y: 0}

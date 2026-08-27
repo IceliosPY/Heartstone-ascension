@@ -24,12 +24,34 @@ namespace CoH.Presentation.CardVisuals
         [Tooltip("Material for the sprite layers. Left empty, a URP sprite material is made on demand.")]
         [SerializeField] private Material spriteMaterial;
 
-        [Tooltip("Font for the text layers. Left empty, TextMeshPro uses its default.")]
+        [Tooltip(
+            "Font used by any role that has none of its own. Left empty too, TextMeshPro " +
+            "uses its default.")]
         [SerializeField] private TMP_FontAsset font;
+
+        [Header("Fonts by role")]
+        [Tooltip("The display face card names are set in.")]
+        [SerializeField] private TMP_FontAsset titleFont;
+
+        [Tooltip("The text face rules are set in.")]
+        [SerializeField] private TMP_FontAsset rulesFont;
+
+        [Tooltip("The face the mana, attack and health numbers are set in.")]
+        [SerializeField] private TMP_FontAsset statFont;
+
+        [Tooltip("The face a minion's tribe is set in.")]
+        [SerializeField] private TMP_FontAsset tribeFont;
 
         [Tooltip("How much an unplayable card is dimmed. Zero is untouched, one is black.")]
         [Range(0f, 1f)]
         [SerializeField] private float dimStrength = 0.55f;
+
+        [Tooltip(
+            "How much the writing on an unplayable card is dimmed. Less than the pictures, " +
+            "because a card you cannot play is still a card you have to read in order to " +
+            "decide what to do next turn.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float textDimStrength = 0.28f;
 
         private readonly List<SpriteRenderer> _sprites = new List<SpriteRenderer>();
         private readonly List<TextMeshPro> _labels = new List<TextMeshPro>();
@@ -37,6 +59,7 @@ namespace CoH.Presentation.CardVisuals
         private readonly List<Color> _labelTints = new List<Color>();
 
         private Transform _layerRoot;
+        private MaterialPropertyBlock _block;
         private Material _madeUpMaterial;
         private float _dim;
 
@@ -48,7 +71,48 @@ namespace CoH.Presentation.CardVisuals
         /// actually driving the camera, which is why a direct Camera.Render in
         /// a capture tool can look perfectly fine while the game does not.
         /// </summary>
-        private const string LayerShader = "Universal Render Pipeline/2D/Sprite-Unlit-Default";
+        private const string LayerShader = "CoH/Card Layer";
+
+        /// <summary>
+        /// What to fall back to if the project's own shader is missing. Draws
+        /// every layer correctly except that nothing can be clipped, which is
+        /// visible but not broken.
+        /// </summary>
+        private const string PlainSpriteShader = "Universal Render Pipeline/2D/Sprite-Unlit-Default";
+
+        private static readonly int MaskTexture = Shader.PropertyToID("_MaskTex");
+        private static readonly int MaskScaleAndOffset = Shader.PropertyToID("_MaskST");
+
+        private static readonly int OutlineWidth = Shader.PropertyToID("_OutlineWidth");
+        private static readonly int OutlineColour = Shader.PropertyToID("_OutlineColor");
+
+        /// <summary>
+        /// The style each drawn label was set in, kept so that rewriting the
+        /// words can bend them again.
+        ///
+        /// A curved title has to be re-warped every time it changes, because
+        /// TextMeshPro rebuilds the mesh from scratch and throws the bent
+        /// vertices away. Without this, a minion renamed mid-match would keep
+        /// its curve until the card happened to be recomposed, and then lose it.
+        /// </summary>
+        private readonly List<CardTextStyle> _labelStyles = new List<CardTextStyle>();
+
+        /// <summary>
+        /// The width each label is meant to occupy, which is not the width it
+        /// was laid out in. See <see cref="CardTextWarp"/>.
+        /// </summary>
+        private readonly List<float> _labelWidths = new List<float>();
+
+        /// <summary>
+        /// Which labels have been rebuilt by TextMeshPro and are waiting to be
+        /// bent again.
+        ///
+        /// A note rather than the work itself, and that distinction is the
+        /// whole of this. See <see cref="OnTextRegenerated"/>.
+        /// </summary>
+        private readonly List<bool> _labelNeedsWarp = new List<bool>();
+
+        private bool _anyLabelNeedsWarp;
 
         /// <summary>How many sprite layers the last plan drew. Diagnostics and tests.</summary>
         public int SpriteLayerCount { get; private set; }
@@ -64,6 +128,89 @@ namespace CoH.Presentation.CardVisuals
         /// per variant after all.
         /// </summary>
         public int PooledRendererCount => _sprites.Count + _labels.Count;
+
+        /// <summary>
+        /// Listens for TextMeshPro rebuilding a mesh, so a bent title can be
+        /// bent again.
+        ///
+        /// This is what the whole warp turned on, and what made the preview and
+        /// the running game disagree about the same card. Bending a title edits
+        /// the vertex buffer; almost anything afterwards — a colour change, a
+        /// new string, a card being dimmed because it can no longer be played —
+        /// marks the text dirty, and TextMeshPro then regenerates that buffer
+        /// from the font and throws the curve away. In a still nothing came
+        /// after the warp and it survived; in a match the card was dimmed a
+        /// frame later and the title went flat, which is exactly how it looked
+        /// on the table.
+        /// </summary>
+        private void OnEnable() =>
+            TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextRegenerated);
+
+        private void OnDisable() =>
+            TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextRegenerated);
+
+        /// <summary>
+        /// Notes that a label needs bending again. Deliberately does not bend it.
+        ///
+        /// TextMeshPro raises this from inside the routine that builds the mesh,
+        /// and goes on working afterwards: a warp applied here is overwritten
+        /// before anything ever draws it. That was measured rather than guessed —
+        /// the warp reported success on every rebuild and the mesh read flat
+        /// immediately afterwards, every time. So the work is put off to
+        /// <see cref="LateUpdate"/>, which runs when TextMeshPro has finished
+        /// and where a warp is known to stick.
+        /// </summary>
+        private void OnTextRegenerated(Object changed)
+        {
+            TextMeshPro label = changed as TextMeshPro;
+
+            if (label == null)
+            {
+                return;
+            }
+
+            int index = _labels.IndexOf(label);
+
+            if (index < 0 || index >= _labelNeedsWarp.Count)
+            {
+                return;
+            }
+
+            _labelNeedsWarp[index] = true;
+            _anyLabelNeedsWarp = true;
+        }
+
+        private void LateUpdate()
+        {
+            if (!_anyLabelNeedsWarp)
+            {
+                return;
+            }
+
+            _anyLabelNeedsWarp = false;
+
+            for (int index = 0; index < _labelNeedsWarp.Count; index++)
+            {
+                if (!_labelNeedsWarp[index])
+                {
+                    continue;
+                }
+
+                _labelNeedsWarp[index] = false;
+
+                TextMeshPro label = _labels[index];
+
+                if (label == null || !label.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                // Not regenerating: the mesh TextMeshPro just built is the one
+                // to bend, and asking for another would put us back inside the
+                // routine this exists to stay out of.
+                CardTextWarp.Apply(label, _labelStyles[index], _labelWidths[index], false);
+            }
+        }
 
         /// <summary>Draws a plan, reusing everything already built.</summary>
         public void Apply(CardVisualPlan plan)
@@ -127,10 +274,21 @@ namespace CoH.Presentation.CardVisuals
 
             for (int index = 0; index < plan.Layers.Count && labelIndex < _labels.Count; index++)
             {
-                if (plan.Layers[index].IsText)
+                if (!plan.Layers[index].IsText)
                 {
-                    _labels[labelIndex++].text = plan.Layers[index].Text;
+                    continue;
                 }
+
+                TextMeshPro label = _labels[labelIndex];
+                label.text = plan.Layers[index].Text;
+
+                // New words mean a new mesh, and a new mesh is a straight one.
+                CardTextWarp.Apply(
+                    label, _labelStyles[labelIndex], _labelWidths[labelIndex], true);
+
+                Settled(labelIndex);
+
+                labelIndex++;
             }
         }
 
@@ -142,7 +300,7 @@ namespace CoH.Presentation.CardVisuals
         /// </summary>
         public void SetDimmed(bool dimmed)
         {
-            float target = dimmed ? dimStrength : 0f;
+            float target = dimmed ? 1f : 0f;
 
             if (Mathf.Approximately(target, _dim))
             {
@@ -157,12 +315,20 @@ namespace CoH.Presentation.CardVisuals
         {
             for (int index = 0; index < SpriteLayerCount && index < _sprites.Count; index++)
             {
-                _sprites[index].color = Dimmed(_spriteTints[index], _dim);
+                _sprites[index].color = Dimmed(_spriteTints[index], _dim * dimStrength);
             }
 
             for (int index = 0; index < TextLayerCount && index < _labels.Count; index++)
             {
-                _labels[index].color = Dimmed(_labelTints[index], _dim);
+                Color wanted = Dimmed(_labelTints[index], _dim * textDimStrength);
+
+                // Only when it differs. Assigning a colour marks the text dirty
+                // whatever it was, and every dirty mesh is one more rebuild for
+                // the warp to survive.
+                if (_labels[index].color != wanted)
+                {
+                    _labels[index].color = wanted;
+                }
             }
         }
 
@@ -195,7 +361,7 @@ namespace CoH.Presentation.CardVisuals
 
             if (_madeUpMaterial == null)
             {
-                Shader shader = Shader.Find(LayerShader);
+                Shader shader = Shader.Find(LayerShader) ?? Shader.Find(PlainSpriteShader);
 
                 if (shader != null)
                 {
@@ -205,6 +371,37 @@ namespace CoH.Presentation.CardVisuals
 
             return _madeUpMaterial;
         }
+
+        /// <summary>
+        /// The face for a role, or the nearest thing assigned.
+        ///
+        /// The fallback is deliberate and ordered rather than absent: a project
+        /// part way through acquiring its fonts should draw every card in
+        /// whatever it does have, not lose its rules text because only a title
+        /// face has been dropped in yet. Numbers fall back to the title face
+        /// before the general one, because on a real card they are set in the
+        /// display face; a tribe falls back the same way.
+        /// </summary>
+        private TMP_FontAsset FontFor(CardTextRole role)
+        {
+            switch (role)
+            {
+                case CardTextRole.Title:
+                    return titleFont != null ? titleFont : font;
+
+                case CardTextRole.Stat:
+                    return statFont != null ? statFont : titleFont != null ? titleFont : font;
+
+                case CardTextRole.Tribe:
+                    return tribeFont != null ? tribeFont : titleFont != null ? titleFont : font;
+
+                default:
+                    return rulesFont != null ? rulesFont : font;
+            }
+        }
+
+        /// <summary>Which faces are assigned. Reports and tests.</summary>
+        public bool HasFontFor(CardTextRole role) => FontFor(role) != null;
 
         private void EnsureRoot()
         {
@@ -280,6 +477,9 @@ namespace CoH.Presentation.CardVisuals
 
                 _labels.Add(label);
                 _labelTints.Add(Color.white);
+                _labelStyles.Add(CardTextStyle.For(CardVisualTextSlot.None));
+                _labelWidths.Add(0f);
+                _labelNeedsWarp.Add(false);
             }
 
             _labels[index].gameObject.SetActive(true);
@@ -302,16 +502,85 @@ namespace CoH.Presentation.CardVisuals
             Vector2 wanted = CardCanvas.ToLocalSize(layer.Rect);
             Vector2 natural = NaturalSize(layer.Sprite);
 
-            target.localScale = new Vector3(
-                natural.x > 0f ? wanted.x / natural.x : 1f,
-                natural.y > 0f ? wanted.y / natural.y : 1f,
-                1f);
+            float scaleX = natural.x > 0f ? wanted.x / natural.x : 1f;
+            float scaleY = natural.y > 0f ? wanted.y / natural.y : 1f;
+
+            switch (layer.Fill)
+            {
+                case CardVisualFill.Cover:
+                    // Up until it covers, keeping its proportions. A painting is
+                    // whatever shape it was painted; squashing it to a window is
+                    // never the right answer, so it overflows and is cropped.
+                    scaleX = scaleY = Mathf.Max(scaleX, scaleY);
+                    break;
+
+                case CardVisualFill.Contain:
+                    scaleX = scaleY = Mathf.Min(scaleX, scaleY);
+                    break;
+            }
+
+            target.localScale = new Vector3(scaleX, scaleY, 1f);
 
             int index = _sprites.IndexOf(renderer);
 
             if (index >= 0)
             {
                 _spriteTints[index] = layer.Tint;
+            }
+
+            ApplyMask(renderer, layer, wanted, natural, scaleX, scaleY);
+        }
+
+        /// <summary>
+        /// Clips a layer to a shape, without touching the picture itself.
+        ///
+        /// The mask belongs to the rectangle rather than to the image, so a
+        /// painting scaled up to cover its window has to be told where that
+        /// window is in its own coordinates. That is the whole of the
+        /// arithmetic below: how much bigger the drawn picture is than the
+        /// rectangle, and therefore how far into the picture the window sits.
+        /// </summary>
+        private void ApplyMask(
+            SpriteRenderer renderer,
+            in CardVisualPlannedLayer layer,
+            Vector2 wanted,
+            Vector2 natural,
+            float scaleX,
+            float scaleY)
+        {
+            _block ??= new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(_block);
+
+            if (layer.Mask == null || layer.Mask.texture == null)
+            {
+                _block.SetTexture(MaskTexture, Texture2D.whiteTexture);
+                _block.SetVector(MaskScaleAndOffset, new Vector4(1f, 1f, 0f, 0f));
+            }
+            else
+            {
+                float drawnWidth = natural.x * scaleX;
+                float drawnHeight = natural.y * scaleY;
+
+                float ratioX = wanted.x > 0f ? drawnWidth / wanted.x : 1f;
+                float ratioY = wanted.y > 0f ? drawnHeight / wanted.y : 1f;
+
+                _block.SetTexture(MaskTexture, layer.Mask.texture);
+                _block.SetVector(MaskScaleAndOffset, new Vector4(
+                    ratioX, ratioY, 0.5f - 0.5f * ratioX, 0.5f - 0.5f * ratioY));
+            }
+
+            renderer.SetPropertyBlock(_block);
+        }
+
+        private static TextAlignmentOptions Alignment(CardVisualAlignment alignment)
+        {
+            switch (alignment)
+            {
+                case CardVisualAlignment.Top: return TextAlignmentOptions.Top;
+                case CardVisualAlignment.Bottom: return TextAlignmentOptions.Bottom;
+                case CardVisualAlignment.Left: return TextAlignmentOptions.Left;
+                case CardVisualAlignment.Right: return TextAlignmentOptions.Right;
+                default: return TextAlignmentOptions.Center;
             }
         }
 
@@ -329,10 +598,40 @@ namespace CoH.Presentation.CardVisuals
 
         private void ApplyText(TextMeshPro label, in CardVisualPlannedLayer layer)
         {
+            // Before the text, because changing the face rebuilds the mesh and
+            // the material with it, which would undo an outline set first.
+            TMP_FontAsset face = FontFor(layer.TextStyle.Role);
+
+            if (face != null && label.font != face)
+            {
+                label.font = face;
+            }
+
             label.text = layer.Text;
             label.fontSizeMax = layer.FontSize;
+
+            // A floor as well as a ceiling. Without one a long name shrinks
+            // until it is unreadable rather than admitting it does not fit, and
+            // the card silently becomes worse the more you write on it.
+            label.fontSizeMin = Mathf.Min(layer.FontSizeMin, layer.FontSize);
+
             label.fontStyle = layer.Bold ? FontStyles.Bold : FontStyles.Normal;
-            label.rectTransform.sizeDelta = CardCanvas.ToLocalSize(layer.Rect);
+            label.textWrappingMode = layer.Wrap ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
+            label.alignment = Alignment(layer.Alignment);
+
+            Vector2 slot = CardCanvas.ToLocalSize(layer.Rect);
+
+            // A label that may be squeezed is laid out in a wider box than it
+            // will occupy, so that its height decides its size and the squeeze
+            // brings the width back. Without this a long name is shrunk to fit
+            // across, and a short name in a large banner is sized by nothing at
+            // all — which is how the titles ended up looking like interface
+            // text rather than titles.
+            float layoutWidth = layer.TextStyle.CanCondense
+                ? slot.x / layer.TextStyle.MinCondense
+                : slot.x;
+
+            label.rectTransform.sizeDelta = new Vector2(layoutWidth, slot.y);
             label.sortingOrder = layer.SortingOrder;
 
             Transform target = label.transform;
@@ -340,12 +639,77 @@ namespace CoH.Presentation.CardVisuals
             target.localRotation = Quaternion.Euler(0f, 0f, -layer.Rotation);
             target.localScale = Vector3.one;
 
+            label.characterSpacing = layer.TextStyle.Tracking;
+
+            if (layer.TextStyle.LineSpacing != 0f)
+            {
+                label.lineSpacing = layer.TextStyle.LineSpacing;
+            }
+
+            ApplyOutline(label, layer.TextStyle);
+
             int index = _labels.IndexOf(label);
 
             if (index >= 0)
             {
                 _labelTints[index] = layer.Tint;
+                _labelStyles[index] = layer.TextStyle;
+                _labelWidths[index] = slot.x;
             }
+
+            CardTextWarp.Apply(label, layer.TextStyle, slot.x, true);
+
+            // Bent here and now, so nothing is owed.
+            //
+            // Bending regenerates the mesh first, and regenerating it is exactly
+            // what asks for a bend later: without this the label is bent twice,
+            // once now and once on the next late update, and the second one
+            // works on a mesh that is already curved. On the table that went
+            // unnoticed, because dimming a card recolours its text a frame later
+            // and the clean rebuild that follows leaves a single bend. On a bare
+            // painter — which is what the preview and every capture tool use —
+            // nothing ever recolours it, so the doubled curve stayed, and a
+            // still showed a title arched half again as far as the game drew it.
+            Settled(index);
+        }
+
+        /// <summary>Notes that a label is bent and needs nothing further.</summary>
+        private void Settled(int index)
+        {
+            if (index >= 0 && index < _labelNeedsWarp.Count)
+            {
+                _labelNeedsWarp[index] = false;
+            }
+        }
+
+        /// <summary>
+        /// Draws the label's outline, the way a card's numbers and titles carry
+        /// one.
+        ///
+        /// Through the label's own material instance rather than a property
+        /// block, because TextMeshPro reads the outline in its shader and a
+        /// block would be overwritten the next time it rebuilt the mesh. The
+        /// padding has to be recomputed too: an outline is drawn outside the
+        /// glyph, and without room for it the thick stroke on a title is sliced
+        /// off square at the edge of the character.
+        /// </summary>
+        private static void ApplyOutline(TextMeshPro label, in CardTextStyle style)
+        {
+            Material material = label.fontMaterial;
+
+            if (material == null || !material.HasProperty(OutlineWidth))
+            {
+                return;
+            }
+
+            material.SetFloat(OutlineWidth, style.OutlineWidth);
+
+            if (material.HasProperty(OutlineColour))
+            {
+                material.SetColor(OutlineColour, style.OutlineColor);
+            }
+
+            label.UpdateMeshPadding();
         }
     }
 }

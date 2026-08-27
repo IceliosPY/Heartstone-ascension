@@ -1,0 +1,747 @@
+{
+  "$comment": [
+    "The allowlist. Nothing is downloaded that is not named here, and there is",
+    "no crawling: the fetcher reads this list and fetches exactly these URLs.",
+    "",
+    "Every entry below is a fact, not a proposal. The names come from the",
+    "renderer's own layer templates, which are public:",
+    "",
+    "    https://www.hearthcards.net/assets_template_new/minion.json",
+    "    https://www.hearthcards.net/assets_template_new/spell.json",
+    "",
+    "The first version of this file was guessed from one known URL and a",
+    "supposed naming rule. Twelve of fifteen names were wrong, and the site",
+    "answers an unknown path with its own index page at HTTP 200, so every",
+    "wrong guess looked like a success. Hence the rule now: a name is in this",
+    "file because the renderer references it, never because it seems plausible.",
+    "",
+    "'sourceRect' is where the renderer draws that component on the 800x1100",
+    "canvas. It is recorded because it is a fact worth keeping, not because",
+    "anything reads it yet: our recipe carries its own rects.",
+    "",
+    "Each entry also says where the file belongs on one of our cards, so",
+    "filling the catalog is reading this file rather than wiring anything by",
+    "hand. Adding a component is adding an entry - no new code."
+  ],
+  "schemaVersion": 2,
+  "baseUrl": "https://www.hearthcards.net/assets/",
+  "rawFolder": "Assets/ThirdParty/HearthCards/Raw",
+  "importedFolder": "Assets/ThirdParty/HearthCards/Imported",
+  "canvas": {
+    "$comment": [
+      "The renderer composes on 800 x 1100, which is the canvas this project",
+      "has used since its card layout was first measured. Components are not",
+      "full-canvas layers: each is its own small image placed at its own rect,",
+      "which is exactly how our painter draws them.",
+      "",
+      "The minion art window is an ellipse. The renderer offers both an",
+      "ellipse and a rectangle mask for it, and our recipe currently uses the",
+      "rectangle - the same 186,185 434x420 the template lists."
+    ],
+    "width": 800,
+    "height": 1100,
+    "artMasks": {
+      "minion": [
+        {
+          "type": "ellipse",
+          "x": 210,
+          "y": 106,
+          "width": 370,
+          "height": 384
+        },
+        {
+          "type": "rectangle",
+          "x": 186,
+          "y": 185,
+          "width": 434,
+          "height": 420
+        }
+      ],
+      "spell": [
+        {
+          "type": "rectangle",
+          "x": 140,
+          "y": 195,
+          "width": 525,
+          "height": 400
+        }
+      ]
+    }
+  },
+  "classFrames": {
+    "$comment": [
+      "The renderer's full class table, recorded as a fact and deliberately",
+      "not turned into entries. Our engine's CardClass has only Neutral, so an",
+      "entry naming any of these would be a mapping to a value that does not",
+      "exist. When a class is added to CardClass, its two lines move down into",
+      "'entries' and nothing else changes.",
+      "",
+      "Note the two different words for the same idea: a minion frame is",
+      "Card_Inhand_Minion_<Class>, and a spell frame is",
+      "Card_Inhand_Ability_<Class>. No rule derives the second from the first.",
+      "This is the single reason the guessed manifest could never have worked."
+    ],
+    "minion": "Card_Inhand_Minion_{Class}.webp",
+    "spell": "Card_Inhand_Ability_{Class}.webp",
+    "classes": [
+      "Neutral",
+      "Warrior",
+      "Shaman",
+      "Rogue",
+      "Paladin",
+      "Hunter",
+      "Druid",
+      "Warlock",
+      "Mage",
+      "Priest",
+      "DemonHunter",
+      "DeathKnight"
+    ]
+  },
+  "entries": [
+    {
+      "id": "frame_minion_neutral",
+      "filename": "Card_Inhand_Minion_Neutral.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_Neutral.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 669x1007",
+      "category": "frame",
+      "purpose": "The neutral minion frame. Carries its own rules parchment; the art window is an ellipse.",
+      "sourceRect": {
+        "x": 66,
+        "y": 92,
+        "width": 669,
+        "height": 1007
+      },
+      "slot": "Frame",
+      "cardType": "Minion",
+      "cardClass": "Neutral",
+      "rarity": null,
+      "priority": 1,
+      "measured": {
+        "format": "WEBP",
+        "width": 669,
+        "height": 1007,
+        "bytes": 65352
+      }
+    },
+    {
+      "id": "frame_spell_neutral",
+      "filename": "Card_Inhand_Ability_Neutral.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Ability_Neutral.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 669x947",
+      "category": "frame",
+      "purpose": "The neutral spell frame. Called Ability, not Spell.",
+      "sourceRect": {
+        "x": 66,
+        "y": 150,
+        "width": 669,
+        "height": 947
+      },
+      "slot": "Frame",
+      "cardType": "Spell",
+      "cardClass": "Neutral",
+      "rarity": null,
+      "priority": 1,
+      "measured": {
+        "format": "WEBP",
+        "width": 669,
+        "height": 947,
+        "bytes": 42030
+      }
+    },
+    {
+      "id": "frame_hero_neutral",
+      "filename": "Card_Inhand_Hero_Neutral.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Hero_Neutral.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 669x1007",
+      "category": "frame",
+      "purpose": "Hero frame. Visual support only; there are no hero rules and none are planned here.",
+      "sourceRect": {
+        "x": 66,
+        "y": 92,
+        "width": 669,
+        "height": 1007
+      },
+      "slot": "Frame",
+      "cardType": "Hero",
+      "cardClass": "Neutral",
+      "rarity": null,
+      "priority": 7,
+      "measured": {
+        "format": "WEBP",
+        "width": 669,
+        "height": 1007,
+        "bytes": 31026
+      }
+    },
+    {
+      "id": "frame_weapon_neutral",
+      "filename": "Card_Inhand_Weapon_Neutral.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Weapon_Neutral.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 669x1007",
+      "category": "frame",
+      "purpose": "Weapon frame. Visual support only; there are no weapon rules.",
+      "sourceRect": {
+        "x": 66,
+        "y": 92,
+        "width": 669,
+        "height": 1007
+      },
+      "slot": "Frame",
+      "cardType": "Weapon",
+      "cardClass": "Neutral",
+      "rarity": null,
+      "priority": 7,
+      "measured": {
+        "format": "WEBP",
+        "width": 669,
+        "height": 1007,
+        "bytes": 51930
+      }
+    },
+    {
+      "id": "manaGem",
+      "filename": "Card_Inhand_BannerAtlas_Minion_ManaGem.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Minion_ManaGem.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 179x181",
+      "category": "gem",
+      "purpose": "The mana crystal. The spell template reuses the minion's, so one file serves both.",
+      "sourceRect": {
+        "x": 33,
+        "y": 114,
+        "width": 179,
+        "height": 181
+      },
+      "slot": "ManaGem",
+      "cardType": null,
+      "cardClass": null,
+      "rarity": null,
+      "priority": 1,
+      "measured": {
+        "format": "WEBP",
+        "width": 179,
+        "height": 181,
+        "bytes": 7518
+      }
+    },
+    {
+      "id": "attackGem",
+      "filename": "attacktexture.webp",
+      "url": "https://www.hearthcards.net/assets/attacktexture.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 222x245",
+      "category": "gem",
+      "purpose": "The attack gem, bottom left. Lower case, no prefix: nothing about the naming is regular.",
+      "sourceRect": {
+        "x": 0,
+        "y": 893,
+        "width": 222,
+        "height": 245
+      },
+      "slot": "AttackGem",
+      "cardType": null,
+      "cardClass": null,
+      "rarity": null,
+      "priority": 1,
+      "measured": {
+        "format": "WEBP",
+        "width": 222,
+        "height": 245,
+        "bytes": 12490
+      }
+    },
+    {
+      "id": "healthGem",
+      "filename": "healthtexture.webp",
+      "url": "https://www.hearthcards.net/assets/healthtexture.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 170x231",
+      "category": "gem",
+      "purpose": "The health gem, bottom right.",
+      "sourceRect": {
+        "x": 590,
+        "y": 906,
+        "width": 170,
+        "height": 231
+      },
+      "slot": "HealthGem",
+      "cardType": null,
+      "cardClass": null,
+      "rarity": null,
+      "priority": 1,
+      "measured": {
+        "format": "WEBP",
+        "width": 170,
+        "height": 231,
+        "bytes": 11108
+      }
+    },
+    {
+      "id": "nameBanner_minion",
+      "filename": "Card_Inhand_BannerAtlas_Minion_Title.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Minion_Title.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 624x159",
+      "category": "banner",
+      "purpose": "The name banner. It is a separate overlay, not part of the frame.",
+      "sourceRect": {
+        "x": 92,
+        "y": 572,
+        "width": 624,
+        "height": 159
+      },
+      "slot": "NameBanner",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 2,
+      "measured": {
+        "format": "WEBP",
+        "width": 624,
+        "height": 159,
+        "bytes": 17846
+      }
+    },
+    {
+      "id": "nameBanner_spell",
+      "filename": "Card_Inhand_BannerAtlas_Spell_Title.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Spell_Title.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 647x199",
+      "category": "banner",
+      "purpose": "The spell name banner, at its own rect. Here the word is Spell, not Ability.",
+      "sourceRect": {
+        "x": 82,
+        "y": 563,
+        "width": 647,
+        "height": 199
+      },
+      "slot": "NameBanner",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 2,
+      "measured": {
+        "format": "WEBP",
+        "width": 647,
+        "height": 199,
+        "bytes": 15648
+      }
+    },
+    {
+      "id": "rulesPanel_minion",
+      "filename": "Card_Inhand_BannerAtlas_Minion_Text.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Minion_Text.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 580x341",
+      "category": "panel",
+      "purpose": "The parchment the rules text is printed on.",
+      "sourceRect": {
+        "x": 113,
+        "y": 718,
+        "width": 580,
+        "height": 341
+      },
+      "slot": "RulesPanel",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 2,
+      "measured": {
+        "format": "WEBP",
+        "width": 580,
+        "height": 341,
+        "bytes": 24200
+      }
+    },
+    {
+      "id": "rulesPanel_spell",
+      "filename": "Card_Inhand_BannerAtlas_Spell_Text.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Spell_Text.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 518x301",
+      "category": "panel",
+      "purpose": "The spell rules parchment.",
+      "sourceRect": {
+        "x": 143,
+        "y": 722,
+        "width": 518,
+        "height": 301
+      },
+      "slot": "RulesPanel",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 2,
+      "measured": {
+        "format": "WEBP",
+        "width": 518,
+        "height": 301,
+        "bytes": 13848
+      }
+    },
+    {
+      "id": "rarity_minion_common",
+      "filename": "Card_Inhand_Minion_Gem_Common.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_Gem_Common.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 122x92",
+      "category": "rarity",
+      "purpose": "Rarity stone, common. A basic card wears none, which is a condition on our layer.",
+      "sourceRect": {
+        "x": 347,
+        "y": 663,
+        "width": 122,
+        "height": 92
+      },
+      "slot": "RarityGem",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": "Common",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 122,
+        "height": 92,
+        "bytes": 4396
+      }
+    },
+    {
+      "id": "rarity_minion_rare",
+      "filename": "Card_Inhand_Minion_Gem_Rare.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_Gem_Rare.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 122x92",
+      "category": "rarity",
+      "purpose": "Rarity stone, rare.",
+      "sourceRect": {
+        "x": 347,
+        "y": 663,
+        "width": 122,
+        "height": 92
+      },
+      "slot": "RarityGem",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": "Rare",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 122,
+        "height": 92,
+        "bytes": 4480
+      }
+    },
+    {
+      "id": "rarity_minion_epic",
+      "filename": "Card_Inhand_Minion_Gem_Epic.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_Gem_Epic.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 122x92",
+      "category": "rarity",
+      "purpose": "Rarity stone, epic.",
+      "sourceRect": {
+        "x": 347,
+        "y": 663,
+        "width": 122,
+        "height": 92
+      },
+      "slot": "RarityGem",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": "Epic",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 122,
+        "height": 92,
+        "bytes": 4198
+      }
+    },
+    {
+      "id": "rarity_minion_legendary",
+      "filename": "Card_Inhand_Minion_Gem_Legendary.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_Gem_Legendary.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 122x92",
+      "category": "rarity",
+      "purpose": "Rarity stone, legendary.",
+      "sourceRect": {
+        "x": 347,
+        "y": 663,
+        "width": 122,
+        "height": 92
+      },
+      "slot": "RarityGem",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": "Legendary",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 122,
+        "height": 92,
+        "bytes": 4352
+      }
+    },
+    {
+      "id": "rarity_spell_common",
+      "filename": "Card_Inhand_Spell_Gem_Common.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Spell_Gem_Common.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 171x94",
+      "category": "rarity",
+      "purpose": "Spell rarity stone, common. Its own file at its own rect, and here the word is Spell.",
+      "sourceRect": {
+        "x": 320,
+        "y": 669,
+        "width": 171,
+        "height": 94
+      },
+      "slot": "RarityGem",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": "Common",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 171,
+        "height": 94,
+        "bytes": 4160
+      }
+    },
+    {
+      "id": "rarity_spell_rare",
+      "filename": "Card_Inhand_Spell_Gem_Rare.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Spell_Gem_Rare.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 171x94",
+      "category": "rarity",
+      "purpose": "Spell rarity stone, rare.",
+      "sourceRect": {
+        "x": 320,
+        "y": 669,
+        "width": 171,
+        "height": 94
+      },
+      "slot": "RarityGem",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": "Rare",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 171,
+        "height": 94,
+        "bytes": 4316
+      }
+    },
+    {
+      "id": "rarity_spell_epic",
+      "filename": "Card_Inhand_Spell_Gem_Epic.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Spell_Gem_Epic.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 171x94",
+      "category": "rarity",
+      "purpose": "Spell rarity stone, epic.",
+      "sourceRect": {
+        "x": 320,
+        "y": 669,
+        "width": 171,
+        "height": 94
+      },
+      "slot": "RarityGem",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": "Epic",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 171,
+        "height": 94,
+        "bytes": 4298
+      }
+    },
+    {
+      "id": "rarity_spell_legendary",
+      "filename": "Card_Inhand_Spell_Gem_Legendary.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Spell_Gem_Legendary.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 171x94",
+      "category": "rarity",
+      "purpose": "Spell rarity stone, legendary.",
+      "sourceRect": {
+        "x": 320,
+        "y": 669,
+        "width": 171,
+        "height": 94
+      },
+      "slot": "RarityGem",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": "Legendary",
+      "priority": 3,
+      "measured": {
+        "format": "WEBP",
+        "width": 171,
+        "height": 94,
+        "bytes": 4494
+      }
+    },
+    {
+      "id": "elite_minion",
+      "filename": "Card_Inhand_Minion_LegendaryDragon.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_LegendaryDragon.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 560x402",
+      "category": "overlay",
+      "purpose": "The legendary dragon laid over a minion frame. An overlay, not a second frame.",
+      "sourceRect": {
+        "x": 208,
+        "y": 30,
+        "width": 560,
+        "height": 402
+      },
+      "slot": "EliteFrame",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": "Legendary",
+      "priority": 4,
+      "measured": {
+        "format": "WEBP",
+        "width": 560,
+        "height": 402,
+        "bytes": 26176
+      }
+    },
+    {
+      "id": "elite_spell",
+      "filename": "Card_Inhand_Ability_LegendaryDragon.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Ability_LegendaryDragon.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 609x333",
+      "category": "overlay",
+      "purpose": "The legendary dragon for a spell.",
+      "sourceRect": {
+        "x": 216,
+        "y": 90,
+        "width": 609,
+        "height": 333
+      },
+      "slot": "EliteFrame",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": "Legendary",
+      "priority": 4,
+      "measured": {
+        "format": "WEBP",
+        "width": 609,
+        "height": 333,
+        "bytes": 26572
+      }
+    },
+    {
+      "id": "tribeBanner_minion",
+      "filename": "Card_Inhand_BannerAtlas_Minion_TribePlaque.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_BannerAtlas_Minion_TribePlaque.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 511x97",
+      "category": "banner",
+      "purpose": "The plaque a minion's tribe is printed on.",
+      "sourceRect": {
+        "x": 145,
+        "y": 975,
+        "width": 511,
+        "height": 97
+      },
+      "slot": "TribeBanner",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 5,
+      "measured": {
+        "format": "WEBP",
+        "width": 511,
+        "height": 97,
+        "bytes": 7778
+      }
+    },
+    {
+      "id": "backdrop_minion",
+      "filename": "Card_Inhand_Minion_DropShadow.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Minion_DropShadow.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 429x585",
+      "category": "backdrop",
+      "purpose": "The shadow behind a minion's artwork, sized to the art window rather than the card.",
+      "sourceRect": {
+        "x": 186,
+        "y": 107,
+        "width": 429,
+        "height": 585
+      },
+      "slot": "Backdrop",
+      "cardType": "Minion",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 6,
+      "measured": {
+        "format": "WEBP",
+        "width": 429,
+        "height": 585,
+        "bytes": 17544
+      }
+    },
+    {
+      "id": "backdrop_spell",
+      "filename": "Card_Inhand_Spell_DropShadow.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_Spell_DropShadow.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer template, and fetched and decoded from the site: WEBP 517x421",
+      "category": "backdrop",
+      "purpose": "The shadow behind a spell's artwork.",
+      "sourceRect": {
+        "x": 144,
+        "y": 198,
+        "width": 517,
+        "height": 421
+      },
+      "slot": "Backdrop",
+      "cardType": "Spell",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 6,
+      "measured": {
+        "format": "WEBP",
+        "width": 517,
+        "height": 421,
+        "bytes": 11078
+      }
+    }
+  ],
+  "notInEntries": {
+    "$comment": [
+      "Real components the renderer uses that our composer has no slot for. They",
+      "are recorded so the next person does not have to discover them again, and",
+      "left out of 'entries' so nothing downloads a file with nowhere to put it.",
+      "",
+      "There is no card back among them: the renderer draws card fronts, so our",
+      "own back stays scaffolding until somebody draws one."
+    ],
+    "Card_Inhand_Minion_HoleFix.webp": "Patches a gap where the rarity gem meets the frame. 412,653 76x42.",
+    "Card_Inhand_BannerAtlas_Minion_TribePlaqueDual.webp": "Two-tribe plaque.",
+    "Card_Inhand_BannerAtlas_Ability_TribePlaque.webp": "Spell tribe plaque.",
+    "Card_Inhand_BannerAtlas_Minion_Coin.webp": "Alternative cost: a coin instead of mana.",
+    "Card_Inhand_BannerAtlas_Minion_Runestone.webp": "Alternative cost: a runestone.",
+    "Card_Inhand_BannerAtlas_Minion_BGStars0..7.webp": "Battlegrounds star costs.",
+    "heroshieldbannertexture.webp": "Alternative cost: armor.",
+    "stiched_minions_bot_new.webp": "Dual class stitching.",
+    "CardRunes_DeathKnight_Blood/Frost/Unholy.webp": "Death Knight runes.",
+    "Deathknight_Card_Hand_RuneHolder.webp": "Death Knight rune holder."
+  }
+}

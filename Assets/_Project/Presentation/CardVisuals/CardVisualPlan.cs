@@ -21,9 +21,40 @@ namespace CoH.Presentation.CardVisuals
         public Rect Rect;
 
         public float Rotation;
+        public CardVisualFill Fill;
+
+        /// <summary>The shape this layer is clipped to, or null.</summary>
+        public Sprite Mask;
+
         public float FontSize;
+        public float FontSizeMin;
         public bool Bold;
+        public bool Wrap;
+        public CardVisualAlignment Alignment;
         public Color Tint;
+
+        /// <summary>
+        /// How this label is set: its face, its outline and the shape of its
+        /// baseline. Meaningless on a picture layer.
+        ///
+        /// Resolved and copied rather than pointed at, so that a plan describes
+        /// a card completely and keeps describing it while somebody edits the
+        /// recipe it came from.
+        /// </summary>
+        public CardTextStyle TextStyle;
+
+        /// <summary>
+        /// Which layer of the recipe produced this, and why it applied.
+        ///
+        /// Carried for the reports and the preview only. Nothing about how a
+        /// card draws reads it, and a plan composed without it would look
+        /// exactly the same — but "the frame came from somewhere" is a much
+        /// worse answer than "the frame came from the layer named Frame
+        /// (spell), because the card is a spell".
+        /// </summary>
+        public string LayerName;
+
+        public string Reason;
 
         public bool IsText => TextSlot != CardVisualTextSlot.None;
     }
@@ -141,6 +172,51 @@ namespace CoH.Presentation.CardVisuals
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Every layer that was drawn, and why. One line each:
+        ///
+        ///     090  RarityGem   Card_Inhand_Minion_Gem_Rare   347,663 122x92   CardType Equals 1 and Rarity NotEquals 0
+        ///
+        /// This is what turns "the wrong gem is showing" into "the wrong gem is
+        /// showing because this layer applied and resolved to that file".
+        /// </summary>
+        public string DescribeResolution()
+        {
+            System.Text.StringBuilder text = new System.Text.StringBuilder();
+
+            for (int index = 0; index < _layers.Count; index++)
+            {
+                CardVisualPlannedLayer layer = _layers[index];
+
+                text.Append(layer.SortingOrder.ToString("D3"));
+                text.Append("  ");
+                text.Append((layer.IsText ? layer.TextSlot.ToString() : layer.Slot.ToString()).PadRight(16));
+
+                text.Append((layer.IsText
+                    ? "\"" + layer.Text + "\""
+                    : layer.Sprite != null ? layer.Sprite.name : "(none)").PadRight(44));
+
+                text.Append(layer.Rect.x.ToString("0") + "," + layer.Rect.y.ToString("0") + " " +
+                            layer.Rect.width.ToString("0") + "x" + layer.Rect.height.ToString("0"));
+
+                if (!string.IsNullOrEmpty(layer.Reason))
+                {
+                    text.Append("   [" + layer.Reason + "]");
+                }
+
+                text.Append('\n');
+            }
+
+            for (int index = 0; index < _gaps.Count; index++)
+            {
+                text.Append("MISSING  ");
+                text.Append(_gaps[index].Describe());
+                text.Append('\n');
+            }
+
+            return text.ToString();
         }
 
         public string Describe()

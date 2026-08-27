@@ -503,6 +503,71 @@ namespace CoH.Tests.VisualEditMode
             Assert.That(problems[0], Does.Contain("Artwork belongs to a card"));
         }
 
+        // ------------------------------------------------------------------
+        //  Filling the catalog in
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// A real component landing on a row with the same constraints replaces
+        /// the scaffolding that was standing in for it.
+        /// </summary>
+        [Test]
+        public void An_arriving_component_replaces_the_scaffolding_with_the_same_constraints()
+        {
+            Sprite scaffolding = VisualTestFactory.Picture("grey rectangle");
+            Sprite real = VisualTestFactory.Picture("the real frame");
+
+            CardVisualCatalogAsset catalog = VisualTestFactory.Catalog(
+                VisualTestFactory.Entry(CardVisualSlot.Frame, scaffolding, type: CardType.Minion));
+
+            catalog.SetSprite(
+                CardVisualSlot.Frame,
+                VisualTestFactory.Entry(CardVisualSlot.Frame, real, type: CardType.Minion).match,
+                real);
+
+            Assert.That(catalog.Entries.Count, Is.EqualTo(1), "A duplicate row was added.");
+            Assert.That(catalog.Entries[0].sprite, Is.SameAs(real));
+        }
+
+        /// <summary>
+        /// A component that is more specific than the scaffolding is added
+        /// beside it, not over it.
+        ///
+        /// This is the case that actually happens. The scaffolding frame is
+        /// authored for a card type; a real one is a particular class's frame.
+        /// Collapsing them would make one class's artwork silently answer for
+        /// every class, and would throw away the only fallback a class nobody
+        /// has drawn yet has left.
+        /// </summary>
+        [Test]
+        public void A_more_specific_component_is_added_beside_the_scaffolding_not_over_it()
+        {
+            Sprite scaffolding = VisualTestFactory.Picture("grey rectangle");
+            Sprite neutral = VisualTestFactory.Picture("the neutral frame");
+
+            CardVisualCatalogAsset catalog = VisualTestFactory.Catalog(
+                VisualTestFactory.Entry(CardVisualSlot.Frame, scaffolding, type: CardType.Minion));
+
+            catalog.SetSprite(
+                CardVisualSlot.Frame,
+                VisualTestFactory.Entry(
+                    CardVisualSlot.Frame, neutral,
+                    type: CardType.Minion, cardClass: CardClass.Neutral).match,
+                neutral);
+
+            Assert.That(catalog.Entries.Count, Is.EqualTo(2), "The scaffolding row was destroyed.");
+
+            // A neutral minion gets the real one, because it is more specific.
+            Assert.That(
+                catalog.Resolve(CardVisualSlot.Frame, VisualTestFactory.Card(CardType.Minion)).Sprite,
+                Is.SameAs(neutral));
+
+            // And a spell still finds nothing, rather than a minion frame.
+            Assert.That(
+                catalog.Resolve(CardVisualSlot.Frame, VisualTestFactory.Card(CardType.Spell)).Found,
+                Is.False);
+        }
+
         [Test]
         public void Two_layers_at_the_same_depth_are_reported()
         {

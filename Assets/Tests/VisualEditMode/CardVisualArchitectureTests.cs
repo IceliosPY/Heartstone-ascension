@@ -63,6 +63,17 @@ namespace CoH.Tests.VisualEditMode
                 string.Join("\n", offenders));
         }
 
+        /// <summary>
+        /// A description says what a card is like, never which card it is.
+        ///
+        /// Checked on the types rather than on the names. Reading the names was
+        /// how this started, and it flagged the first property that happened to
+        /// contain the letters — "Overrides" — while it would have said nothing
+        /// at all about a property called Which or Source that carried the very
+        /// thing it exists to keep out. A description is allowed to carry data
+        /// that was *looked up* by identity; what it may not carry is the
+        /// identity, because that is the only thing a renderer could branch on.
+        /// </summary>
         [Test]
         public void The_description_of_a_card_carries_no_identity()
         {
@@ -71,8 +82,35 @@ namespace CoH.Tests.VisualEditMode
 
             for (int index = 0; index < properties.Length; index++)
             {
-                Assert.That(properties[index].Name, Does.Not.Contain("Id").IgnoreCase,
-                    "The composer would be able to tell one card from another.");
+                PropertyInfo property = properties[index];
+
+                Assert.That(property.PropertyType, Is.Not.EqualTo(typeof(CoH.Core.Identifiers.CardId)),
+                    "The description carries a card id in '" + property.Name +
+                    "', so the composer could tell one card from another.");
+
+                Assert.That(property.Name, Is.Not.EqualTo("Id"),
+                    "The description carries an identity.");
+
+                Assert.That(property.Name, Is.Not.EqualTo("CardId"),
+                    "The description carries an identity.");
+
+                // And nothing it hands on carries one either. A set of per-card
+                // adjustments is fine; a set of adjustments that remembers whose
+                // they are is not.
+                if (property.PropertyType.Namespace == null ||
+                    !property.PropertyType.Namespace.StartsWith("CoH.", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                foreach (PropertyInfo carried in property.PropertyType.GetProperties(
+                    BindingFlags.Public | BindingFlags.Instance))
+                {
+                    Assert.That(
+                        carried.PropertyType, Is.Not.EqualTo(typeof(CoH.Core.Identifiers.CardId)),
+                        "'" + property.Name + "' hands the composer a card id through '" +
+                        carried.Name + "'.");
+                }
             }
         }
 

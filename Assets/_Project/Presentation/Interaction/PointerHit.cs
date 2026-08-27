@@ -64,6 +64,8 @@ namespace CoH.Presentation
 
         public bool IsHero => Kind == PointerTargetKind.FriendlyHero || Kind == PointerTargetKind.EnemyHero;
 
-        public string Describe() => Collider == null ? Kind.ToString() : Kind + " (" + Collider.name + ")";
+        public string Describe() => Collider == null
+            ? Kind.ToString()
+            : Kind + " " + EntityId + " (" + Collider.name + ")";
     }
 }

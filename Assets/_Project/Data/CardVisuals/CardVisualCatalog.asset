@@ -69,6 +69,34 @@ MonoBehaviour:
         value: 
     sprite: {fileID: 21300000, guid: a5525fa9b66635f4cb0b2b23eadded52, type: 3}
     notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 14
+    match:
+      constrainType: 0
+      type: 0
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 11cabd1a9d9cf80449a50c2862f05219, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 14
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 846ba3f7af2d5d642ae9ab80e54e1ae7, type: 3}
+    notes: Placeholder. Replace the sprite; leave the row.
   - slot: 1
     match:
       constrainType: 0
@@ -109,8 +137,8 @@ MonoBehaviour:
       tribe: 0
       style:
         value: 
-    sprite: {fileID: 21300000, guid: 3250a91831b6ca54a825a824d5b7feee, type: 3}
-    notes: Placeholder. Replace the sprite; leave the row.
+    sprite: {fileID: 21300000, guid: e763f8dab31740e4abe54bb4c1e69d60, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Minion_ManaGem.webp
   - slot: 8
     match:
       constrainType: 0
@@ -123,8 +151,8 @@ MonoBehaviour:
       tribe: 0
       style:
         value: 
-    sprite: {fileID: 21300000, guid: 35c47f01e017ad74a898e03f5b29d603, type: 3}
-    notes: Placeholder. Replace the sprite; leave the row.
+    sprite: {fileID: 21300000, guid: bafdce3c621ee9f47b26839f53651e64, type: 3}
+    notes: Imported from attacktexture.webp
   - slot: 9
     match:
       constrainType: 0
@@ -137,8 +165,8 @@ MonoBehaviour:
       tribe: 0
       style:
         value: 
-    sprite: {fileID: 21300000, guid: 34de6d8010fd48746a1a218c38db13fd, type: 3}
-    notes: Placeholder. Replace the sprite; leave the row.
+    sprite: {fileID: 21300000, guid: e9432011f78a4eb48b12e0d216d142ea, type: 3}
+    notes: Imported from healthtexture.webp
   - slot: 5
     match:
       constrainType: 0
@@ -251,3 +279,297 @@ MonoBehaviour:
         value: 
     sprite: {fileID: 21300000, guid: 58bd77dd08c52e548915b270bc22e92b, type: 3}
     notes: Placeholder. Replace the sprite; leave the row.
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 1
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: f08d312c3bceaef43b42437e199fa77f, type: 3}
+    notes: Imported from Card_Inhand_Minion_Neutral.webp
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 1
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 9005eef5ecbedf54ead7007e2730fa73, type: 3}
+    notes: Imported from Card_Inhand_Ability_Neutral.webp
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 4
+      constrainClass: 1
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 78f4a115840f4634c80bb0416fdf93d1, type: 3}
+    notes: Imported from Card_Inhand_Hero_Neutral.webp
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 3
+      constrainClass: 1
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 3252cddb4f4e9e54b87a460d10fe96e1, type: 3}
+    notes: Imported from Card_Inhand_Weapon_Neutral.webp
+  - slot: 5
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ac753568929b2e64d969e666a5447654, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Minion_Title.webp
+  - slot: 5
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 9ceb2affdb7a03444bc3977dae217a9b, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Spell_Title.webp
+  - slot: 6
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ff3b10aebcdd55449aae350d2be72b01, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Minion_Text.webp
+  - slot: 6
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 06f0321936827dd4483f934ce83ae33d, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Spell_Text.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 1
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 2bbddef62bc18e64e8f44a68a765975d, type: 3}
+    notes: Imported from Card_Inhand_Minion_Gem_Common.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 2
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ad92567c3fdba9345ab55416b635d19b, type: 3}
+    notes: Imported from Card_Inhand_Minion_Gem_Rare.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 3
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 830b1d2a72dab3f4a9ea2d8ade8fa7ca, type: 3}
+    notes: Imported from Card_Inhand_Minion_Gem_Epic.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ab370990d17bfc24ebd65e6c3daa4338, type: 3}
+    notes: Imported from Card_Inhand_Minion_Gem_Legendary.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 1
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 72d79a48fea295749b1dfe00e0a5b377, type: 3}
+    notes: Imported from Card_Inhand_Spell_Gem_Common.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 2
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 8b71b9cf77cbf1742b08b764cb43f2f2, type: 3}
+    notes: Imported from Card_Inhand_Spell_Gem_Rare.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 3
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 824e48a759c3a4b49afd19872044a1c6, type: 3}
+    notes: Imported from Card_Inhand_Spell_Gem_Epic.webp
+  - slot: 10
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ed3ea63b812e0b541b43485838ea575f, type: 3}
+    notes: Imported from Card_Inhand_Spell_Gem_Legendary.webp
+  - slot: 4
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ad46e857ddffc80439a2530db1caa646, type: 3}
+    notes: Imported from Card_Inhand_Minion_LegendaryDragon.webp
+  - slot: 4
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 1
+      rarity: 4
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 8251e3e98db6b1d4a83af7b07d0ae16a, type: 3}
+    notes: Imported from Card_Inhand_Ability_LegendaryDragon.webp
+  - slot: 11
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ed6ce7cc5a0f31c4d951a5c5cc15a1fd, type: 3}
+    notes: Imported from Card_Inhand_BannerAtlas_Minion_TribePlaque.webp
+  - slot: 1
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: 5ebc97feca7e3184b9949615ae5e2522, type: 3}
+    notes: Imported from Card_Inhand_Minion_DropShadow.webp
+  - slot: 1
+    match:
+      constrainType: 1
+      type: 2
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: ee9552df5d5e7bc4a987a3a173bf9702, type: 3}
+    notes: Imported from Card_Inhand_Spell_DropShadow.webp

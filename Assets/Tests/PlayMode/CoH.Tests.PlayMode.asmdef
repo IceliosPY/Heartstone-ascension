@@ -6,6 +6,7 @@
         "CoH.Data",
         "CoH.Presentation",
         "CoH.App",
+        "Unity.TextMeshPro",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
