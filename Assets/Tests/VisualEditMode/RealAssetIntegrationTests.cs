@@ -32,7 +32,7 @@ namespace CoH.Tests.VisualEditMode
                 "Assets/_Project/Data/CardVisuals/CardVisualFactory.asset");
 
             Assert.That(factory, Is.Not.Null,
-                "No card visual factory. Run Conquest of Hearthstone -> Rebuild Card Visuals.");
+                "No card visual factory. Run Conquest of Hearthstone -> Create Missing Card Visual Assets.");
 
             return factory;
         }
@@ -370,15 +370,23 @@ namespace CoH.Tests.VisualEditMode
 
             string source = File.ReadAllText(path);
 
-            int rebuild = source.IndexOf("public static void Rebuild()", StringComparison.Ordinal);
-            Assert.That(rebuild, Is.GreaterThan(-1), "Rebuild is gone.");
+            // Rebuild is now a one-line entry point onto the shared body,
+            // because there are two ways in: the safe maintenance command and
+            // the explicitly destructive one. The guarantee belongs to the body
+            // they share.
+            int run = source.IndexOf("private static void Run(bool replaceAuthored)", StringComparison.Ordinal);
+            Assert.That(run, Is.GreaterThan(-1), "The shared setup body is gone.");
 
             // The end of the method, taken as the next method that follows it.
-            int next = source.IndexOf("private static ", rebuild, StringComparison.Ordinal);
-            string body = next > rebuild ? source.Substring(rebuild, next - rebuild) : source.Substring(rebuild);
+            int next = source.IndexOf("private static ", run + 1, StringComparison.Ordinal);
+            string body = next > run ? source.Substring(run, next - run) : source.Substring(run);
 
             Assert.That(body, Does.Contain("CardVisualImport.Import()"),
-                "Rebuild no longer reapplies the downloaded components, so it silently undoes an import.");
+                "Setup no longer reapplies the downloaded components, so it silently undoes an import.");
+
+            // And both ways in reach it, so neither can quietly skip the step.
+            Assert.That(source, Does.Contain("public static void Rebuild() => Run(replaceAuthored: false)"),
+                "The safe command no longer goes through the shared body.");
         }
 
         /// <summary>
@@ -405,7 +413,7 @@ namespace CoH.Tests.VisualEditMode
             }
 
             Assert.That(imported, Is.GreaterThan(0),
-                "Every row is still scaffolding. Run Rebuild Card Visuals, or fetch the components.");
+                "Every row is still scaffolding. Run Create Missing Card Visual Assets, or fetch the components.");
         }
 
         // ------------------------------------------------------------------

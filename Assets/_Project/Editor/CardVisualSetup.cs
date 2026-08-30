@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using CoH.Core.Cards;
@@ -42,14 +43,71 @@ namespace CoH.Editor
         /// <summary>Where the catalog lives, for whatever fills it in.</summary>
         public static string CatalogAssetPath => CatalogPath;
 
-        [MenuItem("Conquest of Hearthstone/Rebuild Card Visuals")]
-        public static void Rebuild()
+        /// <summary>
+        /// Creates whatever baseline assets are missing, and leaves everything
+        /// that already exists exactly as authored.
+        ///
+        /// This used to rebuild the recipe from the scaffolding below every
+        /// time it ran, which was reasonable while the recipe *was* the
+        /// scaffolding and became dangerous the moment the Card Visual Editor
+        /// made it the authored source of truth. Every rectangle, font size and
+        /// curve in the recipe is now somebody's work, and a command called
+        /// "rebuild" sitting in a menu is not an acceptable way to lose it.
+        ///
+        /// So the safe command is this one, and it is the one on the menu. It
+        /// will not touch a recipe that already has layers, or a catalog that
+        /// already has entries. The scaffolding is still there, and still
+        /// reachable, behind <see cref="ReplaceAuthoredData"/> - which says
+        /// what it does and asks first.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Create Missing Card Visual Assets")]
+        public static void Rebuild() => Run(replaceAuthored: false);
+
+        /// <summary>
+        /// Throws the authored recipe and catalog away and writes the
+        /// scaffolding over them.
+        ///
+        /// Kept because starting again is occasionally the right thing, and
+        /// deleting the scaffolding would mean a new project could not be
+        /// bootstrapped at all. It asks first, it says what it is about to
+        /// destroy, and its name does not pretend to be maintenance.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Danger - Replace Authored Card Visuals With Scaffolding")]
+        public static void ReplaceAuthoredData()
+        {
+            CardVisualRecipeAsset existing = AssetDatabase.LoadAssetAtPath<CardVisualRecipeAsset>(RecipePath);
+            int layers = existing == null ? 0 : existing.Layers.Count;
+
+            bool confirmed = EditorUtility.DisplayDialog(
+                "Replace authored card visuals?",
+                "This throws away the authored recipe (" + layers + " layers - every rectangle, " +
+                "font size, curve and outline in it) and the authored catalog, and writes the " +
+                "built-in scaffolding over them." + Break +
+                "Per-card adjustments in the library are not touched, but any that name a layer " +
+                "the scaffolding does not recreate will be left pointing at nothing." + Break +
+                "There is no undo.",
+                "Replace them",
+                "Cancel");
+
+            if (!confirmed)
+            {
+                Debug.Log("Card visuals left alone.");
+                return;
+            }
+
+            Run(replaceAuthored: true);
+        }
+
+        /// <summary>A blank line in a dialog, kept out of the string literals above.</summary>
+        private static readonly string Break = Environment.NewLine + Environment.NewLine;
+
+        private static void Run(bool replaceAuthored)
         {
             Directory.CreateDirectory(SpriteFolder);
             Directory.CreateDirectory(AssetFolder);
 
-            CardVisualRecipeAsset recipe = BuildRecipe();
-            CardVisualCatalogAsset catalog = BuildCatalog();
+            CardVisualRecipeAsset recipe = BuildRecipe(replaceAuthored);
+            CardVisualCatalogAsset catalog = BuildCatalog(replaceAuthored);
             CardVisualLibraryAsset library = BuildLibrary();
 
             CardVisualFactory factory = Load<CardVisualFactory>(FactoryPath);
@@ -61,6 +119,10 @@ namespace CoH.Editor
 
             List<string> problems = new List<string>();
             factory.Validate(problems);
+
+            // And the contracts the authoring tools depend on: layer identity,
+            // and every saved adjustment naming something that exists.
+            CardVisualDataValidator.Validate(factory, problems);
 
             if (problems.Count == 0)
             {
@@ -86,9 +148,23 @@ namespace CoH.Editor
         //  The recipe
         // ------------------------------------------------------------------
 
-        private static CardVisualRecipeAsset BuildRecipe()
+        private static CardVisualRecipeAsset BuildRecipe(bool replaceAuthored)
         {
             CardVisualRecipeAsset recipe = Load<CardVisualRecipeAsset>(RecipePath);
+
+            // The one guard that matters. Everything below this line rebuilds
+            // the layer list from scratch, and an authored recipe is the
+            // project's source of truth for what a card looks like.
+            if (recipe.Layers.Count > 0 && !replaceAuthored)
+            {
+                Debug.Log(
+                    "The card visual recipe already has " + recipe.Layers.Count + " authored " +
+                    "layers and was left untouched. Use the Card Visual Editor to change them, " +
+                    "or the Danger menu item to start again from scaffolding.");
+
+                return recipe;
+            }
+
             HearthCardsManifestFile manifest = HearthCardsManifest.LoadOrEmpty();
 
             List<CardVisualLayerDefinition> layers = new List<CardVisualLayerDefinition>
@@ -439,9 +515,19 @@ namespace CoH.Editor
         //  The catalog
         // ------------------------------------------------------------------
 
-        private static CardVisualCatalogAsset BuildCatalog()
+        private static CardVisualCatalogAsset BuildCatalog(bool replaceAuthored)
         {
             CardVisualCatalogAsset catalog = Load<CardVisualCatalogAsset>(CatalogPath);
+
+            if (catalog.Entries.Count > 0 && !replaceAuthored)
+            {
+                Debug.Log(
+                    "The card visual catalog already has " + catalog.Entries.Count +
+                    " entries and was left untouched.");
+
+                return catalog;
+            }
+
             catalog.ClearEntries();
 
             // A frame per card type, and a neutral override on top of the
@@ -699,7 +785,7 @@ namespace CoH.Editor
 
             texture.Apply();
             File.WriteAllBytes(path, texture.EncodeToPNG());
-            Object.DestroyImmediate(texture);
+            UnityEngine.Object.DestroyImmediate(texture);
 
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 

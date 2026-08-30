@@ -40,6 +40,14 @@ namespace CoH.Presentation
             "front, not swelling. Past a point more size only takes up more screen.")]
         [SerializeField] private float hoverScale = 1.12f;
 
+        [Tooltip(
+            "Extra degrees a hovered card turns to face the camera. The hand lies on a plane " +
+            "tilted thirty six degrees while the camera looks down at fifty four, so a card " +
+            "that has merely straightened out of the fan is still eighteen degrees away from " +
+            "square: its top edge is further off than its bottom, and the writing keystones. " +
+            "This closes that.")]
+        [SerializeField] private float hoverFaceOn = 18f;
+
         [Tooltip("How quickly a card reaches its target pose. Higher is snappier.")]
         [SerializeField] private float poseSmoothing = 18f;
 
@@ -327,9 +335,12 @@ namespace CoH.Presentation
                 ? _restingPosition + new Vector3(0f, hoverLift, -hoverForward)
                 : _restingPosition;
 
-            // A hovered card straightens up out of the fan, which is most of
-            // what makes it readable.
-            Quaternion targetRotation = _isHovered ? Quaternion.identity : _restingRotation;
+            // A hovered card straightens up out of the fan and turns the rest of
+            // the way to face the camera, which is most of what makes it
+            // readable: out of the lean, and out of the keystoning.
+            Quaternion targetRotation = _isHovered
+                ? Quaternion.Euler(hoverFaceOn, 0f, 0f)
+                : _restingRotation;
             float targetScale = _isHovered ? _restingScale * hoverScale : _restingScale;
 
             transform.localPosition = Vector3.Lerp(transform.localPosition, targetPosition, t);

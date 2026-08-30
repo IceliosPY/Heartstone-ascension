@@ -15,7 +15,8 @@ MonoBehaviour:
   style:
     value: standard
   layers:
-  - name: CardBack
+  - id: cardback
+    name: CardBack
     slot: 13
     text: 0
     face: 1
@@ -36,7 +37,8 @@ MonoBehaviour:
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 1
     conditions: []
-  - name: Backdrop (minion)
+  - id: backdrop-minion
+    name: Backdrop (minion)
     slot: 1
     text: 0
     face: 0
@@ -60,7 +62,8 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 1
-  - name: Backdrop (spell)
+  - id: backdrop-spell
+    name: Backdrop (spell)
     slot: 1
     text: 0
     face: 0
@@ -84,7 +87,8 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 2
-  - name: Artwork (spell)
+  - id: artwork-spell
+    name: Artwork (spell)
     slot: 2
     text: 0
     face: 0
@@ -111,7 +115,8 @@ MonoBehaviour:
     - field: 7
       comparison: 0
       value: 1
-  - name: Artwork (other)
+  - id: artwork-other
+    name: Artwork (other)
     slot: 2
     text: 0
     face: 0
@@ -138,7 +143,8 @@ MonoBehaviour:
     - field: 7
       comparison: 0
       value: 1
-  - name: Frame (spell)
+  - id: frame-spell
+    name: Frame (spell)
     slot: 3
     text: 0
     face: 0
@@ -162,7 +168,8 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 2
-  - name: Frame (other)
+  - id: frame-other
+    name: Frame (other)
     slot: 3
     text: 0
     face: 0
@@ -186,7 +193,8 @@ MonoBehaviour:
     - field: 0
       comparison: 1
       value: 2
-  - name: EliteFrame (minion)
+  - id: eliteframe-minion
+    name: EliteFrame (minion)
     slot: 4
     text: 0
     face: 0
@@ -213,7 +221,8 @@ MonoBehaviour:
     - field: 9
       comparison: 0
       value: 1
-  - name: EliteFrame (spell)
+  - id: eliteframe-spell
+    name: EliteFrame (spell)
     slot: 4
     text: 0
     face: 0
@@ -240,7 +249,8 @@ MonoBehaviour:
     - field: 9
       comparison: 0
       value: 1
-  - name: NameBanner (spell)
+  - id: namebanner-spell
+    name: NameBanner (spell)
     slot: 5
     text: 0
     face: 0
@@ -264,7 +274,8 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 2
-  - name: NameBanner (other)
+  - id: namebanner-other
+    name: NameBanner (other)
     slot: 5
     text: 0
     face: 0
@@ -288,7 +299,8 @@ MonoBehaviour:
     - field: 0
       comparison: 1
       value: 2
-  - name: RulesPanel (spell)
+  - id: rulespanel-spell
+    name: RulesPanel (spell)
     slot: 6
     text: 0
     face: 0
@@ -315,7 +327,8 @@ MonoBehaviour:
     - field: 8
       comparison: 0
       value: 1
-  - name: RulesPanel (other)
+  - id: rulespanel-other
+    name: RulesPanel (other)
     slot: 6
     text: 0
     face: 0
@@ -342,7 +355,8 @@ MonoBehaviour:
     - field: 8
       comparison: 0
       value: 1
-  - name: ManaGem
+  - id: managem
+    name: ManaGem
     slot: 7
     text: 0
     face: 0
@@ -366,7 +380,8 @@ MonoBehaviour:
     - field: 5
       comparison: 0
       value: 1
-  - name: AttackGem
+  - id: attackgem
+    name: AttackGem
     slot: 8
     text: 0
     face: 0
@@ -390,13 +405,14 @@ MonoBehaviour:
     - field: 4
       comparison: 0
       value: 1
-  - name: HealthGem
+  - id: healthgem
+    name: HealthGem
     slot: 9
     text: 0
     face: 0
     sortingOrder: 80
     x: 590
-    y: 906
+    y: 900
     width: 170
     height: 231
     rotation: 0
@@ -414,7 +430,8 @@ MonoBehaviour:
     - field: 4
       comparison: 0
       value: 1
-  - name: RarityGem (spell)
+  - id: raritygem-spell
+    name: RarityGem (spell)
     slot: 10
     text: 0
     face: 0
@@ -441,7 +458,8 @@ MonoBehaviour:
     - field: 2
       comparison: 1
       value: 0
-  - name: RarityGem (other)
+  - id: raritygem-other
+    name: RarityGem (other)
     slot: 10
     text: 0
     face: 0
@@ -468,7 +486,8 @@ MonoBehaviour:
     - field: 2
       comparison: 1
       value: 0
-  - name: TribeBanner
+  - id: tribebanner
+    name: TribeBanner
     slot: 11
     text: 0
     face: 0
@@ -492,7 +511,8 @@ MonoBehaviour:
     - field: 6
       comparison: 0
       value: 1
-  - name: ExpansionEmblem
+  - id: expansionemblem
+    name: ExpansionEmblem
     slot: 12
     text: 0
     face: 0
@@ -513,13 +533,14 @@ MonoBehaviour:
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: NameText (spell)
+  - id: nametext-spell
+    name: NameText (spell)
     slot: 0
     text: 1
     face: 0
     sortingOrder: 130
     x: 154
-    y: 562
+    y: 590
     width: 510
     height: 100
     rotation: 0
@@ -537,20 +558,21 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 2
-  - name: NameText (other)
+  - id: nametext-other
+    name: NameText (other)
     slot: 0
     text: 1
     face: 0
     sortingOrder: 130
-    x: 173
-    y: 591
-    width: 490
+    x: 106
+    y: 585
+    width: 601
     height: 132
     rotation: 0
     fill: 0
     maskSlot: 0
     textStyle: AllyTitle
-    fontSize: 1
+    fontSize: 0.685
     fontSizeMin: 0.55
     bold: 1
     alignment: 0
@@ -561,13 +583,14 @@ MonoBehaviour:
     - field: 0
       comparison: 1
       value: 2
-  - name: ManaText
+  - id: manatext
+    name: ManaText
     slot: 0
     text: 3
     face: 0
     sortingOrder: 140
-    x: 42
-    y: 141
+    x: 39
+    y: 130
     width: 161
     height: 105
     rotation: 0
@@ -575,14 +598,15 @@ MonoBehaviour:
     maskSlot: 0
     textStyle: StatNumber
     fontSize: 12
-    fontSizeMin: 1.6
+    fontSizeMin: 1.8
     bold: 1
     alignment: 0
     wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: RulesText (spell)
+  - id: rulestext-spell
+    name: RulesText (spell)
     slot: 0
     text: 2
     face: 0
@@ -606,7 +630,8 @@ MonoBehaviour:
     - field: 0
       comparison: 0
       value: 2
-  - name: RulesText (other)
+  - id: rulestext-other
+    name: RulesText (other)
     slot: 0
     text: 2
     face: 0
@@ -630,34 +655,36 @@ MonoBehaviour:
     - field: 0
       comparison: 1
       value: 2
-  - name: AttackText
+  - id: attacktext
+    name: AttackText
     slot: 0
     text: 4
     face: 0
     sortingOrder: 160
-    x: 50
-    y: 947
+    x: 45
+    y: 955
     width: 178
     height: 115
     rotation: 0
     fill: 0
     maskSlot: 0
     textStyle: StatNumber
-    fontSize: 12
-    fontSizeMin: 1.6
+    fontSize: 14
+    fontSizeMin: 1.8
     bold: 1
     alignment: 0
     wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: HealthText
+  - id: healthtext
+    name: HealthText
     slot: 0
     text: 5
     face: 0
     sortingOrder: 170
-    x: 616
-    y: 949
+    x: 609
+    y: 955
     width: 151
     height: 108
     rotation: 0
@@ -665,14 +692,15 @@ MonoBehaviour:
     maskSlot: 0
     textStyle: StatNumber
     fontSize: 12
-    fontSizeMin: 1.6
+    fontSizeMin: 1.8
     bold: 1
     alignment: 0
     wrap: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
     required: 0
     conditions: []
-  - name: TribeText
+  - id: tribetext
+    name: TribeText
     slot: 0
     text: 6
     face: 0
@@ -696,18 +724,18 @@ MonoBehaviour:
   textStyles:
   - name: AllyTitle
     role: 0
-    renderMode: 2
+    renderMode: 1
     fillColor: {r: 1, g: 1, b: 1, a: 1}
     outlineColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
-    outlineWidth: 0.44
-    tracking: -3
+    outlineWidth: 0.43
+    tracking: 0
     lineSpacing: 0
     minCondense: 0.62
-    stretch: 0.97
-    taper: 0
-    curveControlA: {x: 0.33333334, y: -0.0115855895}
-    curveControlB: {x: 0.6666667, y: -0.17895429}
-    curveEnd: {x: 1, y: -0.03}
+    stretch: 1.1
+    taper: 0.24
+    curveControlA: {x: 0.33333334, y: -0.0032333334}
+    curveControlB: {x: 0.6666667, y: -0.18196666}
+    curveEnd: {x: 1, y: -0.0097}
   - name: SpellTitle
     role: 0
     renderMode: 1
@@ -738,14 +766,14 @@ MonoBehaviour:
     curveEnd: {x: 1, y: 0}
   - name: StatNumber
     role: 2
-    renderMode: 0
+    renderMode: 1
     fillColor: {r: 1, g: 1, b: 1, a: 1}
     outlineColor: {r: 0.039215688, g: 0.03137255, b: 0.019607844, a: 1}
-    outlineWidth: 0.14
+    outlineWidth: 0.25
     tracking: 0
     lineSpacing: 0
-    minCondense: 1
-    stretch: 1
+    minCondense: 0.85
+    stretch: 1.15
     taper: 0
     curveControlA: {x: 0.333, y: 0}
     curveControlB: {x: 0.667, y: 0}

@@ -63,16 +63,32 @@ namespace CoH.Presentation.CardVisuals
     [Serializable]
     public sealed class CardVisualLayerDefinition
     {
-        [Tooltip("A name for the inspector. Nothing reads it.")]
+        [Tooltip(
+            "Permanent identity. Saved adjustments name this, never the label below, so a " +
+            "layer can be renamed and reordered without orphaning them. Never change it once " +
+            "cards have been polished.")]
+        [CardVisualProperty(CardVisualAuthorability.Identity,
+            Note = "Permanent identity. Changing it orphans every adjustment that names it.")]
+        public string id = string.Empty;
+
+        [Tooltip("A label for the inspector. Free to change; nothing is saved against it.")]
+        [CardVisualProperty(CardVisualAuthorability.ProfileOnly,
+            Note = "A display label, free to change: adjustments are saved against the id.")]
         public string name = "Layer";
 
         [Tooltip("What picture goes here. None for a layer that only prints text.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Chooses the picture before a card's own adjustments are read.")]
         public CardVisualSlot slot = CardVisualSlot.None;
 
         [Tooltip("What this layer prints. None for a layer that is only a picture.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Decides whether this layer is a picture or a label, before anything else.")]
         public CardVisualTextSlot text = CardVisualTextSlot.None;
 
         [Tooltip("Which side of the card this layer belongs to.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Selects whether the layer applies at all, before adjustments are read.")]
         public CardVisualFace face = CardVisualFace.FaceUp;
 
         [Tooltip("Higher draws in front. Leave gaps, so a layer can be inserted between two later.")]
@@ -84,6 +100,14 @@ namespace CoH.Presentation.CardVisuals
         [Tooltip("Top edge on the 800 x 1100 card canvas.")]
         public float y;
 
+        // A real, live former id, kept for exactly one reason: proving the
+        // alias mechanism against the real schema and the real composer
+        // rather than against a type built only for a test. Nothing in this
+        // project has ever actually been called "boxWidth" - the alias exists
+        // so CardVisualContractTests can store an override under it and watch
+        // the value reach a composed CardVisualPlan, which a test double
+        // cannot demonstrate because WithOverrides iterates the real schema.
+        [CardVisualProperty(FormerIds = new[] { "boxWidth" })]
         public float width = 100f;
         public float height = 100f;
 
@@ -96,6 +120,8 @@ namespace CoH.Presentation.CardVisuals
         [Tooltip(
             "Clip this layer to the shape of the picture in another slot. None for no clipping. " +
             "Used for artwork, which is a rectangle that has to sit inside a frame's window.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Resolved from the catalog before a card's own adjustments are read.")]
         public CardVisualSlot maskSlot = CardVisualSlot.None;
 
         [Header("Text")]
@@ -103,6 +129,9 @@ namespace CoH.Presentation.CardVisuals
             "Which of the recipe's text styles this label is set in. Empty falls back to a " +
             "plain style chosen from the text slot, which is what every layer authored before " +
             "styles existed still gets.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Selects the style before adjustments are applied; a card adjusts the style " +
+                   "its layer already uses rather than pointing at another one.")]
         public string textStyle = string.Empty;
 
         [Tooltip("Largest point size. Text shrinks from here to fit its rectangle.")]
@@ -124,10 +153,25 @@ namespace CoH.Presentation.CardVisuals
             "A layer whose picture is missing is normally skipped in silence, because most " +
             "layers are optional. Mark the ones that are not, and the composer will report " +
             "the gap instead of quietly drawing a card with a hole in it.")]
+        [CardVisualProperty(CardVisualAuthorability.Structural,
+            Note = "Read while resolving pictures, before a card's own adjustments exist.")]
         public bool required;
 
         [Tooltip("Every one of these must hold for the layer to appear. Empty means always.")]
         public CardVisualCondition[] conditions = Array.Empty<CardVisualCondition>();
+
+        /// <summary>
+        /// What adjustments name this layer by.
+        ///
+        /// Falls back to the label for data authored before ids existed, so
+        /// nothing breaks the moment the field appears and before anything has
+        /// been migrated. The validator reports every layer still relying on
+        /// that, because it is the state in which a rename still loses data.
+        /// </summary>
+        public string LayerId => string.IsNullOrEmpty(id) ? name : id;
+
+        /// <summary>Whether this layer has a real id rather than falling back to its label.</summary>
+        public bool HasStableId => !string.IsNullOrEmpty(id);
 
         public bool IsText => text != CardVisualTextSlot.None;
 
@@ -220,6 +264,16 @@ namespace CoH.Presentation.CardVisuals
                 ? CardTextStyle.For(layer.text)
                 : CardTextStyle.From(found, layer.text);
         }
+
+        /// <summary>
+        /// The style definition a layer is set in, or null.
+        ///
+        /// The definition rather than the resolved copy, because a card's own
+        /// adjustments are authored against the schema of the definition and
+        /// have to be applied before it is resolved.
+        /// </summary>
+        public CardTextStyleDefinition TextStyleFor(CardVisualLayerDefinition layer) =>
+            layer == null ? null : FindTextStyle(layer.textStyle);
 
         /// <summary>The named style, or null. Editor tooling and the validator.</summary>
         public CardTextStyleDefinition FindTextStyle(string wanted)

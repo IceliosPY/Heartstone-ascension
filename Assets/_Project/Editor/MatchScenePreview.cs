@@ -396,11 +396,78 @@ namespace CoH.Editor
         [MenuItem("Conquest of Hearthstone/Capture Title Showcase")]
         public static void CaptureTitleShowcase()
         {
+            _dimTheShowcase = false;
             CaptureHand(
                 "hand-titles.png", 1920, 1080,
                 new MadeUpCard("Test Soldier", CardType.Minion, 2, 2, 3),
                 new MadeUpCard("Test Quartermaster", CardType.Minion, 3, 1, 2),
                 new MadeUpCard("The Coin", CardType.Spell, 0, 0, 0),
+                new MadeUpCard("Test Deathrattle Draw", CardType.Minion, 2, 1, 2),
+                new MadeUpCard("Test Scribe", CardType.Minion, 2, 1, 2));
+        }
+
+        /// <summary>
+        /// The same hand with every card dimmed, the way an unplayable card is
+        /// drawn.
+        ///
+        /// Worth its own still because dimming is the one thing that genuinely
+        /// differs between what the editor shows and what a player sees: the
+        /// geometry is identical either way, and the change in how a title reads
+        /// comes entirely from the colour.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Capture Title Showcase (dimmed)")]
+        public static void CaptureTitleShowcaseDimmed()
+        {
+            _dimTheShowcase = true;
+
+            CaptureHand(
+                "hand-titles-dimmed.png", 1920, 1080,
+                new MadeUpCard("Test Soldier", CardType.Minion, 2, 2, 3),
+                new MadeUpCard("Test Quartermaster", CardType.Minion, 3, 1, 2),
+                new MadeUpCard("The Coin", CardType.Spell, 0, 0, 0),
+                new MadeUpCard("Test Deathrattle Draw", CardType.Minion, 2, 1, 2),
+                new MadeUpCard("Test Scribe", CardType.Minion, 2, 1, 2));
+
+            _dimTheShowcase = false;
+        }
+
+        private static bool _dimTheShowcase;
+
+        /// <summary>Which card of the showcase is being read, or minus one.</summary>
+        private static int _hoveredInTheShowcase = -1;
+
+        /// <summary>
+        /// The showcase with one card being read, which is the pose that has to
+        /// carry the whole of a card's legibility: at rest a hand is a row of
+        /// spines, and hovering is when a player actually looks at one.
+        /// </summary>
+        [MenuItem("Conquest of Hearthstone/Capture Title Showcase (hovered)")]
+        public static void CaptureTitleShowcaseHovered()
+        {
+            _dimTheShowcase = false;
+            _hoveredInTheShowcase = 2;
+            Showcase("hand-hover-middle.png");
+
+            _hoveredInTheShowcase = 4;
+            Showcase("hand-hover-edge-card.png");
+
+            // And the same card unplayable, because that is how most of a hand
+            // looks for most of a turn.
+            _dimTheShowcase = true;
+            _hoveredInTheShowcase = 2;
+            Showcase("hand-hover-dimmed.png");
+
+            _dimTheShowcase = false;
+            _hoveredInTheShowcase = -1;
+        }
+
+        private static void Showcase(string outputPath)
+        {
+            CaptureHand(
+                outputPath, 1920, 1080,
+                new MadeUpCard("Test Soldier", CardType.Minion, 2, 2, 3),
+                new MadeUpCard("Test Quartermaster", CardType.Minion, 3, 1, 2),
+                new MadeUpCard("Test Sharpshooter", CardType.Minion, 3, 2, 2),
                 new MadeUpCard("Test Deathrattle Draw", CardType.Minion, 2, 1, 2),
                 new MadeUpCard("Test Scribe", CardType.Minion, 2, 1, 2));
         }
@@ -438,7 +505,7 @@ namespace CoH.Editor
         {
             HandFanSettings settings = new HandFanSettings
             {
-                Scale = 1.45f,
+                Scale = 1.56f,
                 Spacing = 0.765f,
                 MaxWidth = 7.56f,
                 PivotDistance = 15.0f,
@@ -460,6 +527,11 @@ namespace CoH.Editor
                 view.SetRestingPose(pose.LocalPosition, pose.LocalRotation, pose.Scale);
                 view.SetHandOrder(index);
 
+                if (index == _hoveredInTheShowcase)
+                {
+                    view.SetHovered(true);
+                }
+
                 CardVisualFactory factory = view.Visuals;
 
                 if (factory != null)
@@ -472,6 +544,7 @@ namespace CoH.Editor
                     if (painter != null)
                     {
                         painter.Apply(plan);
+                        painter.SetDimmed(_dimTheShowcase);
                     }
                 }
 
@@ -486,7 +559,7 @@ namespace CoH.Editor
             // Same numbers the scene wires into the presenter.
             HandFanSettings settings = new HandFanSettings
             {
-                Scale = 1.45f,
+                Scale = 1.56f,
                 Spacing = 0.765f,
                 MaxWidth = 7.56f,
                 PivotDistance = 15.0f,

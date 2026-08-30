@@ -18,7 +18,7 @@ namespace CoH.Tests.VisualEditMode
         /// <summary>The settings the match scene wires into the presenter.</summary>
         private static HandFanSettings Hand() => new HandFanSettings
         {
-            Scale = 1.45f,
+            Scale = 1.56f,
             Spacing = 0.765f,
             MaxWidth = 7.56f,
             PivotDistance = 15.0f,

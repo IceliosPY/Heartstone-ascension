@@ -144,7 +144,7 @@ namespace CoH.Tests.VisualEditMode
                 "Assets/_Project/Data/CardVisuals/CardVisualFactory.asset");
 
             Assert.That(factory, Is.Not.Null,
-                "The card visual factory is missing. Run Conquest of Hearthstone -> Rebuild Card Visuals.");
+                "The card visual factory is missing. Run Conquest of Hearthstone -> Create Missing Card Visual Assets.");
 
             return factory;
         }

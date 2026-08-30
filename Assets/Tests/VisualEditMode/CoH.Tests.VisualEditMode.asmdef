@@ -3,6 +3,7 @@
     "rootNamespace": "CoH.Tests.VisualEditMode",
     "references": [
         "CoH.Core",
+        "CoH.Data",
         "CoH.Presentation",
         "CoH.Editor",
         "Unity.TextMeshPro",

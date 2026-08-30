@@ -9,10 +9,10 @@ namespace CoH.Editor
     /// Writes the card's text styles into the recipe, and points the labels at
     /// them.
     ///
-    /// Deliberately not part of Rebuild Card Visuals. Rebuild authors the whole
-    /// layer list from scratch, which is the right thing when the components
-    /// change and the wrong thing entirely once somebody has spent an evening
-    /// nudging rectangles into place by hand. This touches the styles and the
+    /// Deliberately not part of Create Missing Card Visual Assets. That command
+    /// now leaves an authored recipe alone rather than rebuilding it - only the
+    /// explicitly destructive Danger command still authors the whole layer list
+    /// from scratch. This one is narrower still: it touches the styles and the
     /// one field on each label that names one, and never a rectangle, a font
     /// size or a sorting order — so it can be run on a recipe that has been
     /// hand tuned without undoing any of it.

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoH.Core.Cards;
+using CoH.Editor;
 using CoH.Presentation.CardVisuals;
 using NUnit.Framework;
 using UnityEditor;
@@ -30,7 +31,7 @@ namespace CoH.Tests.VisualEditMode
                 "Assets/_Project/Data/CardVisuals/CardVisualFactory.asset");
 
             Assert.That(factory, Is.Not.Null,
-                "No card visual factory. Run Conquest of Hearthstone -> Rebuild Card Visuals.");
+                "No card visual factory. Run Conquest of Hearthstone -> Create Missing Card Visual Assets.");
 
             return factory;
         }
@@ -315,7 +316,7 @@ namespace CoH.Tests.VisualEditMode
         [Test]
         public void Two_digit_numbers_still_fit_their_gems_when_laid_out()
         {
-            foreach (int value in new[] { 0, 1, 9, 10, 30 })
+            foreach (int value in new[] { 0, 1, 9, 10, 11, 20, 30, 99 })
             {
                 Factory().Compose(
                     new CardVisualDescriptor(
@@ -331,58 +332,68 @@ namespace CoH.Tests.VisualEditMode
         }
 
         /// <summary>
-        /// Lays a label out for real and measures what came out.
+        /// Lays a label out for real - the real prefab, the real font, the
+        /// real warp - and measures what actually came out of it.
+        ///
+        /// This used to build a bare TextMeshPro of its own instead of going
+        /// through <see cref="CardPreviewCard"/>. Two things were wrong with
+        /// that, both silent: it never assigned a font, so it measured
+        /// whatever TextMeshPro falls back to project-wide (LiberationSans SDF)
+        /// rather than the card's own title or stat face; and it read
+        /// <c>textBounds</c>, which reports the *typeset* extent from before
+        /// any warp runs, not the mesh a card-specific style like a curved or
+        /// condensed number actually ends up with. A style that squeezes a
+        /// two-digit value to fit its gem - which is real, on the card, and
+        /// the fix this test exists to guard - was consequently invisible to
+        /// it in both directions: it could not have failed a style that
+        /// condensed too little, and it could not confirm one that condenses
+        /// correctly either.
+        ///
+        /// So this composes onto the real prefab and reads the mesh the way
+        /// <see cref="CardTextWarp"/> itself does for the same reason it does:
+        /// not the box TextMeshPro laid the text out in, the space the glyphs
+        /// actually occupy afterwards.
         ///
         /// Width always: text running off the side of a banner is the failure
         /// that made this test necessary, and it is always visible.
         ///
-        /// Height only for text that wraps. A single centred line reports the
-        /// full height of its font — ascender to descender, most of which no
-        /// digit uses — so a number on a gem measures taller than its box and
-        /// looks perfectly placed. Asserting on that would be asserting on font
+        /// Height only for text that wraps, and only from <c>textBounds</c> -
+        /// wrapped text is never warped in this recipe, so the two agree there,
+        /// and a single centred line reports the full height of its font
+        /// (ascender to descender, most of which no digit uses) whichever way
+        /// it is measured. Asserting on that would be asserting on font
         /// metrics rather than on layout.
         /// </summary>
-        private static void AssertRenderedInside(CardVisualPlannedLayer layer, string what)
+        private void AssertRenderedInside(CardVisualPlannedLayer layer, string what)
         {
             GameObject stage = new GameObject("Measuring") { hideFlags = HideFlags.HideAndDontSave };
 
             try
             {
-                TMPro.TextMeshPro label = stage.AddComponent<TMPro.TextMeshPro>();
+                CardVisualPainter painter = CardPreviewCard.Make(stage.transform, out GameObject card);
+                painter.Apply(_plan);
 
-                if (label.font == null)
-                {
-                    Assert.Ignore("TextMeshPro has no default font in this project.");
-                }
+                TMPro.TextMeshPro label = FindPaintedLabel(card, layer);
+
+                Assert.That(label, Is.Not.Null,
+                    "No painted label reads \"" + what + "\" for layer '" + layer.LayerName + "'.");
 
                 Vector2 box = CardCanvas.ToLocalSize(layer.Rect);
-
-                label.rectTransform.sizeDelta = box;
-                label.enableAutoSizing = true;
-                label.fontSizeMax = layer.FontSize;
-                label.fontSizeMin = Mathf.Min(layer.FontSizeMin, layer.FontSize);
-                label.textWrappingMode = layer.Wrap
-                    ? TMPro.TextWrappingModes.Normal
-                    : TMPro.TextWrappingModes.NoWrap;
-                label.alignment = TMPro.TextAlignmentOptions.Center;
-                label.margin = Vector4.zero;
-                label.text = layer.Text;
-
-                label.ForceMeshUpdate();
-
-                Vector2 rendered = label.textBounds.size;
+                float renderedWidth = MeshWidth(label);
 
                 const float slack = 1.06f;
 
-                Assert.That(rendered.x, Is.LessThanOrEqualTo(box.x * slack),
-                    "\"" + what + "\" renders " + rendered.x.ToString("0.000") +
+                Assert.That(renderedWidth, Is.LessThanOrEqualTo(box.x * slack),
+                    "\"" + what + "\" renders " + renderedWidth.ToString("0.000") +
                     " wide in a box " + box.x.ToString("0.000") + " wide, from layer '" +
                     layer.LayerName + "' rect " + layer.Rect + ".");
 
                 if (layer.Wrap)
                 {
-                    Assert.That(rendered.y, Is.LessThanOrEqualTo(box.y * slack),
-                        "\"" + what + "\" renders " + rendered.y.ToString("0.000") +
+                    float renderedHeight = label.textBounds.size.y;
+
+                    Assert.That(renderedHeight, Is.LessThanOrEqualTo(box.y * slack),
+                        "\"" + what + "\" renders " + renderedHeight.ToString("0.000") +
                         " tall in a box " + box.y.ToString("0.000") + " tall.");
                 }
             }
@@ -390,6 +401,71 @@ namespace CoH.Tests.VisualEditMode
             {
                 Object.DestroyImmediate(stage);
             }
+        }
+
+        /// <summary>The painted label a plan layer describes, found by its text and its place on the card.</summary>
+        private static TMPro.TextMeshPro FindPaintedLabel(GameObject card, in CardVisualPlannedLayer layer)
+        {
+            Vector3 wanted = CardCanvas.ToLocalPosition(layer.Rect, layer.SortingOrder);
+
+            TMPro.TextMeshPro found = null;
+            float closest = float.MaxValue;
+
+            foreach (TMPro.TextMeshPro label in card.GetComponentsInChildren<TMPro.TextMeshPro>(true))
+            {
+                if (label.text != layer.Text)
+                {
+                    continue;
+                }
+
+                float distance = Vector2.Distance(
+                    new Vector2(label.transform.localPosition.x, label.transform.localPosition.y),
+                    new Vector2(wanted.x, wanted.y));
+
+                if (distance < closest)
+                {
+                    closest = distance;
+                    found = label;
+                }
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// How wide the glyphs actually are, measured off the mesh - the same
+        /// way <see cref="CardTextWarp"/> measures before deciding whether to
+        /// condense, and the only measurement a warp or a condense actually
+        /// shows up in. <c>textBounds</c> is the typeset extent from before
+        /// either runs.
+        /// </summary>
+        private static float MeshWidth(TMPro.TextMeshPro label)
+        {
+            TMPro.TMP_TextInfo info = label.textInfo;
+
+            float left = float.MaxValue;
+            float right = float.MinValue;
+
+            for (int index = 0; index < info.characterCount; index++)
+            {
+                TMPro.TMP_CharacterInfo character = info.characterInfo[index];
+
+                if (!character.isVisible)
+                {
+                    continue;
+                }
+
+                Vector3[] vertices = info.meshInfo[character.materialReferenceIndex].vertices;
+                int at = character.vertexIndex;
+
+                for (int corner = 0; corner < 4; corner++)
+                {
+                    left = Mathf.Min(left, vertices[at + corner].x);
+                    right = Mathf.Max(right, vertices[at + corner].x);
+                }
+            }
+
+            return right > left ? right - left : 0f;
         }
 
         // ------------------------------------------------------------------

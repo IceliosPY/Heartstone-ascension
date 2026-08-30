@@ -106,6 +106,89 @@ namespace CoH.Tests.PlayMode
                 : new Rect(0f, 0f, 0f, 0f);
         }
 
+        /// <summary>
+        /// The same measurements the editor's own report prints, taken off a
+        /// card on the table, so the two can be read side by side.
+        ///
+        /// Screenshots of a window against screenshots of a game answer "they
+        /// look different" and nothing more. These answer which number differs.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Report_the_title_as_the_game_draws_it()
+        {
+            yield return LoadMatch();
+            yield return HandAtRest();
+
+            for (int frame = 0; frame < 6; frame++)
+            {
+                yield return null;
+            }
+
+            StringBuilder report = new StringBuilder();
+            report.AppendLine("=== the title, as the game draws it ===");
+
+            foreach (CoH.Core.State.CardInstance card in Active.Hand)
+            {
+                if (!Presenter.TryGetCardView(card.Id, out CardView view))
+                {
+                    continue;
+                }
+
+                if (!TryTitle(view.Plan, out CardVisualPlannedLayer title))
+                {
+                    continue;
+                }
+
+                TextMeshPro label = LabelShowing(view.gameObject, title.Text);
+
+                report.AppendLine();
+                report.AppendLine("--- \"" + title.Text + "\" ---");
+                report.AppendLine("  slot           " + title.Rect);
+                report.AppendLine("  size range     " + title.FontSize + " .. " + title.FontSizeMin);
+                report.AppendLine("  style          " + title.TextStyle.Name +
+                    " / " + title.TextStyle.RenderMode);
+                report.AppendLine("  outline        " + title.TextStyle.OutlineWidth);
+                report.AppendLine("  tracking       " + title.TextStyle.Tracking);
+                report.AppendLine("  condense floor " + title.TextStyle.MinCondense);
+                report.AppendLine("  stretch/taper  " + title.TextStyle.Stretch +
+                    " / " + title.TextStyle.Taper);
+                report.AppendLine("  curve          A " + title.TextStyle.CurveControlA +
+                    " B " + title.TextStyle.CurveControlB + " end " + title.TextStyle.CurveEnd);
+
+                if (label == null)
+                {
+                    report.AppendLine("  NO LABEL DRAWS THIS");
+                    continue;
+                }
+
+                Material material = label.fontSharedMaterial;
+
+                report.AppendLine("  font           " +
+                    (label.font != null ? label.font.name : "(none)"));
+                report.AppendLine("  material       " +
+                    (material != null ? material.name : "(none)") +
+                    (material != null && material.HasProperty("_OutlineWidth")
+                        ? "  outline " + material.GetFloat("_OutlineWidth")
+                        : ""));
+                report.AppendLine("  point size     " + label.fontSize +
+                    "   (auto " + label.enableAutoSizing + ")");
+                report.AppendLine("  alignment      " + label.alignment);
+                report.AppendLine("  box            " + label.rectTransform.sizeDelta);
+                report.AppendLine("  label position " + label.transform.localPosition);
+                report.AppendLine("  label scale    " + label.transform.localScale);
+                report.AppendLine("  colour         " + label.color);
+                report.AppendLine("  card scale     " + view.transform.localScale);
+
+                Rect ink = Ink(label);
+
+                report.AppendLine("  ink            " + ink +
+                    "   (in canvas px: w " + (ink.width * CardCanvas.Width).ToString("0") +
+                    ", h " + (ink.height * CardCanvas.Width).ToString("0") + ")");
+            }
+
+            Debug.Log(report.ToString());
+        }
+
         [UnityTest]
         public IEnumerator A_card_in_hand_is_composed_exactly_as_the_preview_composes_it()
         {
@@ -217,11 +300,48 @@ namespace CoH.Tests.PlayMode
 
             Assert.That(hand, Is.Not.Empty, "The match dealt no cards.");
 
-            GameObject bare = new GameObject("Reference card");
+            // A second copy of a card already on the table, rather than a bare
+            // object with a painter added to it. A painter made that way has
+            // every serialized field at its default — no title font, no rules
+            // font — so the reference would be drawn in the fallback face and
+            // this would compare two fonts instead of two pipelines. Which it
+            // did, and the difference it reported was real but was not the one
+            // being looked for.
+            GameObject bare = Object.Instantiate(hand[0].gameObject);
+            bare.name = "Reference card";
+
+            // Off the table, unscaled, and not driving itself: what is wanted
+            // from it is its painter and the settings on it.
+            CardView clone = bare.GetComponent<CardView>();
+
+            if (clone != null)
+            {
+                clone.enabled = false;
+            }
+
+            bare.transform.SetParent(null, false);
+            bare.transform.localPosition = new Vector3(500f, 500f, 500f);
+            bare.transform.localRotation = Quaternion.identity;
+            bare.transform.localScale = Vector3.one;
+
+            // The layers the original had are copied along with it, and the
+            // painter's own list of them is not: it is a runtime field, so the
+            // clone's painter wakes up believing it has drawn nothing and builds
+            // a second set beside the first. Both are live, both show a title,
+            // and the search below would as happily find the stale one — which
+            // is what it did, and which made a perfectly warped card look flat.
+            Transform stale = bare.transform.Find("Layers");
+
+            if (stale != null)
+            {
+                Object.DestroyImmediate(stale.gameObject);
+            }
 
             try
             {
-                CardVisualPainter reference = bare.AddComponent<CardVisualPainter>();
+                CardVisualPainter reference = bare.GetComponent<CardVisualPainter>();
+
+                Assert.That(reference, Is.Not.Null, "The card prefab has no painter.");
 
                 int compared = 0;
                 StringBuilder report = new StringBuilder();
@@ -243,9 +363,19 @@ namespace CoH.Tests.PlayMode
                     }
 
                     // The same plan, painted onto an object nothing has scaled.
+                    //
+                    // Then several frames, because a freshly painted card is not
+                    // finished with itself: colouring its labels marks them
+                    // dirty, TextMeshPro rebuilds them on the next render, and
+                    // the bend is put back the frame after that. The card on the
+                    // table settled all of this long ago; this one has to be
+                    // given the same chance before the two are compared.
                     reference.Apply(view.Plan);
-                    yield return null;
-                    yield return null;
+
+                    for (int frame = 0; frame < 6; frame++)
+                    {
+                        yield return null;
+                    }
 
                     TextMeshPro fresh = LabelShowing(bare, title.Text);
 
@@ -257,6 +387,9 @@ namespace CoH.Tests.PlayMode
                     report.AppendLine("\"" + title.Text + "\"");
                     report.AppendLine("  card scale  " + view.transform.localScale +
                         "  vs " + bare.transform.localScale);
+                    report.AppendLine("  title font  " +
+                        (onTable.font != null ? onTable.font.name : "(none)") + " vs " +
+                        (fresh.font != null ? fresh.font.name : "(none)"));
                     report.AppendLine("  label scale " + onTable.transform.localScale +
                         " vs " + fresh.transform.localScale);
                     report.AppendLine("  box         " + onTable.rectTransform.sizeDelta +
@@ -273,6 +406,10 @@ namespace CoH.Tests.PlayMode
                     Assert.That(onTable.transform.localScale,
                         Is.EqualTo(fresh.transform.localScale),
                         "The title's own transform is scaled differently.\n" + report);
+
+                    Assert.That(onTable.font, Is.EqualTo(fresh.font),
+                        "The two are set in different faces, so nothing below compares " +
+                        "pipelines.\n" + report);
 
                     Assert.That(onTable.fontSize, Is.EqualTo(fresh.fontSize).Within(0.005f),
                         "TextMeshPro chose a different size for the same title.\n" + report);

@@ -46,7 +46,7 @@ namespace CoH.Editor
             if (catalog == null)
             {
                 Debug.LogError(
-                    "There is no card visual catalog. Run Conquest of Hearthstone -> Rebuild Card Visuals first.");
+                    "There is no card visual catalog. Run Conquest of Hearthstone -> Create Missing Card Visual Assets first.");
                 return;
             }
 

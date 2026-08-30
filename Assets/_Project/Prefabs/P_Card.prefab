@@ -49,9 +49,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visuals: {fileID: 11400000, guid: 1954b1152d8ce6b43a19545902b2a22a, type: 2}
   painter: {fileID: 791536414886205049}
-  hoverLift: 1.3
-  hoverForward: 0.95
-  hoverScale: 1.12
+  hoverLift: 1.72
+  hoverForward: 1.45
+  hoverScale: 0.933
+  hoverFaceOn: 18
   poseSmoothing: 18
 --- !u!114 &791536414886205049
 MonoBehaviour:

@@ -74,15 +74,28 @@ namespace CoH.Presentation.CardVisuals
     public sealed class CardTextStyleDefinition
     {
         [Tooltip("What a layer names to select this style. Unique within the recipe.")]
+        [CardVisualProperty(CardVisualAuthorability.Identity,
+            Note = "Layers select this style by this name; changing it detaches them.")]
         public string name = "Style";
 
         [Tooltip("Which font this style asks the painter for.")]
+        [CardVisualProperty(CardVisualAuthorability.ProfileOnly,
+            Note = "Which font family a card is set in is a project-wide invariant, not a " +
+                   "per-card choice: every title resolves through the Title role and every " +
+                   "rules block through Rules, whatever the card type.")]
         public CardTextRole role = CardTextRole.Rules;
 
         [Tooltip("How the laid out text is shaped afterwards.")]
         public CardTextRenderMode renderMode = CardTextRenderMode.Straight;
 
         [Header("Colour")]
+        [Tooltip(
+            "Not read by anything. A label's colour comes from its layer's tint, which is set " +
+            "per layer rather than per style and is what the painter actually applies.")]
+        [CardVisualProperty(CardVisualAuthorability.Unsupported,
+            Note = "Reaches no renderer. A label's colour is its layer's tint; this is a " +
+                   "second, dead source of truth for the same thing and is kept visible only " +
+                   "so its presence in the asset has an explanation.")]
         public Color fillColor = Color.white;
 
         public Color outlineColor = new Color(0.004f, 0.004f, 0.004f, 1f);

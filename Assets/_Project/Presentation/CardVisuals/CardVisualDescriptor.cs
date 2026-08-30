@@ -56,7 +56,16 @@ namespace CoH.Presentation.CardVisuals
             Style = style.IsNone ? CardVisualStyle.Default : style;
             Expansion = expansion ?? string.Empty;
             Overrides = overrides;
+            OverridesRevision = overrides?.Revision ?? 0;
         }
+
+        /// <summary>
+        /// What <see cref="Overrides"/> had been edited to when this was built.
+        ///
+        /// Only <see cref="LooksTheSameAs"/> reads it, and only to tell "the
+        /// same adjustments" from "the same object, since changed".
+        /// </summary>
+        public int OverridesRevision { get; }
 
         /// <summary>
         /// Which side of the card is being shown.
@@ -155,12 +164,29 @@ namespace CoH.Presentation.CardVisuals
             Style.Equals(other.Style) &&
             string.Equals(Expansion, other.Expansion, System.StringComparison.Ordinal) &&
             HasRulesText == other.HasRulesText &&
+            SameAdjustments(other);
 
-            // By reference. Two cards polished the same way still compose the
-            // same, and one whose polish was just edited must not: the tool
-            // rewrites the object in place, so anything comparing its contents
-            // would decide nothing had changed and the preview would freeze.
-            ReferenceEquals(Overrides, other.Overrides);
+        /// <summary>
+        /// Whether two descriptions ask for the same per-card adjustments.
+        ///
+        /// Two separate sets holding the same rows compose the same card, so
+        /// they are compared by content rather than by reference - reference
+        /// equality reported a needless difference every time a description was
+        /// rebuilt.
+        ///
+        /// The same object seen twice is the harder case, and content
+        /// comparison cannot help with it at all: the editor edits one of these
+        /// in place, so the description held from last time and the one being
+        /// offered now point at the same object, whose contents are trivially
+        /// equal to themselves however much they changed. That is what the
+        /// revision stamp is for - it was taken when each description was
+        /// built, and it is the only witness that the object moved underneath
+        /// them both.
+        /// </summary>
+        private bool SameAdjustments(in CardVisualDescriptor other) =>
+            ReferenceEquals(Overrides, other.Overrides)
+                ? OverridesRevision == other.OverridesRevision
+                : CardVisualOverrides.SameContent(Overrides, other.Overrides);
 
         /// <summary>The same card with a different painting.</summary>
         public CardVisualDescriptor With(Sprite newArtwork) =>
@@ -190,7 +216,18 @@ namespace CoH.Presentation.CardVisuals
                 ManaCost, Attack, Health, ShowsCost, ShowsStatistics,
                 Style, SecondaryClass, Expansion, faceDown, Overrides);
 
-        /// <summary>Builds a description of a card in a hand during a match.</summary>
+        /// <summary>
+        /// Builds a description of a card in a hand during a match.
+        ///
+        /// The overrides are passed on, which is the whole reason this takes
+        /// them. They used to be accepted here and then quietly dropped on the
+        /// way to the constructor, so every card in a running match composed as
+        /// though it had none: the library held them, the factory fetched them,
+        /// and this was where they stopped. Nothing failed and nothing was
+        /// logged - a polished card simply drew unpolished, and only in the
+        /// game, because the editor built its descriptor by another route and
+        /// looked correct.
+        /// </summary>
         public static CardVisualDescriptor FromViewModel(
             in CardViewModel model,
             Sprite artwork,
@@ -211,7 +248,10 @@ namespace CoH.Presentation.CardVisuals
                 showsCost: true,
                 showsStatistics: model.ShowsStatistics,
                 style: style,
-                expansion: expansion);
+                secondaryClass: CardClass.Neutral,
+                expansion: expansion,
+                faceDown: false,
+                overrides: overrides);
 
         public override string ToString() =>
             Type + " / " + Class + " / " + Rarity +

@@ -36,7 +36,7 @@ namespace CoH.Tests.VisualEditMode
                 "Assets/_Project/Data/CardVisuals/CardVisualFactory.asset");
 
             Assert.That(factory, Is.Not.Null,
-                "No card visual factory. Run Conquest of Hearthstone -> Rebuild Card Visuals.");
+                "No card visual factory. Run Conquest of Hearthstone -> Create Missing Card Visual Assets.");
 
             return factory;
         }
@@ -652,8 +652,14 @@ namespace CoH.Tests.VisualEditMode
 
                 float shortSize = shortName.fontSize;
 
-                Assert.That(shortSize, Is.GreaterThan(shortName.fontSizeMin * 1.5f),
-                    "A two word name was shrunk to its floor.");
+                // At the size the recipe asked for, rather than driven down
+                // towards the floor. Measured against the ceiling and not
+                // against the floor: the two are close together now that the
+                // ceiling is a deliberate size rather than a guard rail, so
+                // "comfortably above the floor" no longer means anything.
+                Assert.That(shortSize, Is.GreaterThanOrEqualTo(shortName.fontSizeMax * 0.95f),
+                    "A two word name was not set at the size its recipe chose: " + shortSize +
+                    " against a ceiling of " + shortName.fontSizeMax + ".");
 
                 Compose(CardType.Minion, name: "Test Deathrattle Draw");
                 painted.Painter.Apply(_plan);
@@ -770,7 +776,22 @@ namespace CoH.Tests.VisualEditMode
             {
                 CardVisualPlannedLayer number = TextLayer(slot);
 
-                Assert.That(number.TextStyle.IsWarped, Is.False, slot + " is warped.");
+                // Flat, not straight. The two used to be the same thing, and are
+                // no longer: the render mode is what applies the vertical scale
+                // as well as the curve, so a number set a little taller than the
+                // face draws it has to go through a bending mode with a baseline
+                // that does not bend. What matters is that the baseline is
+                // level — a number arched like a title would be absurd — and
+                // that is now asked directly rather than read off the mode.
+                for (int step = 0; step <= 20; step++)
+                {
+                    number.TextStyle.SampleBaseline(step / 20f, out Vector2 point, out _);
+
+                    Assert.That(Mathf.Abs(point.y), Is.LessThan(0.005f),
+                        slot + " sits on a curved baseline: it strays " +
+                        point.y.ToString("0.000") + " of its width from level.");
+                }
+
                 Assert.That(number.TextStyle.Role, Is.EqualTo(CardTextRole.Stat),
                     slot + " is not set in the numbers face.");
 

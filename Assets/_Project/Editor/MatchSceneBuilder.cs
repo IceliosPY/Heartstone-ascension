@@ -63,7 +63,7 @@ namespace CoH.Editor
         // read from its top — cost, art, name — and losing the last of its
         // border buys enough size to read the rest of it.
         private const float NearHandZ = -4.75f;
-        private const float NearHandY = 1.32f;
+        private const float NearHandY = 1.88f;
         // Pushed a little further from the player than the board needs, so the
         // hand rising in front of it has somewhere to be. Not a redesign of the
         // hero: the plate simply stops sharing screen space with the cards.
@@ -342,7 +342,7 @@ namespace CoH.Editor
             // down. The fan spreads until it is 6.4 units wide and then stops:
             // an eleventh card overlaps harder instead of reaching the decks.
             WireNumbers(presenter,
-                ("handLayout.Scale", 1.45f),
+                ("handLayout.Scale", 1.56f),
                 ("handLayout.Spacing", 0.765f),
                 ("handLayout.MaxWidth", 7.56f),
                 ("handLayout.PivotDistance", 15.0f),

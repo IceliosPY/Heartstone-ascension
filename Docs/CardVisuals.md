@@ -209,7 +209,8 @@ the catalog. This is the only one that touches code, and it is one enum member.
 
 | | |
 |---|---|
-| **Rebuild Card Visuals** | Regenerates the recipe, catalog, library and factory |
+| **Create Missing Card Visual Assets** | Creates whatever recipe, catalog, library or factory is missing; leaves an authored recipe or catalog untouched |
+| **Danger - Replace Authored Card Visuals With Scaffolding** | Discards the authored recipe and catalog and writes the scaffolding over them, after confirmation |
 | **Report Card Visual Coverage** | What is missing, and what is falling back |
 | **Capture Card Variants** | One image per variant, into `CardCaptures/` |
 | **Tools → Card Visual Preview** | Any combination, interactively |

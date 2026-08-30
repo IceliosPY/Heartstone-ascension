@@ -4569,7 +4569,7 @@ Transform:
   m_GameObject: {fileID: 1239528475}
   serializedVersion: 2
   m_LocalRotation: {x: 0.309017, y: 0, z: 0, w: 0.95105654}
-  m_LocalPosition: {x: 0, y: 1.32, z: -4.75}
+  m_LocalPosition: {x: 0, y: 1.88, z: -4.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5168,7 +5168,7 @@ MonoBehaviour:
   dragLayer: {fileID: 607398823}
   insertionMarker: {fileID: 1622300334}
   handLayout:
-    Scale: 1.45
+    Scale: 1.56
     Spacing: 0.765
     MaxWidth: 7.56
     PivotDistance: 15

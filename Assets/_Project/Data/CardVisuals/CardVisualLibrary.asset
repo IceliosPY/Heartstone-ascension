@@ -13,4 +13,18 @@ MonoBehaviour:
   m_Name: CardVisualLibrary
   m_EditorClassIdentifier: 
   fallbackArtwork: {fileID: 21300000, guid: f87f35db2697f3e41b6f5b421ae8a237, type: 3}
-  cards: []
+  cards:
+  - cardId: test_soldier
+    artwork: {fileID: 0}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: the_coin
+    artwork: {fileID: 0}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []

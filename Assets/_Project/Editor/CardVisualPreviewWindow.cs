@@ -64,9 +64,7 @@ namespace CoH.Editor
 
         // --- polishing one card by hand ------------------------------------
         private CardDefinitionAsset _definition;
-        private bool _polishing;
         private bool _rawCurve;
-        private CardVisualTextSlot _polished = CardVisualTextSlot.Name;
 
         // --- laying the labels out by hand ---------------------------------
         private bool _editing;
@@ -190,7 +188,7 @@ namespace CoH.Editor
                 }
 
                 EditorGUILayout.Space();
-                DrawCardPolish();
+                DrawCardChoice();
 
                 EditorGUILayout.Space();
                 DrawLayoutEditor();
@@ -344,8 +342,9 @@ namespace CoH.Editor
                     "Drag inside the outline to move it, or a corner to resize. Reset returns to the " +
                     "values this slot had when it was selected; Save writes the recipe to disk. " +
                     "Style changes apply to every label set in that style. Author Card Text Styles " +
-                    "leaves all of this alone; Rebuild Card Visuals regenerates the recipe and " +
-                    "will overwrite it.",
+                    "leaves all of this alone, and so does Create Missing Card Visual Assets once " +
+                    "the recipe is authored; only the explicitly destructive Danger command " +
+                    "overwrites it.",
                     MessageType.None);
             }
         }
@@ -506,274 +505,35 @@ namespace CoH.Editor
         // ------------------------------------------------------------------
         //  Polishing one card by hand
         // ------------------------------------------------------------------
+        //
+        // Moved out. This window used to carry a panel of eleven named fields a
+        // card could differ on, which was useful and did not scale: every new
+        // property meant another field here, and only text was reachable at all.
+        //
+        // Card Visual Editor authors any property the schema knows about, on any
+        // layer, at whichever scope is selected. This window keeps what it is
+        // still the better tool for - a quick look at a made up card, and
+        // dragging a text box around by its corners.
 
         /// <summary>
-        /// Adjusts what one card, and only that card, wants done differently.
+        /// Which real card, if any, this window is showing.
         ///
-        /// The recipe is still where the style lives, and almost everything
-        /// belongs there: a change to it fixes every card at once. This is for
-        /// the last five per cent on a card that needs it, and it is written as
-        /// multipliers and offsets on top of the recipe rather than as absolute
-        /// values, so retuning the recipe still moves the cards polished over
-        /// it.
-        ///
-        /// Every field can be left alone, and a card that asks for nothing keeps
-        /// no entry at all.
+        /// Kept because previewing an actual card is useful here too. What it no
+        /// longer does is edit that card: adjusting one card's appearance is
+        /// what Card Visual Editor is for, and having two windows that both
+        /// wrote to the same data was a way to lose an edit.
         /// </summary>
-        private void DrawCardPolish()
+        private void DrawCardChoice()
         {
-            _polishing = EditorGUILayout.ToggleLeft(
-                "Per-card polish", _polishing, EditorStyles.boldLabel);
+            _definition = (CardDefinitionAsset)EditorGUILayout.ObjectField(
+                "Real card", _definition, typeof(CardDefinitionAsset), false);
 
-            if (!_polishing)
-            {
-                return;
-            }
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                _definition = (CardDefinitionAsset)EditorGUILayout.ObjectField(
-                    "Card", _definition, typeof(CardDefinitionAsset), false);
-
-                if (_definition == null)
-                {
-                    EditorGUILayout.HelpBox(
-                        "Pick a card to polish it. Without one the preview shows the made up " +
-                        "card above, which belongs to no card and cannot be overridden.",
-                        MessageType.Info);
-                    return;
-                }
-
-                CardVisualLibraryAsset library = _factory != null ? _factory.Library : null;
-
-                if (library == null)
-                {
-                    EditorGUILayout.HelpBox(
-                        "The factory has no card visual library, which is where a card's " +
-                        "polish is kept.", MessageType.Warning);
-                    return;
-                }
-
-                _polished = (CardVisualTextSlot)EditorGUILayout.EnumPopup("Slot", _polished);
-
-                if (_polished == CardVisualTextSlot.None)
-                {
-                    EditorGUILayout.HelpBox("Pick something the card writes.", MessageType.Info);
-                    return;
-                }
-
-                // What the recipe would do on its own, so every field can show
-                // what it is overriding rather than a number with no context.
-                if (!TryInherit(out CardVisualPlannedLayer inherited))
-                {
-                    EditorGUILayout.HelpBox(
-                        "This card does not draw a " + _polished + ", so there is nothing to " +
-                        "adjust.", MessageType.Info);
-                    return;
-                }
-
-                CardVisualOverrides overrides = library.OverridesFor(_definition.Id);
-                CardTextOverride polish = overrides?.For(_polished);
-
-                DrawPolishFields(library, polish, inherited);
-                DrawPolishButtons(library, overrides);
-            }
-        }
-
-        /// <summary>
-        /// What the recipe alone makes of this card's slot.
-        ///
-        /// Composed without the card's own polish, which is the only honest way
-        /// to show somebody what they are overriding: reading the current plan
-        /// would report the adjusted value as though it were inherited, and the
-        /// numbers would drift every time the panel redrew.
-        /// </summary>
-        private bool TryInherit(out CardVisualPlannedLayer found)
-        {
-            found = default;
-
-            if (_factory == null || _definition == null)
-            {
-                return false;
-            }
-
-            CardVisualDescriptor bare = Describe(_type).WithoutOverrides();
-            CardVisualPlan plan = new CardVisualPlan();
-
-            _factory.Compose(bare, plan);
-
-            for (int index = 0; index < plan.Layers.Count; index++)
-            {
-                if (plan.Layers[index].TextSlot == _polished)
-                {
-                    found = plan.Layers[index];
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void DrawPolishFields(
-            CardVisualLibraryAsset library,
-            CardTextOverride polish,
-            in CardVisualPlannedLayer inherited)
-        {
-            CardTextStyle style = inherited.TextStyle;
-
-            EditorGUILayout.LabelField("Where it sits", EditorStyles.miniBoldLabel);
-
-            Field(library, polish, "Offset X", 0f, p => p.offsetX, (p, v) => p.offsetX = v);
-            Field(library, polish, "Offset Y", 0f, p => p.offsetY, (p, v) => p.offsetY = v);
-
-            Field(library, polish, "Width multiplier", 1f,
-                p => p.widthMultiplier, (p, v) => p.widthMultiplier = v,
-                " -> " + inherited.Rect.width.ToString("0") + " px");
-
-            Field(library, polish, "Height multiplier", 1f,
-                p => p.heightMultiplier, (p, v) => p.heightMultiplier = v,
-                " -> " + inherited.Rect.height.ToString("0") + " px");
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("How it is set", EditorStyles.miniBoldLabel);
-
-            Field(library, polish, "Font size multiplier", 1f,
-                p => p.fontSizeMultiplier, (p, v) => p.fontSizeMultiplier = v,
-                " -> ceiling " + inherited.FontSize.ToString("0.##"));
-
-            Field(library, polish, "Tracking", style.Tracking,
-                p => p.tracking, (p, v) => p.tracking = v);
-
-            Field(library, polish, "Condense multiplier", 1f,
-                p => p.condenseMultiplier, (p, v) => p.condenseMultiplier = v,
-                " -> floor " + style.MinCondense.ToString("0.##"));
-
-            Field(library, polish, "Warp strength", 1f,
-                p => p.warpStrength, (p, v) => p.warpStrength = v,
-                style.IsWarped ? string.Empty : "  (this slot is not warped)");
-
-            if (!style.IsWarped)
-            {
-                return;
-            }
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("The shape of the baseline", EditorStyles.miniBoldLabel);
-
-            // Read off the style this card inherits, so each figure says what it
-            // is replacing rather than showing a number with no context.
-            CardTextCurve inheritedCurve = CardTextCurve.From(
-                style.CurveControlA, style.CurveControlB, style.CurveEnd);
-
-            if (!CardTextCurve.Fits(style.CurveControlA, style.CurveControlB, style.CurveEnd))
+            if (_definition != null)
             {
                 EditorGUILayout.HelpBox(
-                    "This card's style uses a baseline that is not a plain arch. Overriding any " +
-                    "of the three below replaces it, for this card only, with the nearest arch.",
-                    MessageType.Info);
+                    "Showing " + _definition.DisplayName + " with its own adjustments applied. " +
+                    "Edit those in Card Visual Editor.", MessageType.None);
             }
-
-            Field(library, polish, "Curve amount", inheritedCurve.Amount,
-                p => p.curveAmount, (p, v) => p.curveAmount = v);
-
-            Field(library, polish, "Curve tilt", inheritedCurve.Tilt,
-                p => p.curveTilt, (p, v) => p.curveTilt = v);
-
-            Field(library, polish, "Curve centre", inheritedCurve.Centre,
-                p => p.curveCentre, (p, v) => p.curveCentre = v);
-        }
-
-        /// <summary>
-        /// One overridable number: a tick, the value, and what it is replacing.
-        ///
-        /// The inherited value is always on screen, and the field is only
-        /// editable once the tick is on. Ticking it starts from the inherited
-        /// value rather than from zero, so turning an override on never moves
-        /// anything by itself — the card looks the same until a number is
-        /// actually changed.
-        /// </summary>
-        private void Field(
-            CardVisualLibraryAsset library,
-            CardTextOverride polish,
-            string label,
-            float inherited,
-            System.Func<CardTextOverride, OptionalNumber> read,
-            System.Action<CardTextOverride, OptionalNumber> write,
-            string note = "")
-        {
-            OptionalNumber current = polish == null ? OptionalNumber.None : read(polish);
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                bool on = EditorGUILayout.Toggle(current.overridden, GUILayout.Width(16f));
-
-                using (new EditorGUI.DisabledScope(!on))
-                {
-                    float shown = on ? current.Or(inherited) : inherited;
-                    float typed = EditorGUILayout.FloatField(label, shown);
-
-                    if (on != current.overridden || !Mathf.Approximately(typed, shown))
-                    {
-                        Undo.RecordObject(library, "Polish " + _polished);
-
-                        CardTextOverride target = library
-                            .EstablishOverrides(_definition.RawId)
-                            .Establish(_polished);
-
-                        write(target, on ? new OptionalNumber(typed) : OptionalNumber.None);
-
-                        EditorUtility.SetDirty(library);
-                    }
-                }
-            }
-
-            EditorGUILayout.LabelField(
-                " ",
-                "Inherited: " + inherited.ToString("0.###") +
-                (current.overridden ? "    Override: " + current.value.ToString("0.###") : "") +
-                note,
-                EditorStyles.miniLabel);
-        }
-
-        private void DrawPolishButtons(
-            CardVisualLibraryAsset library, CardVisualOverrides overrides)
-        {
-            EditorGUILayout.Space();
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                using (new EditorGUI.DisabledScope(overrides?.For(_polished) == null))
-                {
-                    if (GUILayout.Button("Reset " + _polished))
-                    {
-                        Undo.RecordObject(library, "Reset " + _polished);
-                        overrides.Clear(_polished);
-                        EditorUtility.SetDirty(library);
-                    }
-                }
-
-                using (new EditorGUI.DisabledScope(overrides == null))
-                {
-                    if (GUILayout.Button("Reset all"))
-                    {
-                        Undo.RecordObject(library, "Reset card polish");
-                        overrides.Clear();
-                        EditorUtility.SetDirty(library);
-                    }
-                }
-
-                if (GUILayout.Button("Save"))
-                {
-                    AssetDatabase.SaveAssets();
-                }
-            }
-
-            EditorGUILayout.HelpBox(
-                overrides == null || overrides.IsEmpty
-                    ? "This card asks for nothing, so it is composed exactly as its recipe says."
-                    : "This card overrides its recipe. Undo works normally, and Save writes the " +
-                      "library to disk.",
-                MessageType.None);
         }
 
         private CardVisualDescriptor Describe() => Describe(_type);
@@ -839,7 +599,7 @@ namespace CoH.Editor
             if (_factory == null)
             {
                 EditorGUILayout.HelpBox(
-                    "No factory. Run Conquest of Hearthstone → Rebuild Card Visuals.",
+                    "No factory. Run Conquest of Hearthstone → Create Missing Card Visual Assets.",
                     MessageType.Warning);
                 return;
             }
@@ -1266,38 +1026,15 @@ namespace CoH.Editor
         /// exact-name prefab search so moving the prefab does not silently break
         /// the preview.
         /// </summary>
-        private static GameObject LoadPreviewCardPrefab()
-        {
-            const string knownPath = "Assets/_Project/Prefabs/P_Card.prefab";
-
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(knownPath);
-
-            if (prefab != null)
-            {
-                return prefab;
-            }
-
-            string[] guids = AssetDatabase.FindAssets("P_Card t:Prefab");
-
-            for (int index = 0; index < guids.Length; index++)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guids[index]);
-
-                if (System.IO.Path.GetFileNameWithoutExtension(path) != "P_Card")
-                {
-                    continue;
-                }
-
-                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-
-                if (prefab != null)
-                {
-                    return prefab;
-                }
-            }
-
-            return null;
-        }
+        /// <summary>
+        /// The card prefab this preview draws on.
+        ///
+        /// Asked of <see cref="CardPreviewCard"/> rather than looked up here, so
+        /// that the preview and the capture tools cannot end up finding
+        /// different cards - or, as happened once, one of them finding none and
+        /// quietly drawing in the wrong font.
+        /// </summary>
+        private static GameObject LoadPreviewCardPrefab() => CardPreviewCard.Load();
 
         private void EnsureStage()
         {

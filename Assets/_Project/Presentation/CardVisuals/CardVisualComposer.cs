@@ -115,23 +115,26 @@ namespace CoH.Presentation.CardVisuals
                 ? null
                 : catalog.Resolve(layer.maskSlot, card).Sprite;
 
+            CardVisualLayerDefinition placed =
+                CardVisualInheritance.WithOverrides(layer, layer.LayerId, card.Overrides);
+
             plan.Add(new CardVisualPlannedLayer
             {
-                Slot = layer.slot,
+                Slot = placed.slot,
                 TextSlot = CardVisualTextSlot.None,
                 Sprite = sprite,
                 Mask = mask,
                 Text = null,
-                SortingOrder = layer.sortingOrder,
-                Rect = new Rect(layer.x, layer.y, layer.width, layer.height),
-                Rotation = layer.rotation,
-                Fill = layer.fill,
+                SortingOrder = placed.sortingOrder,
+                Rect = new Rect(placed.x, placed.y, placed.width, placed.height),
+                Rotation = placed.rotation,
+                Fill = placed.fill,
                 FontSize = 0f,
                 FontSizeMin = 0f,
                 Bold = false,
                 Wrap = false,
                 Alignment = CardVisualAlignment.Center,
-                Tint = layer.tint,
+                Tint = placed.tint,
                 LayerName = layer.name,
                 Reason = layer.Describe()
             });
@@ -153,32 +156,33 @@ namespace CoH.Presentation.CardVisuals
                 return;
             }
 
-            Rect rect = new Rect(layer.x, layer.y, layer.width, layer.height);
-            float fontSize = layer.fontSize;
-
-            // Which style this label is set in is a question about the recipe,
-            // so it is answered here rather than left for whatever draws the
-            // plan to look up.
-            CardTextStyle style = recipe.ResolveTextStyle(layer);
-
-            // And then, for the handful of cards that have been polished by
-            // hand, what that card wants done differently. The recipe is still
-            // what decided everything above; this only nudges it, and a card
-            // that asks for nothing is composed exactly as though none of this
-            // were here.
+            // What this one card wants done differently, if anything.
             //
-            // Note what is *not* available at this point: which card it is.
-            // Whatever built the description looked the overrides up by id and
-            // handed them over as data, so there is nowhere below to write a
-            // special case for one card.
-            CardTextOverride polish = card.Overrides?.For(layer.text);
+            // Applied to copies of the authored layer and style rather than
+            // read field by field, so a card can adjust anything the schema
+            // knows about and nothing here has to learn what that is. A card
+            // that asks for nothing is composed from the originals, untouched.
+            //
+            // Note what is not available at this point: which card it is.
+            // Whatever built the description looked these up by id and handed
+            // them over as data, so there is nowhere below to write a special
+            // case for one card.
+            CardVisualOverrides polish = card.Overrides;
 
-            if (polish != null)
-            {
-                rect = polish.Placed(rect);
-                fontSize = polish.Sized(fontSize);
-                style = polish.Styled(style);
-            }
+            CardVisualLayerDefinition placed =
+                CardVisualInheritance.WithOverrides(layer, layer.LayerId, polish);
+
+            // Keyed by the layer rather than by the style, on purpose: a card
+            // adjusting the outline of its own title must not thicken the
+            // outline of every other label set in the same style.
+            CardTextStyleDefinition styled =
+                CardVisualInheritance.WithOverrides(recipe.TextStyleFor(layer), layer.LayerId, polish);
+
+            Rect rect = new Rect(placed.x, placed.y, placed.width, placed.height);
+
+            CardTextStyle style = styled == null
+                ? CardTextStyle.For(placed.text)
+                : CardTextStyle.From(styled, placed.text);
 
             plan.Add(new CardVisualPlannedLayer
             {
@@ -186,16 +190,16 @@ namespace CoH.Presentation.CardVisuals
                 TextSlot = layer.text,
                 Sprite = null,
                 Text = value,
-                SortingOrder = layer.sortingOrder,
+                SortingOrder = placed.sortingOrder,
                 Rect = rect,
-                Rotation = layer.rotation,
+                Rotation = placed.rotation,
                 Fill = CardVisualFill.Stretch,
-                FontSize = fontSize,
-                FontSizeMin = Mathf.Min(layer.fontSizeMin, fontSize),
-                Bold = layer.bold,
-                Wrap = layer.wrap,
-                Alignment = layer.alignment,
-                Tint = layer.tint,
+                FontSize = placed.fontSize,
+                FontSizeMin = Mathf.Min(placed.fontSizeMin, placed.fontSize),
+                Bold = placed.bold,
+                Wrap = placed.wrap,
+                Alignment = placed.alignment,
+                Tint = placed.tint,
                 TextStyle = style,
                 LayerName = layer.name,
                 Reason = layer.Describe()

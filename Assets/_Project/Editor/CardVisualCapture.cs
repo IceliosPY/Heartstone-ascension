@@ -28,7 +28,7 @@ namespace CoH.Editor
 
             if (factory == null)
             {
-                Debug.LogError("No card visual factory. Run Rebuild Card Visuals first.");
+                Debug.LogError("No card visual factory. Run Create Missing Card Visual Assets first.");
                 return;
             }
 
@@ -106,10 +106,10 @@ namespace CoH.Editor
             GameObject stage = new GameObject("Capture") { hideFlags = HideFlags.HideAndDontSave };
             stage.transform.position = new Vector3(5000f, 5000f, 5000f);
 
-            GameObject cardObject = new GameObject("Card") { hideFlags = HideFlags.HideAndDontSave };
-            cardObject.transform.SetParent(stage.transform, false);
-
-            CardVisualPainter painter = cardObject.AddComponent<CardVisualPainter>();
+            // The real prefab, so a still is drawn by the same painter the game
+            // uses, with the same fonts on it. Built by hand this was a card in
+            // the fallback face, which looked plausible and was not the card.
+            CardVisualPainter painter = CardPreviewCard.Make(stage.transform, out GameObject cardObject);
             painter.Apply(plan);
 
             GameObject eye = new GameObject("Camera") { hideFlags = HideFlags.HideAndDontSave };

@@ -1,297 +1,513 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using UnityEngine;
 
 namespace CoH.Presentation.CardVisuals
 {
-    /// <summary>
-    /// A number that may or may not have been set.
-    ///
-    /// A flag beside the value rather than a nullable or a sentinel, because
-    /// this is authored in an inspector and has to survive being serialised:
-    /// zero is a perfectly good offset and one is a perfectly good multiplier,
-    /// so no value can stand for "not set". The flag is what the tool draws a
-    /// tick box for, and what tells the difference between a card that asks for
-    /// a font a size larger and a card that asks for nothing.
-    /// </summary>
-    [Serializable]
-    public struct OptionalNumber
+    /// <summary>What shape a stored value has.</summary>
+    public enum CardVisualValueKind
     {
-        [Tooltip("Whether this card overrides the recipe here at all.")]
-        public bool overridden;
-
-        public float value;
-
-        public OptionalNumber(float value)
-        {
-            overridden = true;
-            this.value = value;
-        }
-
-        /// <summary>This card's value, or the one it inherits.</summary>
-        public float Or(float inherited) => overridden ? value : inherited;
-
-        /// <summary>The inherited value scaled by this, or left alone.</summary>
-        public float Scaling(float inherited) => overridden ? inherited * value : inherited;
-
-        /// <summary>The inherited value shifted by this, or left alone.</summary>
-        public float Shifting(float inherited) => overridden ? inherited + value : inherited;
-
-        public static OptionalNumber None => default;
+        Number = 0,
+        Vector = 1,
+        Colour = 2,
+        Text = 3
     }
 
     /// <summary>
-    /// One card's adjustments to one piece of writing on it.
+    /// One authored value, whatever its type.
     ///
-    /// The recipe decides how every card of a kind is set, and that is where
-    /// almost all of the work belongs: a change there fixes every card at once,
-    /// and a change here fixes exactly one. This exists for the cards that need
-    /// the last five per cent — a name that sits a hair too high on its banner,
-    /// a word that wants a little more room — and it is deliberately made of
-    /// multipliers and offsets rather than absolute values, so that retuning the
-    /// recipe still moves the cards that were polished on top of it.
+    /// Four fields and a tag rather than anything polymorphic, because Unity
+    /// serialises this and a serialised polymorphic value is a custom drawer, a
+    /// migration hazard and a class of bug nobody needs. Numbers, enumerations
+    /// and yes-or-no all live in the float; points, rectangles and curve handles
+    /// live in the vector; colours and text have their own.
     ///
-    /// Every field is optional. A card with none of them set composes exactly as
-    /// though this did not exist, which is the property that keeps the recipe
-    /// the real source of the style.
+    /// Adding a genuinely new category of value means one more field here and
+    /// one more case below. Adding a new property of a category that already
+    /// exists means nothing at all.
     /// </summary>
     [Serializable]
-    public sealed class CardTextOverride
+    public struct CardVisualValue
     {
-        [Tooltip("Which piece of writing on the card this adjusts.")]
-        public CardVisualTextSlot slot = CardVisualTextSlot.Name;
+        public CardVisualValueKind kind;
+        public float number;
+        public Vector4 vector;
+        public Color colour;
+        public string text;
 
-        [Header("Where it sits")]
-        [Tooltip("Moved right, in pixels of the 800 by 1100 card canvas.")]
-        public OptionalNumber offsetX;
-
-        [Tooltip("Moved down, in pixels of the card canvas.")]
-        public OptionalNumber offsetY;
-
-        [Tooltip("Wider or narrower, about its own middle. One is unchanged.")]
-        public OptionalNumber widthMultiplier;
-
-        [Tooltip("Taller or shorter, about its own middle. One is unchanged.")]
-        public OptionalNumber heightMultiplier;
-
-        [Header("How it is set")]
-        [Tooltip("Bigger or smaller than the recipe's ceiling. One is unchanged.")]
-        public OptionalNumber fontSizeMultiplier;
-
-        [Tooltip("Space between characters, replacing the style's. Not a multiplier.")]
-        public OptionalNumber tracking;
-
-        [Tooltip(
-            "How much further this card may be squeezed. Below one lets a long name " +
-            "condense more and so be set larger; above one holds it wider.")]
-        public OptionalNumber condenseMultiplier;
-
-        [Tooltip("How strongly the baseline curves. Zero is flat, one is the recipe's.")]
-        public OptionalNumber warpStrength;
-
-        [Header("The shape of the baseline")]
-        [Tooltip("How deep the arch is, as a fraction of the title's width. Replaces the style's.")]
-        public OptionalNumber curveAmount;
-
-        [Tooltip("How much higher one end of the baseline sits than the other.")]
-        public OptionalNumber curveTilt;
-
-        [Tooltip("Where the top of the arch sits across the title. Half is centred.")]
-        public OptionalNumber curveCentre;
-
-        /// <summary>Whether this asks for anything at all.</summary>
-        public bool IsEmpty =>
-            !offsetX.overridden &&
-            !offsetY.overridden &&
-            !widthMultiplier.overridden &&
-            !heightMultiplier.overridden &&
-            !fontSizeMultiplier.overridden &&
-            !tracking.overridden &&
-            !condenseMultiplier.overridden &&
-            !warpStrength.overridden &&
-            !curveAmount.overridden &&
-            !curveTilt.overridden &&
-            !curveCentre.overridden;
-
-        /// <summary>Forgets every adjustment, leaving the slot it belongs to.</summary>
-        public void Clear()
+        /// <summary>Captures a value of any type the schema admits.</summary>
+        public static CardVisualValue Of(object value)
         {
-            offsetX = OptionalNumber.None;
-            offsetY = OptionalNumber.None;
-            widthMultiplier = OptionalNumber.None;
-            heightMultiplier = OptionalNumber.None;
-            fontSizeMultiplier = OptionalNumber.None;
-            tracking = OptionalNumber.None;
-            condenseMultiplier = OptionalNumber.None;
-            warpStrength = OptionalNumber.None;
-            curveAmount = OptionalNumber.None;
-            curveTilt = OptionalNumber.None;
-            curveCentre = OptionalNumber.None;
-        }
-
-        /// <summary>Whether this card reshapes the baseline at all.</summary>
-        public bool ReshapesTheCurve =>
-            curveAmount.overridden || curveTilt.overridden || curveCentre.overridden;
-
-        /// <summary>
-        /// Where the writing goes, once this card has had its say.
-        ///
-        /// Width and height scale about the rectangle's own middle, so making a
-        /// banner's title a little wider does not also drag it sideways. Moving
-        /// it is what the offsets are for, and they are applied afterwards so
-        /// the two do not interfere.
-        /// </summary>
-        public Rect Placed(Rect rect)
-        {
-            float width = widthMultiplier.Scaling(rect.width);
-            float height = heightMultiplier.Scaling(rect.height);
-
-            float middleX = rect.x + rect.width * 0.5f;
-            float middleY = rect.y + rect.height * 0.5f;
-
-            return new Rect(
-                offsetX.Shifting(middleX - width * 0.5f),
-                offsetY.Shifting(middleY - height * 0.5f),
-                Mathf.Max(1f, width),
-                Mathf.Max(1f, height));
-        }
-
-        /// <summary>How the writing is set, once this card has had its say.</summary>
-        public CardTextStyle Styled(CardTextStyle style)
-        {
-            style.Tracking = tracking.Or(style.Tracking);
-
-            // Below one lets the text be squeezed further, which is what makes a
-            // long name larger rather than narrower. Clamped because a card that
-            // asked to be squeezed to nothing would simply disappear.
-            style.MinCondense = Mathf.Clamp(
-                condenseMultiplier.Scaling(style.MinCondense), 0.2f, 1f);
-
-            // The shape first, then how strongly it is applied.
-            //
-            // Rebuilt from whichever of the three this card sets, with the
-            // style's own values standing in for the rest — so a card that
-            // only wants a shallower arch keeps the lean and the off centre top
-            // its recipe gave it. Anything the recipe drew that these three
-            // cannot express is replaced, which is the price of touching them at
-            // all and is why the tool says so before it happens.
-            if (ReshapesTheCurve)
+            switch (value)
             {
-                CardTextCurve inherited = CardTextCurve.From(
-                    style.CurveControlA, style.CurveControlB, style.CurveEnd);
+                case float number:
+                    return new CardVisualValue { kind = CardVisualValueKind.Number, number = number };
 
-                new CardTextCurve(
-                        curveAmount.Or(inherited.Amount),
-                        curveTilt.Or(inherited.Tilt),
-                        curveCentre.Or(inherited.Centre))
-                    .ToControls(
-                        out Vector2 controlA, out Vector2 controlB, out Vector2 end);
+                case int number:
+                    return new CardVisualValue { kind = CardVisualValueKind.Number, number = number };
 
-                style.CurveControlA = controlA;
-                style.CurveControlB = controlB;
-                style.CurveEnd = end;
-            }
+                case bool yes:
+                    return new CardVisualValue { kind = CardVisualValueKind.Number, number = yes ? 1f : 0f };
 
-            if (warpStrength.overridden)
-            {
-                // The curve is scaled rather than replaced, so the shape stays
-                // the recipe's and only its depth is this card's business. Zero
-                // flattens the baseline without turning the warp off, which
-                // keeps the vertical scale and the foreshortening working.
-                float strength = Mathf.Max(0f, warpStrength.value);
-
-                style.CurveControlA = Scaled(style.CurveControlA, strength);
-                style.CurveControlB = Scaled(style.CurveControlB, strength);
-                style.CurveEnd = Scaled(style.CurveEnd, strength);
-            }
-
-            return style;
-        }
-
-        private static Vector2 Scaled(Vector2 control, float strength) =>
-            new Vector2(control.x, control.y * strength);
-
-        /// <summary>The size ceiling, once this card has had its say.</summary>
-        public float Sized(float fontSize) => fontSizeMultiplier.Scaling(fontSize);
-    }
-
-    /// <summary>
-    /// Everything one card wants done differently from its recipe.
-    ///
-    /// Reached by identity and then handed on as data: whatever looks a card up
-    /// does so once, by its id, and passes this along. Nothing downstream is
-    /// told which card it is drawing, so there is still nowhere in the composer
-    /// or the painter to write "if this is The Coin" — the only thing they
-    /// receive is a set of numbers that may or may not be set.
-    /// </summary>
-    [Serializable]
-    public sealed class CardVisualOverrides
-    {
-        [SerializeField] private List<CardTextOverride> text = new List<CardTextOverride>();
-
-        public IReadOnlyList<CardTextOverride> Text => text;
-
-        /// <summary>Whether this card asks for anything at all.</summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                for (int index = 0; index < text.Count; index++)
-                {
-                    if (text[index] != null && !text[index].IsEmpty)
+                case Enum choice:
+                    return new CardVisualValue
                     {
-                        return false;
-                    }
-                }
+                        kind = CardVisualValueKind.Number,
+                        number = Convert.ToInt32(choice, CultureInfo.InvariantCulture)
+                    };
 
-                return true;
+                case Vector2 point:
+                    return new CardVisualValue
+                    {
+                        kind = CardVisualValueKind.Vector,
+                        vector = new Vector4(point.x, point.y, 0f, 0f)
+                    };
+
+                case Vector3 point:
+                    return new CardVisualValue
+                    {
+                        kind = CardVisualValueKind.Vector,
+                        vector = new Vector4(point.x, point.y, point.z, 0f)
+                    };
+
+                case Rect rectangle:
+                    return new CardVisualValue
+                    {
+                        kind = CardVisualValueKind.Vector,
+                        vector = new Vector4(
+                            rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+                    };
+
+                case Color colour:
+                    return new CardVisualValue { kind = CardVisualValueKind.Colour, colour = colour };
+
+                case string words:
+                    return new CardVisualValue { kind = CardVisualValueKind.Text, text = words };
+
+                default:
+                    return new CardVisualValue { kind = CardVisualValueKind.Text, text = string.Empty };
             }
         }
 
-        /// <summary>What this card wants done to one piece of writing, or null.</summary>
-        public CardTextOverride For(CardVisualTextSlot slot)
+        /// <summary>Reads this back as the type a property wants, or null.</summary>
+        public object As(Type wanted)
         {
-            for (int index = 0; index < text.Count; index++)
+            if (wanted == null)
             {
-                if (text[index] != null && text[index].slot == slot)
-                {
-                    return text[index];
-                }
+                return null;
+            }
+
+            if (wanted == typeof(float))
+            {
+                return number;
+            }
+
+            if (wanted == typeof(int))
+            {
+                return Mathf.RoundToInt(number);
+            }
+
+            if (wanted == typeof(bool))
+            {
+                return number != 0f;
+            }
+
+            if (wanted.IsEnum)
+            {
+                return Enum.ToObject(wanted, Mathf.RoundToInt(number));
+            }
+
+            if (wanted == typeof(Vector2))
+            {
+                return new Vector2(vector.x, vector.y);
+            }
+
+            if (wanted == typeof(Vector3))
+            {
+                return new Vector3(vector.x, vector.y, vector.z);
+            }
+
+            if (wanted == typeof(Rect))
+            {
+                return new Rect(vector.x, vector.y, vector.z, vector.w);
+            }
+
+            if (wanted == typeof(Color))
+            {
+                return colour;
+            }
+
+            if (wanted == typeof(string))
+            {
+                return text ?? string.Empty;
             }
 
             return null;
         }
 
-#if UNITY_EDITOR
-        /// <summary>The entry for a slot, made if it was not there. Tooling only.</summary>
-        internal CardTextOverride Establish(CardVisualTextSlot slot)
+        /// <summary>
+        /// Which of the four fields a property of this type is stored in.
+        ///
+        /// Null for a type nothing here can hold, which is the honest answer
+        /// and the one the validator reports.
+        /// </summary>
+        public static CardVisualValueKind? KindFor(Type wanted)
         {
-            CardTextOverride found = For(slot);
-
-            if (found != null)
+            if (wanted == null)
             {
-                return found;
+                return null;
             }
 
-            found = new CardTextOverride { slot = slot };
-            text.Add(found);
+            if (wanted == typeof(float) || wanted == typeof(int) ||
+                wanted == typeof(bool) || wanted.IsEnum)
+            {
+                return CardVisualValueKind.Number;
+            }
 
-            return found;
+            if (wanted == typeof(Vector2) || wanted == typeof(Vector3) || wanted == typeof(Rect))
+            {
+                return CardVisualValueKind.Vector;
+            }
+
+            if (wanted == typeof(Color))
+            {
+                return CardVisualValueKind.Colour;
+            }
+
+            if (wanted == typeof(string))
+            {
+                return CardVisualValueKind.Text;
+            }
+
+            return null;
         }
 
-        /// <summary>Forgets everything this card asked for.</summary>
-        internal void Clear() => text.Clear();
-
-        /// <summary>Forgets what this card asked for in one slot.</summary>
-        internal void Clear(CardVisualTextSlot slot)
+        /// <summary>
+        /// Whether this was stored as the kind a property of that type is read
+        /// from.
+        ///
+        /// Worth asking because <see cref="As"/> does not: it reads whichever
+        /// field the wanted type lives in and never checks that anything was
+        /// written there, so a colour saved against a number reads back as zero
+        /// and looks exactly like an authored zero. That is the shape of
+        /// malformed data this project would least like to debug, so it is
+        /// reported rather than absorbed.
+        /// </summary>
+        public bool Fits(Type wanted)
         {
-            for (int index = text.Count - 1; index >= 0; index--)
+            CardVisualValueKind? expected = KindFor(wanted);
+
+            return expected.HasValue && expected.Value == kind;
+        }
+
+        /// <summary>Whether this names a value the enumeration actually defines.</summary>
+        public bool IsDefinedFor(Type wanted) =>
+            wanted != null &&
+            (!wanted.IsEnum || Enum.IsDefined(wanted, Enum.ToObject(wanted, Mathf.RoundToInt(number))));
+
+        /// <summary>Whether two stored values say the same thing.</summary>
+        public bool SameAs(in CardVisualValue other) =>
+            kind == other.kind &&
+            number.Equals(other.number) &&
+            vector.Equals(other.vector) &&
+            colour.Equals(other.colour) &&
+            string.Equals(text ?? string.Empty, other.text ?? string.Empty, StringComparison.Ordinal);
+    }
+
+    /// <summary>One thing one card does differently, named by layer and property.</summary>
+    [Serializable]
+    public sealed class CardVisualPropertyOverride
+    {
+        [Tooltip("The authoring label of the layer this adjusts.")]
+        public string layer = string.Empty;
+
+        [Tooltip("Which property of it, as the schema names it.")]
+        public string property = string.Empty;
+
+        public CardVisualValue value;
+    }
+
+    /// <summary>
+    /// Everything one card does differently from the type it belongs to.
+    ///
+    /// Sparse, and that is the whole design. A card that wants its title a
+    /// little wider stores one row: that layer, that property, that number.
+    /// Everything else keeps coming from the recipe, so retuning the recipe
+    /// still moves it — which is what makes a roster of a thousand cards
+    /// maintainable and a roster of copies not.
+    ///
+    /// Nothing here knows what any property means. It is a list of names and
+    /// values, and the schema is what turns a name back into a field.
+    /// </summary>
+    [Serializable]
+    public sealed class CardVisualOverrides
+    {
+        [SerializeField]
+        private List<CardVisualPropertyOverride> properties = new List<CardVisualPropertyOverride>();
+
+        public IReadOnlyList<CardVisualPropertyOverride> Properties => properties;
+
+        public bool IsEmpty => properties == null || properties.Count == 0;
+
+        /// <summary>What this card says about one property of one layer, if anything.</summary>
+        public bool TryGet(string layer, string property, out CardVisualValue found)
+        {
+            if (properties != null)
             {
-                if (text[index] != null && text[index].slot == slot)
+                for (int index = 0; index < properties.Count; index++)
                 {
-                    text.RemoveAt(index);
+                    CardVisualPropertyOverride row = properties[index];
+
+                    if (row != null &&
+                        string.Equals(row.layer, layer, StringComparison.Ordinal) &&
+                        string.Equals(row.property, property, StringComparison.Ordinal))
+                    {
+                        found = row.value;
+                        return true;
+                    }
                 }
             }
+
+            found = default;
+            return false;
+        }
+
+        public bool Overrides(string layer, string property) =>
+            TryGet(layer, property, out _);
+
+        /// <summary>
+        /// The value this card asks for a property - already checked and
+        /// converted - or nothing at all, if there is no row for it or the row
+        /// is malformed.
+        ///
+        /// The one door every application of an override goes through, which
+        /// is what makes it the one place two things are true at once:
+        ///
+        ///   a row saved under a property's current id, or under any id it
+        ///   used to answer to, is found - the current id winning if, somehow,
+        ///   both are present at once;
+        ///
+        ///   a row that is not a value of the property's own type - a colour
+        ///   where a number belongs, an enumeration member that does not
+        ///   exist - is treated exactly like no row at all. It does not throw,
+        ///   and <see cref="CardVisualValue.As"/> is never asked to make
+        ///   something plausible out of it. That is the runtime's whole safety
+        ///   net: a malformed row is reported by the editor's validator, and
+        ///   refused here, in a build where the validator was never opened.
+        /// </summary>
+        public bool TryResolve(string layer, CardVisualProperty property, out object value)
+        {
+            value = null;
+
+            if (property == null)
+            {
+                return false;
+            }
+
+            if (!TryGet(layer, property.Id, out CardVisualValue stored) &&
+                !TryFormerId(layer, property, out stored))
+            {
+                return false;
+            }
+
+            if (!stored.Fits(property.Type) || !stored.IsDefinedFor(property.Type))
+            {
+                return false;
+            }
+
+            value = stored.As(property.Type);
+            return value != null;
+        }
+
+        private bool TryFormerId(string layer, CardVisualProperty property, out CardVisualValue found)
+        {
+            IReadOnlyList<string> formerIds = property.FormerIds;
+
+            for (int index = 0; index < formerIds.Count; index++)
+            {
+                if (TryGet(layer, formerIds[index], out found))
+                {
+                    return true;
+                }
+            }
+
+            found = default;
+            return false;
+        }
+
+        /// <summary>How many things this card asks for. Diagnostics and reports.</summary>
+        public int Count => properties?.Count ?? 0;
+
+        /// <summary>
+        /// How many times this has been edited since it was loaded.
+        ///
+        /// Not serialised, and not a version number anyone authors. It exists
+        /// because the editor mutates one of these *in place*: the library
+        /// hands out the same object every time, so a view holding a
+        /// description of a card holds the very object that just changed, and
+        /// no comparison of contents between two references to one object can
+        /// ever report a difference. A stamp taken when the description was
+        /// built is the only thing that can.
+        /// </summary>
+        [NonSerialized] private int _revision;
+
+        public int Revision => _revision;
+
+        /// <summary>
+        /// Whether two sets ask for exactly the same things.
+        ///
+        /// Order-insensitive: two sets holding the same rows describe the same
+        /// card however they were built up. Null and empty are the same thing,
+        /// because a card with no adjustments and a card with an empty set of
+        /// them compose identically.
+        /// </summary>
+        public static bool SameContent(CardVisualOverrides left, CardVisualOverrides right)
+        {
+            int leftCount = left?.Count ?? 0;
+            int rightCount = right?.Count ?? 0;
+
+            if (leftCount != rightCount)
+            {
+                return false;
+            }
+
+            if (leftCount == 0)
+            {
+                return true;
+            }
+
+            for (int index = 0; index < left.properties.Count; index++)
+            {
+                CardVisualPropertyOverride row = left.properties[index];
+
+                if (row == null)
+                {
+                    continue;
+                }
+
+                if (!right.TryGet(row.layer, row.property, out CardVisualValue theirs) ||
+                    !row.value.SameAs(theirs))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+#if UNITY_EDITOR
+        /// <summary>Records one adjustment, replacing any it already had.</summary>
+        internal void Set(string layer, string property, CardVisualValue value)
+        {
+            properties ??= new List<CardVisualPropertyOverride>();
+
+            for (int index = 0; index < properties.Count; index++)
+            {
+                CardVisualPropertyOverride row = properties[index];
+
+                if (row != null &&
+                    string.Equals(row.layer, layer, StringComparison.Ordinal) &&
+                    string.Equals(row.property, property, StringComparison.Ordinal))
+                {
+                    row.value = value;
+                    _revision++;
+                    return;
+                }
+            }
+
+            properties.Add(new CardVisualPropertyOverride
+            {
+                layer = layer,
+                property = property,
+                value = value
+            });
+
+            _revision++;
+        }
+
+        /// <summary>
+        /// Records one adjustment under its current id, and forgets any row
+        /// still sitting under an id it used to answer to.
+        ///
+        /// Every write from the editor goes through here rather than through
+        /// the raw string overload, which is what keeps "the current id is the
+        /// only persisted target" true instead of aspirational: a property
+        /// found through a former id and then edited leaves this card with one
+        /// row, under the current name, not two.
+        /// </summary>
+        internal void Set(string layer, CardVisualProperty property, CardVisualValue value)
+        {
+            Set(layer, property.Id, value);
+
+            IReadOnlyList<string> formerIds = property.FormerIds;
+
+            for (int index = 0; index < formerIds.Count; index++)
+            {
+                Clear(layer, formerIds[index]);
+            }
+        }
+
+        /// <summary>Forgets this card's adjustment, under its current id or any former one.</summary>
+        internal void Clear(string layer, CardVisualProperty property)
+        {
+            Clear(layer, property.Id);
+
+            IReadOnlyList<string> formerIds = property.FormerIds;
+
+            for (int index = 0; index < formerIds.Count; index++)
+            {
+                Clear(layer, formerIds[index]);
+            }
+        }
+
+        /// <summary>Forgets one adjustment, so the card inherits again.</summary>
+        internal void Clear(string layer, string property)
+        {
+            if (properties == null)
+            {
+                return;
+            }
+
+            for (int index = properties.Count - 1; index >= 0; index--)
+            {
+                CardVisualPropertyOverride row = properties[index];
+
+                if (row != null &&
+                    string.Equals(row.layer, layer, StringComparison.Ordinal) &&
+                    string.Equals(row.property, property, StringComparison.Ordinal))
+                {
+                    properties.RemoveAt(index);
+                    _revision++;
+                }
+            }
+        }
+
+        /// <summary>Forgets everything this card asked for about one layer.</summary>
+        internal void ClearLayer(string layer)
+        {
+            if (properties == null)
+            {
+                return;
+            }
+
+            for (int index = properties.Count - 1; index >= 0; index--)
+            {
+                if (properties[index] != null &&
+                    string.Equals(properties[index].layer, layer, StringComparison.Ordinal))
+                {
+                    properties.RemoveAt(index);
+                    _revision++;
+                }
+            }
+        }
+
+        /// <summary>Forgets everything.</summary>
+        internal void Clear()
+        {
+            properties?.Clear();
+            _revision++;
         }
 #endif
     }

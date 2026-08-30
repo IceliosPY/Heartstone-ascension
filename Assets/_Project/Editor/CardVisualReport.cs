@@ -42,7 +42,7 @@ namespace CoH.Editor
             if (factory == null)
             {
                 Debug.LogError(
-                    "There is no card visual factory. Run Conquest of Hearthstone → Rebuild Card Visuals.");
+                    "There is no card visual factory. Run Conquest of Hearthstone → Create Missing Card Visual Assets.");
                 return;
             }
 

@@ -282,12 +282,15 @@ namespace CoH.Tests.PlayMode
 
             Assert.That(shortest, Is.Not.Null, "No warped titles in hand.");
 
-            // Sized by the box rather than by the floor. The floor is what the
-            // recipe allows before a name is allowed to overflow, and a title
-            // sitting on it is a title nobody chose the size of.
-            Assert.That(shortest.fontSize, Is.GreaterThan(shortest.fontSizeMin * 1.5f),
-                "The title \"" + shortest.text + "\" was shrunk to its floor of " +
-                shortest.fontSizeMin + ".");
+            // At the size the recipe asked for. Against the ceiling rather than
+            // the floor: the title is now set at a deliberate fixed size, the
+            // way the reference renderer sets its own, and that size sits near
+            // the floor — so "well above the floor" stopped describing a
+            // healthy title and started failing every one of them.
+            Assert.That(shortest.fontSize, Is.GreaterThanOrEqualTo(shortest.fontSizeMax * 0.95f),
+                "The title \"" + shortest.text + "\" was not set at the size its recipe " +
+                "chose: " + shortest.fontSize + " against a ceiling of " +
+                shortest.fontSizeMax + ".");
 
             if (longest != null && longest != shortest)
             {
