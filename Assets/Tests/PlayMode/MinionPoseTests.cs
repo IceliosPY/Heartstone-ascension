@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Diagnostics;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -31,9 +32,24 @@ namespace CoH.Tests.PlayMode
         /// <summary>Fast enough not to be slow, slow enough to be real.</summary>
         private const float TestSpeed = 8f;
 
-        private IEnumerator LoadAnimatedMatch()
+        /// <summary>
+        /// Loads straight into a position with the requested number of
+        /// ready Test Soldiers on each side, through the debug scenario
+        /// system rather than playing a real hand out - reaching a position
+        /// like this by drawing and mana alone can take a long, luck-bound
+        /// number of turns, and none of that is what this file is about.
+        /// </summary>
+        private IEnumerator LoadAnimatedMatch(int each)
         {
-            yield return LoadMatch();
+            string id = each switch
+            {
+                1 => DebugScenarios.ReadyCombatId,
+                2 => DebugScenarios.TwoReadyEachId,
+                3 => DebugScenarios.ThreeReadyEachId,
+                _ => throw new System.ArgumentOutOfRangeException(nameof(each), each, "No ready-each scenario for this count.")
+            };
+
+            yield return LoadWithScenario(id);
             MatchTestScene.MakeFast(TestSpeed);
         }
 
@@ -136,58 +152,6 @@ namespace CoH.Tests.PlayMode
         //  Setup
         // ------------------------------------------------------------------
 
-        /// <summary>
-        /// Gives both players minions, all old enough to attack, and leaves the
-        /// starting player acting.
-        /// </summary>
-        private IEnumerator GiveBothPlayersMinions(int each)
-        {
-            yield return AdvanceUntilSomethingIsPlayable();
-
-            PlayerId first = Session.State.CurrentPlayer;
-
-            for (int guard = 0; guard < 40; guard++)
-            {
-                bool done =
-                    Session.State.GetPlayer(first).Board.Count >= each &&
-                    Session.State.GetPlayer(first.Opponent).Board.Count >= each;
-
-                if (done && Session.State.CurrentPlayer == first)
-                {
-                    // One more round trip so nothing is summoning sick.
-                    yield return RoundTrip();
-                    yield break;
-                }
-
-                PlayerId acting = Session.State.CurrentPlayer;
-
-                if (Session.State.GetPlayer(acting).Board.Count < each)
-                {
-                    foreach (CardInstance card in Session.State.GetPlayer(acting).Hand)
-                    {
-                        // A plain minion. This file is about where a minion
-                        // stands after a fight, so a spell or a card waiting to
-                        // be aimed would only waste the turn.
-                        if (Session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
-                        {
-                            continue;
-                        }
-
-                        if (Session.CanSubmit(new PlayCardCommand(acting, card.Id)))
-                        {
-                            Session.Submit(new PlayCardCommand(acting, card.Id));
-                            yield return Settle();
-                            break;
-                        }
-                    }
-                }
-
-                yield return EndTurn();
-            }
-
-            Assert.Fail("Both players never reached " + each + " minions.");
-        }
-
         private IEnumerator Attack(EntityId attacker, EntityId target)
         {
             PlayerId acting = Session.State.CurrentPlayer;
@@ -219,8 +183,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator Both_survive_and_both_end_on_their_slots()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(1);
+            yield return LoadAnimatedMatch(1);
 
             PlayerId acting = Session.State.CurrentPlayer;
             PlayerId waiting = acting.Opponent;
@@ -236,8 +199,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator The_defender_dies_and_the_attacker_returns_to_its_slot()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(2);
+            yield return LoadAnimatedMatch(2);
 
             PlayerId acting = Session.State.CurrentPlayer;
             PlayerId waiting = acting.Opponent;
@@ -261,8 +223,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator The_attacker_dies_and_the_defender_returns_to_its_slot()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(2);
+            yield return LoadAnimatedMatch(2);
 
             PlayerId acting = Session.State.CurrentPlayer;
             PlayerId waiting = acting.Opponent;
@@ -287,8 +248,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator Both_die_and_every_other_minion_stays_on_its_slot()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(2);
+            yield return LoadAnimatedMatch(2);
 
             PlayerId acting = Session.State.CurrentPlayer;
             PlayerId waiting = acting.Opponent;
@@ -325,8 +285,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator Repeated_attacks_never_leave_a_minion_off_its_slot()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(3);
+            yield return LoadAnimatedMatch(3);
 
             PlayerId acting = Session.State.CurrentPlayer;
             EntityId enemyHero = Session.State.GetPlayer(acting.Opponent).Hero.Id;
@@ -361,8 +320,7 @@ namespace CoH.Tests.PlayMode
         [UnityTest]
         public IEnumerator Attacking_by_dragging_leaves_the_row_at_rest()
         {
-            yield return LoadAnimatedMatch();
-            yield return GiveBothPlayersMinions(2);
+            yield return LoadAnimatedMatch(2);
 
             PlayerId acting = Session.State.CurrentPlayer;
             PlayerId waiting = acting.Opponent;

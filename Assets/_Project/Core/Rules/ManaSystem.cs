@@ -88,6 +88,41 @@ namespace CoH.Core.Rules
         }
 
         /// <summary>
+        /// Gives back mana already spent this turn, up to the crystals the
+        /// player actually has - never past that, and never as a temporary
+        /// crystal the way <see cref="GrantTemporaryMana"/> is. The two exist
+        /// for different cards: a temporary crystal lends mana beyond what a
+        /// player owns, for the turn only; this only ever gives back some of
+        /// what was already spent, and never creates a crystal, temporary or
+        /// permanent.
+        /// </summary>
+        public static void Restore(ResolutionContext context, Player player, int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            int cap = player.MaxMana - player.OverloadLocked;
+
+            // Temporary mana can legitimately put the live pool above the
+            // permanent-crystal cap. Restoring spent mana must never claw
+            // that surplus back: the cap limits how much Restore may add,
+            // not how much mana the player is allowed to keep.
+            int restored = player.AvailableMana >= cap
+                ? player.AvailableMana
+                : Math.Min(player.AvailableMana + amount, cap);
+
+            if (restored == player.AvailableMana)
+            {
+                return;
+            }
+
+            player.AvailableMana = restored;
+            context.Emit(new ManaRefilledEvent(player.Id, player.AvailableMana, player.MaxMana));
+        }
+
+        /// <summary>
         /// Spends mana. Free cards emit nothing: there is no such thing as an
         /// animation for spending zero.
         /// </summary>

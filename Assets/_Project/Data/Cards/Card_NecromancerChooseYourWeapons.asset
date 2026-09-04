@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512e9c72a07f5d741a056d6bedfd5840, type: 3}
+  m_Name: Card_NecromancerChooseYourWeapons
+  m_EditorClassIdentifier: 
+  cardId: necromancer_choose_your_weapons
+  displayName: Raise
+  cardType: 5
+  cardClass: 1
+  rarity: 0
+  tribe: 0
+  collectible: 0
+  manaCost: 1
+  attack: 0
+  health: 0
+  keywords: 0
+  effects:
+  - trigger: 4
+    selector: 1
+    targetFilter: 0
+    action: 3
+    amount: 0
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: necromancer_skeletal_warrior
+    summonCount: 1
+    placement: 0
+  - trigger: 4
+    selector: 1
+    targetFilter: 0
+    action: 3
+    amount: 0
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: necromancer_skeletal_rogue
+    summonCount: 1
+    placement: 0
+  - trigger: 4
+    selector: 1
+    targetFilter: 0
+    action: 3
+    amount: 0
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: necromancer_crypt_fiend
+    summonCount: 1
+    placement: 0
+  - trigger: 4
+    selector: 1
+    targetFilter: 0
+    action: 3
+    amount: 0
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId: necromancer_abomination
+    summonCount: 1
+    placement: 0
+  rulesText: Choose a minion to summon.
+  artwork: {fileID: 0}

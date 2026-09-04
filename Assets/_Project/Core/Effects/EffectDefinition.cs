@@ -40,7 +40,18 @@ namespace CoH.Core.Effects
         /// hand or shuffled away are three different things, and only the first
         /// is a death.
         /// </summary>
-        Deathrattle = 3
+        Deathrattle = 3,
+
+        /// <summary>
+        /// One of the things a hero power can do when it is used.
+        ///
+        /// Unlike the others this is not a moment: a hero power card's effects
+        /// with this trigger are its menu, in authored order, and using the
+        /// power resolves exactly one of them. A power with a single row offers
+        /// no choice; a power with four rows offers four. See
+        /// <see cref="CoH.Core.Rules.HeroPowerOptions"/>.
+        /// </summary>
+        HeroPower = 4
     }
 
     /// <summary>What an effect reaches.</summary>
@@ -92,7 +103,46 @@ namespace CoH.Core.Effects
         DrawCards = 2,
         Summon = 3,
         GainTemporaryMana = 4,
-        ModifyStats = 5
+        ModifyStats = 5,
+
+        /// <summary>
+        /// Adds to the controller's Spell Damage for the rest of their
+        /// current turn (see <see cref="CoH.Core.Rules.SpellDamageSystem"/>).
+        /// A player-level modifier rather than something applied to an
+        /// entity, which is why it needs no <see cref="SelectorKind"/> other
+        /// than <see cref="SelectorKind.Self"/> - there is no target, only a
+        /// controller.
+        /// </summary>
+        GrantSpellDamage = 6,
+
+        /// <summary>
+        /// Gives the controller back mana already spent this turn, up to
+        /// the crystals they actually have - never a temporary crystal the
+        /// way <see cref="GainTemporaryMana"/> is. A player-level effect
+        /// exactly like <see cref="GrantSpellDamage"/>, for the same reason:
+        /// there is no target, only a controller.
+        /// </summary>
+        RestoreMana = 7
+    }
+
+    /// <summary>
+    /// Where an effect action's <see cref="EffectActionDefinition.Amount"/>
+    /// actually comes from.
+    ///
+    /// Almost every action is authored with a fixed number, but a handful
+    /// need to read a live number off the caster instead - Huntress Shot's
+    /// mana restoration scaling with the caster's current Spell Damage is
+    /// the first of these. One generic switch here is what lets that stay
+    /// data: the alternative was a card-specific action, for one number, on
+    /// one card.
+    /// </summary>
+    public enum EffectValueSource
+    {
+        /// <summary>The authored <see cref="EffectActionDefinition.Amount"/>, unchanged.</summary>
+        Fixed = 0,
+
+        /// <summary>The controller's current <see cref="CoH.Core.State.Player.SpellDamageBonus"/>.</summary>
+        SpellDamage = 1
     }
 
     /// <summary>Where a summoned minion is placed.</summary>
@@ -179,7 +229,8 @@ namespace CoH.Core.Effects
             int healthDelta = 0,
             CardId summonCardId = default,
             int summonCount = 1,
-            SummonPlacement placement = SummonPlacement.Rightmost)
+            SummonPlacement placement = SummonPlacement.Rightmost,
+            EffectValueSource amountSource = EffectValueSource.Fixed)
         {
             Kind = kind;
             Amount = amount;
@@ -188,12 +239,21 @@ namespace CoH.Core.Effects
             SummonCardId = summonCardId;
             SummonCount = summonCount;
             Placement = placement;
+            AmountSource = amountSource;
         }
 
         public EffectActionKind Kind { get; }
 
-        /// <summary>Damage dealt, cards drawn, or mana gained, depending on the kind.</summary>
+        /// <summary>
+        /// Damage dealt, cards drawn, or mana gained, depending on the kind -
+        /// read only when <see cref="AmountSource"/> is
+        /// <see cref="EffectValueSource.Fixed"/>. A source other than Fixed
+        /// overrides it with a live number read off the caster instead.
+        /// </summary>
         public int Amount { get; }
+
+        /// <summary>Where <see cref="Amount"/> actually comes from at resolution.</summary>
+        public EffectValueSource AmountSource { get; }
 
         public int AttackDelta { get; }
 
@@ -212,8 +272,13 @@ namespace CoH.Core.Effects
             EffectActionKind.GainTemporaryMana => "GainTemporaryMana(" + Amount + ")",
             EffectActionKind.ModifyStats => "ModifyStats(" + Sign(AttackDelta) + "/" + Sign(HealthDelta) + ")",
             EffectActionKind.Summon => "Summon(" + SummonCardId.Value + " x" + SummonCount + ", " + Placement + ")",
+            EffectActionKind.GrantSpellDamage => "GrantSpellDamage(" + Sign(Amount) + ")",
+            EffectActionKind.RestoreMana => "RestoreMana(" + DescribeAmount() + ")",
             _ => "None"
         };
+
+        private string DescribeAmount() =>
+            AmountSource == EffectValueSource.Fixed ? Amount.ToString() : AmountSource.ToString();
 
         private static string Sign(int value) => (value >= 0 ? "+" : string.Empty) + value;
 

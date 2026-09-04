@@ -69,6 +69,22 @@ namespace CoH.Core.Commands
         AlreadyAttacked = 15,
 
         /// <summary>A character with no attack cannot attack.</summary>
-        ZeroAttack = 16
+        ZeroAttack = 16,
+
+        /// <summary>This hero has no hero power to use.</summary>
+        NoHeroPower = 17,
+
+        /// <summary>The hero power has already been used this turn.</summary>
+        HeroPowerAlreadyUsed = 18,
+
+        /// <summary>
+        /// The chosen option is not one this hero power offers.
+        ///
+        /// Its own reason rather than a general "invalid": a client naming an
+        /// option that does not exist is worth telling apart from one naming a
+        /// target that has died, both when explaining a refusal to a player and
+        /// when reading a server log.
+        /// </summary>
+        InvalidHeroPowerOption = 19
     }
 }

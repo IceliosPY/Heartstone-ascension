@@ -49,6 +49,7 @@ namespace CoH.Core.Diagnostics
 
             Fill(state, PlayerId.One, scenario.One, scenario);
             Fill(state, PlayerId.Two, scenario.Two, scenario);
+            AssignHeroPowers(state);
 
             state.TurnNumber = scenario.TurnNumber;
             state.Phase = scenario.Phase;
@@ -129,6 +130,43 @@ namespace CoH.Core.Diagnostics
                         "Scenario '" + scenario.Id + "' puts more minions on a board than " +
                         player.Board.Capacity + " will hold.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gives each seat the hero power its config brings, mirroring
+        /// <c>MatchSetup</c>'s own setup step. A scenario built without this
+        /// would drop a player into a match its own bootstrap says it should
+        /// have a hero power for, and then have none - so every scenario, not
+        /// only ones written with a hero power in mind, needs this to reflect
+        /// the match it was cut from.
+        /// </summary>
+        private static void AssignHeroPowers(GameState state)
+        {
+            for (int index = 0; index < state.Players.Count; index++)
+            {
+                Player player = state.Players[index];
+                CardId heroPower = state.Config.HeroPowerFor(player.Id);
+
+                if (heroPower.IsNone)
+                {
+                    continue;
+                }
+
+                if (!state.Catalog.TryGet(heroPower, out CardDefinition definition))
+                {
+                    throw new InvalidOperationException(
+                        "The catalog has no definition for " + player.Id + "'s hero power: " + heroPower);
+                }
+
+                if (definition.Type != CardType.HeroPower)
+                {
+                    throw new InvalidOperationException(
+                        player.Id + "'s hero power " + heroPower + " is a " + definition.Type +
+                        ", not a hero power.");
+                }
+
+                player.Hero.HeroPowerCardId = heroPower;
             }
         }
 

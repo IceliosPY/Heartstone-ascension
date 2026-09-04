@@ -143,5 +143,23 @@ namespace CoH.Presentation
             _server == null
                 ? RejectionReason.WrongPhase
                 : _server.CanAttack(playerId, attackerId);
+
+        /// <summary>
+        /// Whether this player could use their hero power right now.
+        ///
+        /// What the hero power button is lit by. The view counts no mana and
+        /// remembers no "already used" flag of its own: it asks, every frame,
+        /// and shows the answer.
+        /// </summary>
+        public RejectionReason CanUseHeroPower(PlayerId playerId) =>
+            _server == null
+                ? RejectionReason.WrongPhase
+                : _server.CanUseHeroPower(playerId);
+
+        /// <summary>The fixed options that player's hero power offers, in order.</summary>
+        public IReadOnlyList<EffectDefinition> GetHeroPowerOptions(PlayerId playerId) =>
+            _server == null
+                ? Array.Empty<EffectDefinition>()
+                : _server.GetHeroPowerOptions(playerId);
     }
 }

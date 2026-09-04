@@ -27,9 +27,28 @@ namespace CoH.Core.State
             BaseHealth = definition.Health;
             MaxAttacksPerTurn = 1;
             Zone = ZoneType.None;
+            Keywords = definition.Keywords;
         }
 
         public CardId CardId { get; }
+
+        /// <summary>
+        /// The standing abilities this minion currently has.
+        ///
+        /// Copied from the definition when it is created and then owned by the
+        /// minion, exactly as its statistics are. Losing stealth by attacking
+        /// changes this minion and must not change the card, which every other
+        /// copy of it also reads.
+        /// </summary>
+        public CardKeywords Keywords { get; internal set; }
+
+        public bool HasKeyword(CardKeywords keyword) => Keywords.Has(keyword);
+
+        /// <summary>
+        /// Takes a keyword away. Only stealth is ever removed today, when this
+        /// minion attacks.
+        /// </summary>
+        internal void RemoveKeyword(CardKeywords keyword) => Keywords &= ~keyword;
 
         /// <summary>
         /// Where this minion currently is. Play while it is on the board,

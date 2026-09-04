@@ -47,6 +47,12 @@ namespace CoH.Data
         [Tooltip("Health for a minion, durability for a weapon, unused otherwise.")]
         [SerializeField] private int health;
 
+        [Header("Keywords")]
+        [Tooltip(
+            "Standing abilities printed on the card. Shown to the player as Rush, " +
+            "Provocation (Taunt) and Camouflage (Stealth).")]
+        [SerializeField] private CardKeywords keywords = CardKeywords.None;
+
         [Header("Effects")]
         [Tooltip("What this card does, in order. A card with none is a plain body.")]
         [SerializeField] private List<AuthoredEffect> effects = new List<AuthoredEffect>();
@@ -67,6 +73,9 @@ namespace CoH.Data
         public string DisplayName => displayName;
 
         public CardType CardType => cardType;
+
+        /// <summary>The standing abilities printed on this card.</summary>
+        public CardKeywords Keywords => keywords;
 
         /// <summary>What this card does, as authored.</summary>
         public IReadOnlyList<AuthoredEffect> Effects => effects;
@@ -96,7 +105,8 @@ namespace CoH.Data
                 rarity,
                 tribe,
                 rulesText,
-                ConvertEffects());
+                ConvertEffects(),
+                keywords);
 
         /// <summary>
         /// Converts the authored effects in order, and keeps that order. A card

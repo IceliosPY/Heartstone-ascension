@@ -1,6 +1,7 @@
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
 using CoH.Core.Rules.Resolution;
+using CoH.Core.State;
 
 namespace CoH.Core.Rules.Actions
 {
@@ -24,6 +25,13 @@ namespace CoH.Core.Rules.Actions
         public override void Resolve(ResolutionContext context)
         {
             context.Emit(new TurnEndedEvent(_playerId, context.State.TurnNumber));
+
+            // Spell Damage is only ever "this turn" - it must be gone before
+            // the opponent's turn starts, not merely by the time this
+            // player's own next turn begins (that would leave it active
+            // through the whole of the opponent's intervening turn).
+            Player player = context.State.GetPlayer(_playerId);
+            SpellDamageSystem.ExpireAtEndOfTurn(context, player);
 
             // Extension point (Phase 11): end-of-turn triggers are queued here,
             // before the next turn starts.

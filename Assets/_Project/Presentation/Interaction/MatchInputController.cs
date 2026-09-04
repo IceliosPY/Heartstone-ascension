@@ -38,6 +38,9 @@ namespace CoH.Presentation
         [SerializeField] private MatchHud hud;
         [SerializeField] private Camera matchCamera;
         [SerializeField] private TargetingArrow targetingArrow;
+
+        [Tooltip("The near player's hero power. Optional: a match without one simply has none.")]
+        [SerializeField] private HeroPowerView heroPowerView;
         [SerializeField] private LayerMask clickMask = ~0;
 
         [Header("Drag")]
@@ -111,6 +114,12 @@ namespace CoH.Presentation
                 hud.EndTurnRequested += OnEndTurnRequested;
             }
 
+            if (heroPowerView != null)
+            {
+                heroPowerView.ActivationRequested += OnHeroPowerActivationRequested;
+                heroPowerView.OptionChosen += OnHeroPowerOptionChosen;
+            }
+
             if (session != null)
             {
                 session.CommandRejected += OnCommandRejected;
@@ -122,6 +131,12 @@ namespace CoH.Presentation
             if (hud != null)
             {
                 hud.EndTurnRequested -= OnEndTurnRequested;
+            }
+
+            if (heroPowerView != null)
+            {
+                heroPowerView.ActivationRequested -= OnHeroPowerActivationRequested;
+                heroPowerView.OptionChosen -= OnHeroPowerOptionChosen;
             }
 
             if (session != null)
@@ -196,9 +211,35 @@ namespace CoH.Presentation
             bool ended = session.State.HasEnded;
             bool busy = session.IsBusy;
 
+            // A Raise choice is a modal interaction: End Turn (and anything
+            // else the HUD offers) has nothing sensible to do while the
+            // player is mid-selection, so it goes the same disabled -
+            // interaction blocked, visually dimmed through its own button
+            // transition, nothing about the HUD itself redesigned or moved -
+            // route as "the match ended" or "the queue is replaying" already
+            // do.
+            bool choosing = heroPowerView != null && heroPowerView.IsChoosing;
+
             if (hud != null)
             {
-                hud.SetInteractable(!ended && !busy);
+                hud.SetInteractable(!ended && !busy && !choosing);
+
+                // The four choice cards are allowed to sit visually where
+                // End Turn is - a world-space CardView cannot literally
+                // paint over a Screen Space - Overlay button, so this is
+                // what makes it read as behind them instead: still visible,
+                // never hidden or moved, just faded toward the background
+                // for as long as it has nothing to do.
+                hud.SetEndTurnModalDimmed(choosing);
+            }
+
+            // Asked every frame rather than remembered, so a hero power that
+            // becomes unusable - the mana spent elsewhere, the board filled,
+            // the turn ended - goes dark at the same moment the engine would
+            // start refusing it.
+            if (heroPowerView != null)
+            {
+                heroPowerView.Refresh(session, !ended && !busy);
             }
 
             if (ended)
@@ -980,6 +1021,70 @@ namespace CoH.Presentation
         //  Odds and ends
         // ------------------------------------------------------------------
 
+        /// <summary>
+        /// Opens the choice menu, having first asked the engine whether the
+        /// power could be used at all.
+        ///
+        /// Nothing is committed here. The menu is a view state, and a player
+        /// who closes it again has spent nothing - which is why there is no
+        /// cancel command and nothing in the state to roll back.
+        /// </summary>
+        private void OnHeroPowerActivationRequested()
+        {
+            if (session == null || session.IsBusy || session.State.HasEnded || heroPowerView == null)
+            {
+                return;
+            }
+
+            if (heroPowerView.IsChoosing)
+            {
+                heroPowerView.CloseChoices();
+                return;
+            }
+
+            RejectionReason reason = session.CanUseHeroPower(session.State.CurrentPlayer);
+
+            if (reason != RejectionReason.None)
+            {
+                SetHint(Explain(reason));
+                return;
+            }
+
+            CancelInteraction();
+
+            IReadOnlyList<EffectDefinition> options = session.GetHeroPowerOptions(session.State.CurrentPlayer);
+
+            if (options.Count <= 1)
+            {
+                // Nothing to choose between: Raise's four-card modal exists
+                // because there is something to pick, not because using a
+                // hero power inherently needs a menu. A power authored with
+                // a single option - Lunar Phase today, whatever else
+                // tomorrow - activates the instant it is clicked, with no
+                // choice UI and no card preview. This reads the option list
+                // the same way HeroPowerView itself would; nothing here
+                // knows Lunar Phase's card id or what its one option does.
+                session.Submit(new UseHeroPowerCommand(session.State.CurrentPlayer, 0));
+                return;
+            }
+
+            heroPowerView.OpenChoices();
+        }
+
+        /// <summary>
+        /// The player picked one. This is the only moment anything is
+        /// submitted, and the engine checks the whole thing again.
+        /// </summary>
+        private void OnHeroPowerOptionChosen(int optionIndex)
+        {
+            if (session == null || session.IsBusy || session.State.HasEnded)
+            {
+                return;
+            }
+
+            session.Submit(new UseHeroPowerCommand(session.State.CurrentPlayer, optionIndex));
+        }
+
         private void OnEndTurnRequested()
         {
             if (session == null || session.IsBusy || session.State.HasEnded)
@@ -1015,6 +1120,9 @@ namespace CoH.Presentation
             RejectionReason.NotYourTurn => "It is not your turn.",
             RejectionReason.InvalidBoardPosition => "That is not a place it can go.",
             RejectionReason.InvalidTarget => "That is not a legal target.",
+            RejectionReason.HeroPowerAlreadyUsed => "Your hero power has been used this turn.",
+            RejectionReason.NoHeroPower => "This hero has no hero power.",
+            RejectionReason.InvalidHeroPowerOption => "That is not one of the choices.",
             RejectionReason.None => string.Empty,
             _ => string.Empty
         };

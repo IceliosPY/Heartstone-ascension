@@ -259,13 +259,13 @@ namespace CoH.Tests.PlayMode
 
                 float grew = read.height / resting.height;
 
-                Assert.That(grew, Is.GreaterThan(1.3f),
+                Assert.That(grew, Is.GreaterThan(1.4f),
                     "Reading a card only made it " + grew.ToString("0.00") +
-                    " times taller, which is not an inspection view.");
+                    " times taller, which is not a genuine close-up.");
 
-                Assert.That(grew, Is.LessThan(1.9f),
+                Assert.That(grew, Is.LessThan(2.0f),
                     "Reading a card made it " + grew.ToString("0.00") +
-                    " times taller, which is more screen than a card needs.");
+                    " times taller, which overruns the screen rather than presenting the card.");
 
                 Assert.That(read.yMin, Is.GreaterThanOrEqualTo(0f),
                     "A card being read hangs " + (-read.yMin).ToString("0") +

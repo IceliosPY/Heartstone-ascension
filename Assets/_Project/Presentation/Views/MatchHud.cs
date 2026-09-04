@@ -110,6 +110,60 @@ namespace CoH.Presentation
             }
         }
 
+        /// <summary>
+        /// Read back for tests rather than duplicated by them: whether End
+        /// Turn currently accepts a click. A disabled <see cref="Button"/>
+        /// already draws itself dimmed through its own transition colours,
+        /// so disabling it while a modal choice is open is both the
+        /// interaction fix and the visual one, at no extra cost.
+        /// </summary>
+        public bool IsEndTurnInteractable => endTurnButton != null && endTurnButton.interactable;
+
+        /// <summary>End Turn's own screen rectangle, read back for tests rather than duplicated by them.</summary>
+        public RectTransform EndTurnRect => endTurnButton != null ? (RectTransform)endTurnButton.transform : null;
+
+        private CanvasGroup _endTurnGroup;
+
+        /// <summary>How faint End Turn goes while a modal choice is open over it - visible, never hidden.</summary>
+        private const float EndTurnDimmedAlpha = 0.28f;
+
+        /// <summary>
+        /// Fades End Turn toward the background without hiding, moving or
+        /// resizing it - for as long as a modal selection like a Raise
+        /// choice is open and may be drawn in front of it.
+        ///
+        /// A Screen Space - Overlay canvas always draws after every
+        /// world-space object, so nothing a world-space CardView does with
+        /// its own sorting order can make it literally paint over these
+        /// pixels; fading End Turn low enough to read as background is what
+        /// makes the choice cards read as being in front of it, without
+        /// touching where End Turn sits or what it is - the button keeps
+        /// existing exactly where a future board-integrated version of it
+        /// will replace it.
+        /// </summary>
+        public void SetEndTurnModalDimmed(bool dimmed)
+        {
+            if (endTurnButton == null)
+            {
+                return;
+            }
+
+            if (_endTurnGroup == null)
+            {
+                _endTurnGroup = endTurnButton.GetComponent<CanvasGroup>();
+
+                if (_endTurnGroup == null)
+                {
+                    _endTurnGroup = endTurnButton.gameObject.AddComponent<CanvasGroup>();
+                }
+            }
+
+            _endTurnGroup.alpha = dimmed ? EndTurnDimmedAlpha : 1f;
+        }
+
+        /// <summary>Read back for tests rather than duplicated by them.</summary>
+        public bool IsEndTurnModalDimmed => _endTurnGroup != null && _endTurnGroup.alpha < 0.999f;
+
         public void SetHint(string hint)
         {
             if (hintText != null)

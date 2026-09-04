@@ -4,6 +4,7 @@ using CoH.Core.Commands;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
+using CoH.Presentation.CardVisuals;
 using UnityEngine;
 
 namespace CoH.Presentation
@@ -41,6 +42,9 @@ namespace CoH.Presentation
         [Header("Heroes")]
         [SerializeField] private HeroView nearHero;
         [SerializeField] private HeroView farHero;
+
+        [Tooltip("The near player's hero power. Optional: a hero without one hides it.")]
+        [SerializeField] private HeroPowerView nearHeroPower;
 
         [Header("Interaction")]
         [Tooltip("Where a card being dragged is parented, clear of both hands.")]
@@ -133,6 +137,12 @@ namespace CoH.Presentation
 
         public HeroView FarHero => farHero;
 
+        /// <summary>The near player's hero power view, or null when the scene has none.</summary>
+        public HeroPowerView NearHeroPower => nearHeroPower;
+
+        /// <summary>The match's own HUD, read back for tests rather than duplicated by them.</summary>
+        public MatchHud Hud => hud;
+
         /// <summary>Anchors, so a staged event can find the deck or a row.</summary>
         public BoardAnchors Anchors => anchors;
 
@@ -200,6 +210,23 @@ namespace CoH.Presentation
             if (farHero != null)
             {
                 farHero.Bind(state.GetPlayer(near.Opponent), MatchHud.Describe(near.Opponent), false);
+            }
+
+            BindHeroPower(state, near);
+        }
+
+        /// <summary>
+        /// Points the hero power at whoever the near seat currently is.
+        ///
+        /// Rebound rather than bound once, because in hotseat the near seat
+        /// changes hands: a hero power belongs to a player, not to a side of
+        /// the table, and the view has to follow the player.
+        /// </summary>
+        private void BindHeroPower(GameState state, PlayerId near)
+        {
+            if (nearHeroPower != null && nearHero != null)
+            {
+                nearHeroPower.Bind(session, state.GetPlayer(near), nearHero.transform);
             }
         }
 
@@ -413,6 +440,8 @@ namespace CoH.Presentation
                 farHero.Bind(state.GetPlayer(far), MatchHud.Describe(far), false);
             }
 
+            BindHeroPower(state, near);
+
             if (hud != null)
             {
                 hud.Refresh(state);
@@ -579,6 +608,15 @@ namespace CoH.Presentation
             // precisely the moment it became castable.
             bool playable = session.CanPlayCard(owner, card.Id) == RejectionReason.None;
 
+            // Display-only: the card's own printed text is never touched.
+            // This rebuilds fresh every time a hand is rebuilt (every queue
+            // drain), which is what makes Lunar Phase's bonus show up the
+            // instant it is granted and disappear the instant EndTurnAction
+            // clears it - nothing here is told to refresh; it simply reads
+            // the controller's current Spell Damage each time it is asked.
+            string rulesText = SpellDamageTextFormatter.Format(
+                definition.Text, definition.Effects, state.GetPlayer(owner).SpellDamageBonus);
+
             return new CardViewModel(
                 card.Id,
                 card.CardId,
@@ -586,7 +624,7 @@ namespace CoH.Presentation
                 Mathf.Max(0, definition.ManaCost + card.CostModifier),
                 definition.Attack + card.AttackModifier,
                 definition.Health + card.HealthModifier,
-                definition.Text,
+                rulesText,
                 definition.Type,
                 definition.Class,
                 definition.Tribe,

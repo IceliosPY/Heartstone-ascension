@@ -80,6 +80,12 @@ namespace CoH.Core.Server
         public IReadOnlyList<EntityId> GetLegalPlayTargets(PlayerId playerId, EntityId cardInstanceId) =>
             _engine.GetLegalPlayTargets(playerId, cardInstanceId);
 
+        public RejectionReason CanUseHeroPower(PlayerId playerId) =>
+            _engine.CanUseHeroPower(playerId);
+
+        public IReadOnlyList<EffectDefinition> GetHeroPowerOptions(PlayerId playerId) =>
+            _engine.GetHeroPowerOptions(playerId);
+
         public RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId) =>
             _engine.CanPlayCard(playerId, cardInstanceId);
     }

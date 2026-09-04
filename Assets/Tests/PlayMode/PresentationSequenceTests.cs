@@ -364,13 +364,38 @@ namespace CoH.Tests.PlayMode
 
         private IEnumerator SetUpOneMinionEach()
         {
-            yield return AdvanceUntilSomethingIsPlayable();
-            yield return PlayOneMinionDirectly();
+            yield return PlayTestSoldierEventually();
             yield return EndTurn();
 
-            yield return AdvanceUntilSomethingIsPlayable();
-            yield return PlayOneMinionDirectly();
+            yield return PlayTestSoldierEventually();
             yield return EndTurn();
+        }
+
+        /// <summary>
+        /// Ends turns until the active player is holding a playable Test
+        /// Soldier, then plays it - specifically that card, not merely "a
+        /// minion". This file's own arithmetic (two exchanges of 2 damage
+        /// each to bring down a 3 health body) is tuned to Test Soldier's
+        /// exact stats, and the hand may hold other minions - or Starcaller's
+        /// Huntress Shot, playable only once a target exists - before it does.
+        /// </summary>
+        private IEnumerator PlayTestSoldierEventually(int maxTurns = 12)
+        {
+            for (int guard = 0; guard < maxTurns; guard++)
+            {
+                CardView soldier = FindCardInHand("test_soldier");
+
+                if (soldier != null && soldier.IsPlayable)
+                {
+                    Session.Submit(new PlayCardCommand(Session.State.CurrentPlayer, soldier.EntityId));
+                    yield return Settle();
+                    yield break;
+                }
+
+                yield return EndTurn();
+            }
+
+            Assert.Fail("Test Soldier never became playable within " + maxTurns + " turns.");
         }
 
         private IEnumerator AttackWith(EntityId attacker, EntityId target)

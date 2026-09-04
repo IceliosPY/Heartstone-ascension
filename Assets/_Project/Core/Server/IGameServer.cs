@@ -66,5 +66,21 @@ namespace CoH.Core.Server
         /// answer rather than being refused.
         /// </summary>
         RejectionReason CanPlayCard(PlayerId playerId, EntityId cardInstanceId);
+
+        /// <summary>
+        /// Whether this player could use their hero power right now, before
+        /// any option has been chosen.
+        ///
+        /// Read only, and answered by the rules that would judge the command.
+        /// The board lights its hero power button from this rather than
+        /// counting mana and turns for itself.
+        /// </summary>
+        RejectionReason CanUseHeroPower(PlayerId playerId);
+
+        /// <summary>
+        /// The fixed options this player's hero power offers, in authored
+        /// order. Empty when they have no hero power.
+        /// </summary>
+        IReadOnlyList<EffectDefinition> GetHeroPowerOptions(PlayerId playerId);
     }
 }

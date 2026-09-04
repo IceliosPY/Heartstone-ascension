@@ -22,7 +22,56 @@ MonoBehaviour:
     overrides:
       properties: []
   - cardId: the_coin
-    artwork: {fileID: 0}
+    artwork: {fileID: 21300000, guid: 43cfc112006b3654e8853b7abaf77180, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: necromancer_choose_your_weapons
+    artwork: {fileID: 21300000, guid: 32fa508edca75f14b9d2eb9b11c4f585, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: necromancer_skeletal_warrior
+    artwork: {fileID: 21300000, guid: 99adcc2799fa4ba4a8a62108c39f5df9, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: necromancer_skeletal_rogue
+    artwork: {fileID: 21300000, guid: 06a2428c383ea2e48a9f9e3811f06ad2, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: necromancer_crypt_fiend
+    artwork: {fileID: 21300000, guid: 4589378f8e192e949a5cb8c862dabedd, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: necromancer_abomination
+    artwork: {fileID: 21300000, guid: 7b18d4aaf52ccc74199965ff233fb5f0, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: starcaller_lunar_phase
+    artwork: {fileID: 21300000, guid: 312e71055a9780846a6f402256016e4f, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []
+  - cardId: starcaller_huntress_shot
+    artwork: {fileID: 21300000, guid: b5d4159c7f7c325428a13191b628161c, type: 3}
     style:
       value: 
     expansion: 

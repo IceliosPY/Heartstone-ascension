@@ -8,6 +8,13 @@
     "",
     "    https://www.hearthcards.net/assets_template_new/minion.json",
     "    https://www.hearthcards.net/assets_template_new/spell.json",
+    "    https://www.hearthcards.net/assets_template_new/heropower.json",
+    "",
+    "The hero power template's own Type id is 'heropower', not 'power' - the",
+    "obvious guess resolves to the site's index page at HTTP 200, exactly the",
+    "trap described below. It was found by reading the app's own bundled",
+    "script for the literal string it fetches (fetch(`/assets_template_new/",
+    "${Type}.json`)) rather than guessed a second time.",
     "",
     "The first version of this file was guessed from one known URL and a",
     "supposed naming rule. Twelve of fifteen names were wrong, and the site",
@@ -721,6 +728,58 @@
         "width": 517,
         "height": 421,
         "bytes": 11078
+      }
+    },
+    {
+      "id": "frame_heropower",
+      "filename": "Card_Inhand_HeroPower_Neutral.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_HeroPower_Neutral.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer's own heropower.json template (Type id \"heropower\", not \"power\" - the naive guess resolves to the site's index page at HTTP 200 like every wrong guess before it), and fetched and decoded from the site: WEBP 669x1007",
+      "category": "frame",
+      "purpose": "The hero power frame. Its own art window is an ellipse near the card's centre (267,269 270x269), which is why this medallion is round rather than a shape approximated in code. Unlike the minion, spell and hero frames, the renderer's own template draws this one layer as type 'static' rather than 'classMapping' - one file for every class, 'Neutral' in the name notwithstanding - so this entry is deliberately left unconstrained by class rather than copying the per-class convention its siblings use for a real reason.",
+      "sourceRect": {
+        "x": 66,
+        "y": 92,
+        "width": 669,
+        "height": 1007
+      },
+      "slot": "Frame",
+      "cardType": "HeroPower",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 7,
+      "measured": {
+        "format": "WEBP",
+        "width": 669,
+        "height": 1007,
+        "bytes": 54740
+      }
+    },
+    {
+      "id": "backdrop_heropower",
+      "filename": "Card_Inhand_HeroPower_DropShadow.webp",
+      "url": "https://www.hearthcards.net/assets/Card_Inhand_HeroPower_DropShadow.webp",
+      "status": "confirmed",
+      "evidence": "named by the renderer's own heropower.json template, and fetched and decoded from the site: WEBP 273x262",
+      "category": "backdrop",
+      "purpose": "The shadow behind a hero power's own art window.",
+      "sourceRect": {
+        "x": 266,
+        "y": 277,
+        "width": 273,
+        "height": 262
+      },
+      "slot": "Backdrop",
+      "cardType": "HeroPower",
+      "cardClass": null,
+      "rarity": null,
+      "priority": 6,
+      "measured": {
+        "format": "WEBP",
+        "width": 273,
+        "height": 262,
+        "bytes": 10854
       }
     }
   ],

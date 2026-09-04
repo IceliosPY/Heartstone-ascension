@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323739a8fcb3bff4783b1292d350d042, type: 3}
+  m_Name: Deck_StarcallerDevelopment
+  m_EditorClassIdentifier:
+  entries:
+  - card: {fileID: 11400000, guid: c0a10001000000000000000000000001, type: 2}
+    count: 8
+  - card: {fileID: 11400000, guid: a2ecf9256d82d8449b51fb4c4c4c98b2, type: 2}
+    count: 6
+  - card: {fileID: 11400000, guid: 54e35ba48c49ba141a2a769fc8300ef3, type: 2}
+    count: 6
+  - card: {fileID: 11400000, guid: 784ba13195b46d045bd8a06e173b6242, type: 2}
+    count: 4
+  - card: {fileID: 11400000, guid: fda9276800cc4254dbfa7d19d15658c6, type: 2}
+    count: 2
+  - card: {fileID: 11400000, guid: b1c0de0000000000000000000000a007, type: 2}
+    count: 4

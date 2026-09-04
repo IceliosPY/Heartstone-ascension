@@ -22,7 +22,8 @@ namespace CoH.Tests.VisualEditMode
             Spacing = 0.765f,
             MaxWidth = 7.56f,
             PivotDistance = 15.0f,
-            DepthStep = 0.035f
+            DepthStep = 0.035f,
+            SmallHandGenerosity = 1.2f
         };
 
         /// <summary>
@@ -191,17 +192,36 @@ namespace CoH.Tests.VisualEditMode
             }
         }
 
+        /// <summary>
+        /// A hand small enough that <see cref="HandFanSettings.MaxWidth"/> was
+        /// never going to bind gets the baseline spacing at minimum - and a
+        /// hand of two or three actually gets more than that, so it does not
+        /// read as thin and stingy next to a fuller one. The boost is largest
+        /// at two cards and fades to nothing by six, where the fan is already
+        /// wide enough on its own.
+        /// </summary>
         [Test]
-        public void A_small_hand_is_spaced_as_generously_as_it_is_allowed()
+        public void A_small_hand_is_spaced_at_least_as_generously_as_it_is_allowed()
         {
             HandFanSettings hand = Hand();
-            float wanted = hand.Scale * hand.Spacing;
+            float baseline = hand.Scale * hand.Spacing;
+            float previous = float.PositiveInfinity;
 
-            foreach (int count in new[] { 2, 3, 4, 5 })
+            foreach (int count in new[] { 2, 3, 4, 5, 6 })
             {
-                Assert.That(HandFanLayout.SpacingFor(count, hand), Is.EqualTo(wanted).Within(0.0001f),
-                    "A hand of " + count + " is being squeezed before it needs to be.");
+                float spacing = HandFanLayout.SpacingFor(count, hand);
+
+                Assert.That(spacing, Is.GreaterThanOrEqualTo(baseline - 0.0001f),
+                    "A hand of " + count + " is being squeezed below the baseline before it needs to be.");
+
+                Assert.That(spacing, Is.LessThanOrEqualTo(previous + 0.0001f),
+                    "A hand of " + count + " is not more tightly spaced than a smaller one.");
+
+                previous = spacing;
             }
+
+            Assert.That(HandFanLayout.SpacingFor(6, hand), Is.EqualTo(baseline).Within(0.0001f),
+                "By six cards the small-hand boost should have faded out entirely.");
         }
 
         // ------------------------------------------------------------------
@@ -346,6 +366,131 @@ namespace CoH.Tests.VisualEditMode
 
             Assert.That(curvedLean, Is.GreaterThan(flatLean),
                 "A tighter radius should lean the outer cards further.");
+        }
+
+        // ------------------------------------------------------------------
+        //  Adapting to hand size
+        // ------------------------------------------------------------------
+
+        private static float OuterLean(int count, HandFanSettings settings) =>
+            Mathf.Abs(Mathf.DeltaAngle(
+                0f, HandFanLayout.GetPose(count - 1, count, settings).LocalRotation.eulerAngles.z));
+
+        /// <summary>
+        /// A hand of two or three lies on exactly the plain baseline radius -
+        /// per the reference, a small hand reads as close to upright, and
+        /// what actually sets it apart from the baseline is the extra room
+        /// <see cref="SpacingFor"/> gives it, never a curve of its own. Read
+        /// straight off the angle the geometry itself implies (asin of x over
+        /// the plain <see cref="HandFanSettings.PivotDistance"/>) rather than
+        /// compared against a second settings object, since there is no
+        /// longer a small-hand radius factor to switch off.
+        /// </summary>
+        [Test]
+        public void A_small_hand_lies_on_the_plain_baseline_radius()
+        {
+            HandFanSettings hand = Hand();
+
+            foreach (int count in new[] { 2, 3 })
+            {
+                CardPose outer = HandFanLayout.GetPose(count - 1, count, hand);
+                float expected = Mathf.Asin(Mathf.Clamp(outer.LocalPosition.x / hand.PivotDistance, -1f, 1f)) * Mathf.Rad2Deg;
+
+                Assert.That(OuterLean(count, hand), Is.EqualTo(expected).Within(0.01f),
+                    "A hand of " + count + " does not lie on the plain baseline radius.");
+            }
+        }
+
+        /// <summary>
+        /// Hearthstone's own large-hand behaviour: more cards means more
+        /// overlap, never a wider fan or a deeper curve. Each of these pairs
+        /// is spaced strictly less generously than the one before it, which
+        /// is the whole difference between seven, eight and ten cards - not
+        /// how far any of them lean.
+        /// </summary>
+        [TestCase(2, 5)]
+        [TestCase(5, 8)]
+        [TestCase(8, 10)]
+        public void A_fuller_hand_spaces_its_cards_less_generously(int fewer, int more)
+        {
+            HandFanSettings hand = Hand();
+
+            Assert.That(HandFanLayout.SpacingFor(more, hand),
+                Is.LessThan(HandFanLayout.SpacingFor(fewer, hand)),
+                "A hand of " + more + " is not spaced any tighter than a hand of " + fewer + ".");
+        }
+
+        /// <summary>
+        /// The hand's total footprint grows a lot while it still has room to
+        /// - two to six cards - and then almost stops growing once it has
+        /// reached <see cref="HandFanSettings.MaxWidth"/>. Seven to ten
+        /// cards must occupy roughly the same width; the only thing an
+        /// eighth, ninth or tenth card can still do is overlap harder.
+        /// </summary>
+        [Test]
+        public void The_hand_s_width_saturates_instead_of_growing_with_every_card()
+        {
+            HandFanSettings hand = Hand();
+
+            float growthWhileRoomy = HandFanLayout.WidthOf(6, hand) - HandFanLayout.WidthOf(2, hand);
+            float growthOnceFull = HandFanLayout.WidthOf(10, hand) - HandFanLayout.WidthOf(7, hand);
+
+            Assert.That(growthWhileRoomy, Is.GreaterThan(1f),
+                "The hand barely widened at all from two cards to six.");
+            Assert.That(growthOnceFull, Is.LessThan(growthWhileRoomy * 0.2f),
+                "The hand kept widening well past six cards instead of saturating.");
+        }
+
+        /// <summary>
+        /// Ten cards overlap far more than five - the visible sign of the
+        /// compression above, stated the way a player would actually read it
+        /// on screen: how much of the card behind is left showing.
+        /// </summary>
+        [Test]
+        public void A_hand_of_ten_overlaps_far_more_than_a_hand_of_five()
+        {
+            HandFanSettings hand = Hand();
+
+            float overlapAtFive = hand.Scale - HandFanLayout.SpacingFor(5, hand);
+            float overlapAtTen = hand.Scale - HandFanLayout.SpacingFor(10, hand);
+
+            Assert.That(overlapAtTen, Is.GreaterThan(overlapAtFive * 1.5f),
+                "A hand of ten does not overlap substantially more than a hand of five.");
+        }
+
+        /// <summary>
+        /// Seven cards and ten cards lean by nearly the same amount: once the
+        /// width has saturated, the outer cards' angle is already set, and a
+        /// few more cards squeezed into the same footprint must not also
+        /// swing the fan open further. A denser hand of seven, not a wider
+        /// semicircle.
+        /// </summary>
+        [Test]
+        public void Seven_to_ten_cards_lean_by_about_the_same_amount()
+        {
+            HandFanSettings hand = Hand();
+
+            float sevenLean = OuterLean(7, hand);
+            float tenLean = OuterLean(10, hand);
+
+            Assert.That(Mathf.Abs(tenLean - sevenLean), Is.LessThan(2f),
+                "A hand of ten leans " + (tenLean - sevenLean).ToString("0.0") +
+                " degrees further than a hand of seven, which is too close to a wider fan.");
+        }
+
+        /// <summary>
+        /// A single card is never touched by any of this: it sits dead centre
+        /// with no lean regardless of how generous or curved a small hand is
+        /// configured to be, because it has nothing to fan against.
+        /// </summary>
+        [Test]
+        public void A_single_card_ignores_the_small_hand_settings()
+        {
+            HandFanSettings hand = Hand();
+            CardPose only = HandFanLayout.GetPose(0, 1, hand);
+
+            Assert.That(only.LocalPosition.x, Is.EqualTo(0f).Within(0.0001f));
+            Assert.That(OuterLean(1, hand), Is.EqualTo(0f).Within(0.01f));
         }
     }
 }

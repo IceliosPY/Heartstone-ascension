@@ -116,6 +116,69 @@ namespace CoH.Tests.EditMode
             Assert.That(StateFingerprint.Of(engine.State), Is.Not.EqualTo(before));
         }
 
+        [Test]
+        public void Otherwise_identical_minions_with_different_keywords_fingerprint_differently()
+        {
+            GameEngine plain = TestFactory.StartedMatch(seed: 23UL);
+            GameEngine hidden = TestFactory.StartedMatch(seed: 23UL);
+
+            Minion plainMinion = TestFactory.PutMinionOnBoard(plain, plain.State.CurrentPlayer);
+            Minion hiddenMinion = TestFactory.PutMinionOnBoard(hidden, hidden.State.CurrentPlayer);
+            plainMinion.Keywords = CardKeywords.None;
+            hiddenMinion.Keywords = CardKeywords.Stealth;
+
+            Assert.That(StateFingerprint.Of(hidden.State), Is.Not.EqualTo(StateFingerprint.Of(plain.State)));
+        }
+
+        [Test]
+        public void Skeletal_rogue_fingerprint_changes_when_camouflage_is_removed()
+        {
+            GameEngine engine = TestFactory.StartedMatch(seed: 29UL);
+            Minion rogue = TestFactory.PutMinionOnBoard(
+                engine, engine.State.CurrentPlayer, TestFactory.SkeletalRogueCardId, ready: true);
+
+            Assert.That(rogue.HasKeyword(CardKeywords.Stealth), Is.True);
+            string camouflaged = StateFingerprint.Of(engine.State);
+
+            rogue.RemoveKeyword(CardKeywords.Stealth);
+
+            Assert.That(StateFingerprint.Of(engine.State), Is.Not.EqualTo(camouflaged));
+        }
+
+        [Test]
+        public void The_same_exact_keyword_state_remains_fingerprint_stable()
+        {
+            GameEngine engine = TestFactory.StartedMatch(seed: 31UL);
+            Minion minion = TestFactory.PutMinionOnBoard(engine, engine.State.CurrentPlayer);
+            minion.Keywords = CardKeywords.Rush | CardKeywords.Taunt;
+
+            string first = StateFingerprint.Of(engine.State);
+
+            Assert.That(StateFingerprint.Of(engine.State), Is.EqualTo(first));
+            Assert.That(StateFingerprint.Of(engine.State), Is.EqualTo(first));
+        }
+
+        [Test]
+        public void Replaying_the_same_stealth_removal_sequence_is_deterministic()
+        {
+            string FingerprintAfterAttack()
+            {
+                GameEngine engine = TestFactory.StartedMatch(seed: 37UL);
+                PlayerId active = engine.State.CurrentPlayer;
+                Minion rogue = TestFactory.PutMinionOnBoard(
+                    engine, active, TestFactory.SkeletalRogueCardId, ready: true);
+                rogue.AddModifier(1, 0);
+                Minion target = TestFactory.PutMinionOnBoard(
+                    engine, active.Opponent, attack: 0, health: 20, ready: true);
+
+                Assert.That(TestFactory.Attack(engine, rogue.Id, target.Id).IsAccepted, Is.True);
+                Assert.That(rogue.HasKeyword(CardKeywords.Stealth), Is.False);
+                return StateFingerprint.Of(engine.State);
+            }
+
+            Assert.That(FingerprintAfterAttack(), Is.EqualTo(FingerprintAfterAttack()));
+        }
+
         /// <summary>
         /// Two matches holding the same cards but having created their entities
         /// in a different order are genuinely different matches: an id is what

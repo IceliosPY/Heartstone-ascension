@@ -31,7 +31,22 @@ namespace CoH.Tests.DataEditMode
             "test_deathrattle_draw",
             "test_summoner",
             "test_buff",
-            "test_aoe"
+            "test_aoe",
+
+            // The Necromancer set. Non-collectible every one of them, which is
+            // exactly why they belong in the catalog and not in a deck: the
+            // hero power summons them by id, so the catalog must know them.
+            "necromancer_skeletal_warrior",
+            "necromancer_skeletal_rogue",
+            "necromancer_crypt_fiend",
+            "necromancer_abomination",
+            "necromancer_choose_your_weapons",
+
+            // Starcaller's first collectible spell.
+            "starcaller_huntress_shot",
+
+            // Starcaller's own hero power.
+            "starcaller_lunar_phase"
         };
 
         [Test]

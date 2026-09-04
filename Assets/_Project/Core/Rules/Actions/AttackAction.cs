@@ -1,3 +1,4 @@
+using CoH.Core.Cards;
 using CoH.Core.Commands;
 using CoH.Core.Events;
 using CoH.Core.Identifiers;
@@ -60,6 +61,12 @@ namespace CoH.Core.Rules.Actions
 
             // The attack is spent the moment it is declared, whatever it kills.
             attacker.AttacksThisTurn++;
+
+            // And stealth is spent with it. Striking is what reveals a hidden
+            // minion, so this happens on declaring the attack rather than on
+            // surviving it: a minion that trades and dies was still visible for
+            // the exchange.
+            attacker.RemoveKeyword(CardKeywords.Stealth);
 
             // Order is a convention, not causality: the two hits are
             // simultaneous, but a list of events has to be in some order, so the

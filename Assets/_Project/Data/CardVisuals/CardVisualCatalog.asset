@@ -573,3 +573,45 @@ MonoBehaviour:
         value: 
     sprite: {fileID: 21300000, guid: ee9552df5d5e7bc4a987a3a173bf9702, type: 3}
     notes: Imported from Card_Inhand_Spell_DropShadow.webp
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 5
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: e35a12f370cd7fd4d809bb703cff08a2, type: 3}
+    notes: Imported from Card_Inhand_HeroPower_Neutral.webp
+  - slot: 1
+    match:
+      constrainType: 1
+      type: 5
+      constrainClass: 0
+      cardClass: 0
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: f28e8e46234ec2d4e89c5c726ecdf438, type: 3}
+    notes: Imported from Card_Inhand_HeroPower_DropShadow.webp
+  - slot: 3
+    match:
+      constrainType: 1
+      type: 1
+      constrainClass: 1
+      cardClass: 1
+      constrainRarity: 0
+      rarity: 0
+      constrainTribe: 0
+      tribe: 0
+      style:
+        value: 
+    sprite: {fileID: 21300000, guid: a43f3d234b2b76041bf5f5031de4da34, type: 3}
+    notes: Authored Necromancer Minion frame

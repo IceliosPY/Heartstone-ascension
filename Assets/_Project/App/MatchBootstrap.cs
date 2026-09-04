@@ -45,6 +45,36 @@ namespace CoH.App
         [Tooltip("Phase 7 keeps every opening card. A mulligan screen comes later.")]
         [SerializeField] private bool autoKeepOpeningHands = true;
 
+        [Header("Heroes")]
+        [Tooltip(
+            "Hero power for seat one. Empty means no hero power, which is how every match " +
+            "behaved before hero powers existed.")]
+        [SerializeField] private string playerOneHeroPower = DefaultDevelopmentHeroPower;
+
+        [Tooltip("Hero power for seat two.")]
+        [SerializeField] private string playerTwoHeroPower = DefaultDevelopmentHeroPowerSeatTwo;
+
+        /// <summary>
+        /// The hero power seat one gets in a development match.
+        ///
+        /// A default for *this scene*, and deliberately nowhere near the rules.
+        /// The engine has no idea which class a seat is; it reads a card id out
+        /// of <see cref="GameConfig"/>, and the only reason that id is the
+        /// Necromancer's today is that this line says so. Changing it, or
+        /// clearing the field in the inspector, is all it takes to play
+        /// something else.
+        /// </summary>
+        public const string DefaultDevelopmentHeroPower = "necromancer_choose_your_weapons";
+
+        /// <summary>
+        /// The hero power seat two gets in a development match - Starcaller's
+        /// Lunar Phase. Exactly the same kind of default as
+        /// <see cref="DefaultDevelopmentHeroPower"/>, and for the same reason:
+        /// nothing in the engine reads "seat two" as meaning Starcaller, only
+        /// this one line does.
+        /// </summary>
+        public const string DefaultDevelopmentHeroPowerSeatTwo = "starcaller_lunar_phase";
+
         private CardCatalog _runtimeCatalog;
         private DeckList _deckOne;
         private DeckList _deckTwo;
@@ -64,7 +94,19 @@ namespace CoH.App
 
         public DeckList DeckTwo => _deckTwo;
 
-        public GameConfig Config => GameConfig.Default;
+        /// <summary>
+        /// The rules constants this match runs on, plus whichever hero powers
+        /// the seats were configured with.
+        ///
+        /// Built here rather than taken from <see cref="GameConfig.Default"/>
+        /// so that the shared default stays a description of the rules and
+        /// never acquires an opinion about who is a Necromancer.
+        /// </summary>
+        public GameConfig Config => GameConfig.Default.WithHeroPowers(
+            HeroPowerId(playerOneHeroPower), HeroPowerId(playerTwoHeroPower));
+
+        private static CardId HeroPowerId(string value) =>
+            string.IsNullOrWhiteSpace(value) ? default : new CardId(value.Trim());
 
         /// <summary>
         /// The mulligans this host settled itself, before anybody could act.
@@ -107,7 +149,7 @@ namespace CoH.App
             _deckOne = playerOneDeck.BuildRuntimeDeckList();
             _deckTwo = playerTwoDeck.BuildRuntimeDeckList();
 
-            LocalGameServer server = new LocalGameServer(GameConfig.Default, _runtimeCatalog, matchSeed);
+            LocalGameServer server = new LocalGameServer(Config, _runtimeCatalog, matchSeed);
 
             session.Initialize(server);
             server.StartMatch(_deckOne, _deckTwo);
@@ -165,7 +207,7 @@ namespace CoH.App
             }
 
             GameEngine engine = GameEngine.FromState(
-                DebugScenarioBuilder.Build(scenario, _runtimeCatalog, GameConfig.Default));
+                DebugScenarioBuilder.Build(scenario, _runtimeCatalog, Config));
 
             AdoptMatch(LocalGameServer.Wrapping(engine));
             return true;

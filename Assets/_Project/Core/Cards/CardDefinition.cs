@@ -33,7 +33,8 @@ namespace CoH.Core.Cards
             Rarity rarity = Rarity.Free,
             Tribe tribe = Tribe.None,
             string text = "",
-            IReadOnlyList<EffectDefinition> effects = null)
+            IReadOnlyList<EffectDefinition> effects = null,
+            CardKeywords keywords = CardKeywords.None)
         {
             if (id.IsNone)
             {
@@ -56,6 +57,7 @@ namespace CoH.Core.Cards
             Rarity = rarity;
             Tribe = tribe;
             Text = text ?? string.Empty;
+            Keywords = keywords;
 
             Effects = effects == null || effects.Count == 0
                 ? NoEffects
@@ -76,6 +78,17 @@ namespace CoH.Core.Cards
 
         /// <summary>True when this card does something beyond being a body.</summary>
         public bool HasEffects => Effects.Count > 0;
+
+        /// <summary>
+        /// The standing abilities printed on the card.
+        ///
+        /// Separate from <see cref="Effects"/> because they are a different
+        /// kind of thing. An effect is something that happens at a moment; a
+        /// keyword is something that is true for as long as the minion is
+        /// there, and is read by rules deciding legality rather than by
+        /// anything that resolves.
+        /// </summary>
+        public CardKeywords Keywords { get; }
 
         public CardId Id { get; }
 

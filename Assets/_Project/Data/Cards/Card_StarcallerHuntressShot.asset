@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512e9c72a07f5d741a056d6bedfd5840, type: 3}
+  m_Name: Card_StarcallerHuntressShot
+  m_EditorClassIdentifier:
+  cardId: starcaller_huntress_shot
+  displayName: Huntress Shot
+  cardType: 2
+  cardClass: 2
+  rarity: 0
+  tribe: 0
+  collectible: 1
+  manaCost: 3
+  attack: 0
+  health: 0
+  keywords: 0
+  effects:
+  - trigger: 1
+    selector: 2
+    targetFilter: 1
+    action: 1
+    amount: 1
+    amountSource: 0
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId:
+    summonCount: 1
+    placement: 0
+  - trigger: 1
+    selector: 1
+    targetFilter: 0
+    action: 7
+    amount: 0
+    amountSource: 1
+    attackDelta: 0
+    healthDelta: 0
+    summonCardId:
+    summonCount: 1
+    placement: 0
+  rulesText: "Deal 1 damage to a minion.\nRestore 1 Mana for each Spell Damage you have."
+  artwork: {fileID: 0}

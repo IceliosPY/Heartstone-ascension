@@ -133,7 +133,14 @@ namespace CoH.Tests.PlayMode
             MoveTo(WhereItsCostIs(card));
             Assert.That(card.IsHovered, Is.True);
 
-            yield return WaitUntil(() => card.transform.position.y > resting.y + 0.2f);
+            // Snapped rather than sampled mid-ease: position and rotation
+            // interpolate together, and a tilted anchor's frame is still
+            // partway through turning at any given partial fraction, which
+            // can leave the card's world Z transiently on the wrong side of
+            // resting.z before the turn catches up. The finished pose is
+            // what this is actually about.
+            card.SnapToPose();
+            yield return null;
 
             Vector3 raised = card.transform.position;
 
@@ -141,9 +148,16 @@ namespace CoH.Tests.PlayMode
                 "A hovered card barely rose out of the hand.");
 
             // And toward the camera, which is what gives it a little perspective
-            // over the rest of the hand.
-            Assert.That(raised.z, Is.LessThan(resting.z),
-                "A hovered card did not come forward at all.");
+            // over the rest of the hand. Distance to the camera, not raw world
+            // Z: the hand anchor is tilted, so a big enough lift carries a
+            // world-Z component of its own through that tilt, and world Z
+            // alone stops being a reliable stand-in for "closer to the
+            // camera" once the lift is large. Distance is not fooled by that.
+            float restingDistance = Vector3.Distance(resting, MatchCamera.transform.position);
+            float raisedDistance = Vector3.Distance(raised, MatchCamera.transform.position);
+
+            Assert.That(raisedDistance, Is.LessThan(restingDistance),
+                "A hovered card did not come any closer to the camera.");
 
             // Whether it is actually in front is a question about draw order,
             // not about depth — which is the whole lesson of the bug this test

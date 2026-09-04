@@ -540,7 +540,7 @@ MonoBehaviour:
     face: 0
     sortingOrder: 130
     x: 154
-    y: 590
+    y: 600
     width: 510
     height: 100
     rotation: 0
@@ -565,7 +565,7 @@ MonoBehaviour:
     face: 0
     sortingOrder: 130
     x: 106
-    y: 585
+    y: 586
     width: 601
     height: 132
     rotation: 0
@@ -724,14 +724,14 @@ MonoBehaviour:
   textStyles:
   - name: AllyTitle
     role: 0
-    renderMode: 1
+    renderMode: 2
     fillColor: {r: 1, g: 1, b: 1, a: 1}
     outlineColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
     outlineWidth: 0.43
     tracking: 0
     lineSpacing: 0
-    minCondense: 0.62
-    stretch: 1.1
+    minCondense: 0.895
+    stretch: 1.46
     taper: 0.24
     curveControlA: {x: 0.33333334, y: -0.0032333334}
     curveControlB: {x: 0.6666667, y: -0.18196666}
@@ -741,15 +741,15 @@ MonoBehaviour:
     renderMode: 1
     fillColor: {r: 1, g: 1, b: 1, a: 1}
     outlineColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
-    outlineWidth: 0.19
-    tracking: 0
+    outlineWidth: 0.384
+    tracking: -17
     lineSpacing: 0
-    minCondense: 0.62
-    stretch: 0.84
+    minCondense: 0.895
+    stretch: 0.97
     taper: 0
-    curveControlA: {x: 0.33333334, y: -0.11451488}
-    curveControlB: {x: 0.6666667, y: -0.12986508}
-    curveEnd: {x: 1, y: 0.005}
+    curveControlA: {x: 0, y: -0.11451488}
+    curveControlB: {x: 1, y: -0.12986508}
+    curveEnd: {x: 2, y: 0.005}
   - name: RulesBody
     role: 1
     renderMode: 0

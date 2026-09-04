@@ -36,8 +36,15 @@ namespace CoH.Data
         [Header("What it does")]
         [SerializeField] private EffectActionKind action = EffectActionKind.DealDamage;
 
-        [Tooltip("Damage dealt, cards drawn, or mana gained, depending on the action.")]
+        [Tooltip("Damage dealt, cards drawn, or mana gained, depending on the action. " +
+                 "Ignored when Amount Source below is not Fixed.")]
         [SerializeField] private int amount = 1;
+
+        [Tooltip(
+            "Where Amount actually comes from. Fixed is the number above, unchanged. Spell " +
+            "Damage reads the controller's current Spell Damage instead, live, at resolution - " +
+            "Huntress Shot's mana restoration is what this exists for.")]
+        [SerializeField] private EffectValueSource amountSource = EffectValueSource.Fixed;
 
         [Header("Modify statistics")]
         [SerializeField] private int attackDelta;
@@ -68,7 +75,8 @@ namespace CoH.Data
                     healthDelta,
                     string.IsNullOrEmpty(summonCardId) ? default : new CardId(summonCardId),
                     summonCount,
-                    placement));
+                    placement,
+                    amountSource));
 
         /// <summary>
         /// Says what is wrong with this effect, in sentences.
@@ -107,6 +115,20 @@ namespace CoH.Data
                     where + ": a minion played from a hand uses Battlecry. OnPlay is for spells.");
             }
 
+            if (trigger == EffectTrigger.HeroPower && cardType != CardType.HeroPower)
+            {
+                problems.Add(
+                    where + ": only a hero power can carry a HeroPower effect, and this is a " +
+                    cardType + ".");
+            }
+
+            if (cardType == CardType.HeroPower && trigger != EffectTrigger.HeroPower)
+            {
+                problems.Add(
+                    where + ": a hero power's effects are its options and must use the HeroPower " +
+                    "trigger. " + trigger + " would never fire.");
+            }
+
             if (selector == SelectorKind.None)
             {
                 problems.Add(where + ": no selector is set, so it would reach nobody.");
@@ -127,7 +149,7 @@ namespace CoH.Data
             switch (action)
             {
                 case EffectActionKind.DealDamage:
-                    if (amount <= 0)
+                    if (amountSource == EffectValueSource.Fixed && amount <= 0)
                     {
                         problems.Add(where + ": DealDamage needs a positive amount (" + amount + ").");
                     }
@@ -171,6 +193,22 @@ namespace CoH.Data
                     if (attackDelta == 0 && healthDelta == 0)
                     {
                         problems.Add(where + ": ModifyStats changes nothing.");
+                    }
+
+                    break;
+
+                case EffectActionKind.GrantSpellDamage:
+                    if (amount <= 0)
+                    {
+                        problems.Add(where + ": GrantSpellDamage needs a positive amount (" + amount + ").");
+                    }
+
+                    break;
+
+                case EffectActionKind.RestoreMana:
+                    if (amountSource == EffectValueSource.Fixed && amount <= 0)
+                    {
+                        problems.Add(where + ": RestoreMana needs a positive amount (" + amount + ").");
                     }
 
                     break;

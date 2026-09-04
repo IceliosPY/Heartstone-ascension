@@ -202,7 +202,8 @@ namespace CoH.Core.Diagnostics
     {
         public ReplayConfig(
             int startingHeroHealth, int maxHandSize, int maxBoardSize, int maxManaCrystals,
-            int deckSize, int startingPlayerHandSize, int secondPlayerHandSize, string secondPlayerExtraCard)
+            int deckSize, int startingPlayerHandSize, int secondPlayerHandSize, string secondPlayerExtraCard,
+            string heroPowerForSeatOne = null, string heroPowerForSeatTwo = null)
         {
             StartingHeroHealth = startingHeroHealth;
             MaxHandSize = maxHandSize;
@@ -212,6 +213,8 @@ namespace CoH.Core.Diagnostics
             StartingPlayerHandSize = startingPlayerHandSize;
             SecondPlayerHandSize = secondPlayerHandSize;
             SecondPlayerExtraCard = secondPlayerExtraCard ?? string.Empty;
+            HeroPowerForSeatOne = heroPowerForSeatOne ?? string.Empty;
+            HeroPowerForSeatTwo = heroPowerForSeatTwo ?? string.Empty;
         }
 
         public int StartingHeroHealth { get; }
@@ -230,6 +233,19 @@ namespace CoH.Core.Diagnostics
 
         public string SecondPlayerExtraCard { get; }
 
+        /// <summary>
+        /// The hero powers each seat played with.
+        ///
+        /// Recorded because a replay has to rebuild the match it was made from.
+        /// Without these a Necromancer's recording would replay as a hero with
+        /// no power at all, and every hero power command in it would be
+        /// refused - which would look like a determinism bug and would not be
+        /// one.
+        /// </summary>
+        public string HeroPowerForSeatOne { get; }
+
+        public string HeroPowerForSeatTwo { get; }
+
         public static ReplayConfig From(GameConfig config)
         {
             if (config == null)
@@ -245,7 +261,9 @@ namespace CoH.Core.Diagnostics
                 config.DeckSize,
                 config.StartingPlayerHandSize,
                 config.SecondPlayerHandSize,
-                config.SecondPlayerExtraCard.IsNone ? string.Empty : config.SecondPlayerExtraCard.Value);
+                config.SecondPlayerExtraCard.IsNone ? string.Empty : config.SecondPlayerExtraCard.Value,
+                config.HeroPowerForSeatOne.IsNone ? string.Empty : config.HeroPowerForSeatOne.Value,
+                config.HeroPowerForSeatTwo.IsNone ? string.Empty : config.HeroPowerForSeatTwo.Value);
         }
 
         public GameConfig ToConfig() => new GameConfig(
@@ -256,7 +274,9 @@ namespace CoH.Core.Diagnostics
             DeckSize,
             StartingPlayerHandSize,
             SecondPlayerHandSize,
-            string.IsNullOrEmpty(SecondPlayerExtraCard) ? default : new CardId(SecondPlayerExtraCard));
+            string.IsNullOrEmpty(SecondPlayerExtraCard) ? default : new CardId(SecondPlayerExtraCard),
+            string.IsNullOrEmpty(HeroPowerForSeatOne) ? default : new CardId(HeroPowerForSeatOne),
+            string.IsNullOrEmpty(HeroPowerForSeatTwo) ? default : new CardId(HeroPowerForSeatTwo));
     }
 
     /// <summary>Version of the replay file format.</summary>

@@ -43,6 +43,8 @@ namespace CoH.Core.Setup
 
             RequireExtraCardIsKnown(state);
 
+            AssignHeroPowers(state);
+
             BuildDeck(state, PlayerId.One, deckForSeatOne);
             BuildDeck(state, PlayerId.Two, deckForSeatTwo);
 
@@ -87,6 +89,47 @@ namespace CoH.Core.Setup
                 // Dealing must never inflict fatigue: a deck shorter than an
                 // opening hand is a deck-building problem, not a game event.
                 DrawSystem.DrawWithoutFatigue(context, player);
+            }
+        }
+
+        /// <summary>
+        /// Gives each hero the power its seat was configured with.
+        ///
+        /// Before any shuffling, because it consumes no randomness and must not
+        /// move what the seed produces: a match set up with hero powers deals
+        /// exactly the same opening hands as the same match set up without
+        /// them.
+        ///
+        /// A configured power the catalog does not know is refused here rather
+        /// than at the moment a player clicks it. Failing at setup names the
+        /// mistake; failing later would look like a broken button.
+        /// </summary>
+        private static void AssignHeroPowers(GameState state)
+        {
+            for (int index = 0; index < state.Players.Count; index++)
+            {
+                Player player = state.Players[index];
+                CardId heroPower = state.Config.HeroPowerFor(player.Id);
+
+                if (heroPower.IsNone)
+                {
+                    continue;
+                }
+
+                if (!state.Catalog.TryGet(heroPower, out CardDefinition definition))
+                {
+                    throw new InvalidOperationException(
+                        "The catalog has no definition for " + player.Id + "'s hero power: " + heroPower);
+                }
+
+                if (definition.Type != CardType.HeroPower)
+                {
+                    throw new InvalidOperationException(
+                        player.Id + "'s hero power " + heroPower + " is a " + definition.Type +
+                        ", not a hero power.");
+                }
+
+                player.Hero.HeroPowerCardId = heroPower;
             }
         }
 

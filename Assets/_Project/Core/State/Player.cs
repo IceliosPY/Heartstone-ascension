@@ -71,6 +71,16 @@ namespace CoH.Core.State
         /// </summary>
         public int TemporaryMana { get; internal set; }
 
+        /// <summary>
+        /// Added to a damaging spell this player casts, for the rest of
+        /// their current turn only. Granted and read through
+        /// <see cref="CoH.Core.Rules.SpellDamageSystem"/> rather than
+        /// written here directly, the same separation <see cref="TemporaryMana"/>
+        /// keeps from <see cref="CoH.Core.Rules.ManaSystem"/>: this class holds
+        /// the number, the system decides when it changes.
+        /// </summary>
+        public int SpellDamageBonus { get; internal set; }
+
         /// <summary>Crystals that will be locked at the start of the next turn.</summary>
         public int OverloadOwed { get; internal set; }
 

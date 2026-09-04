@@ -189,9 +189,27 @@ namespace CoH.Tests.PlayMode
 
             for (int round = 0; round < 6; round++)
             {
+                yield return AdvanceUntilAMinionIsPlayable();
                 yield return PlayOneCardByClicking("round " + round + ", " + _session.State.CurrentPlayer);
                 yield return EndTurn();
             }
+        }
+
+        /// <summary>
+        /// Ends turns until the active player is holding a playable minion.
+        /// A hand can go a turn or two without one - a spell waiting for a
+        /// target that does not exist yet, for one - and this file is only
+        /// about whether the click path still works once one is, not about
+        /// how quickly any particular deck deals one out.
+        /// </summary>
+        private IEnumerator AdvanceUntilAMinionIsPlayable(int maxTurns = 12)
+        {
+            for (int guard = 0; guard < maxTurns && PlayableCardsOfActivePlayer().Count == 0; guard++)
+            {
+                yield return EndTurn();
+            }
+
+            Assert.That(PlayableCardsOfActivePlayer(), Is.Not.Empty, "Nobody ever had a playable minion.");
         }
 
         /// <summary>

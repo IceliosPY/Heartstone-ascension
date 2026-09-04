@@ -113,6 +113,10 @@ namespace CoH.Core.Rules
                     context.Enqueue(new AttackAction(attack.PlayerId, attack.AttackerId, attack.TargetId));
                     break;
 
+                case UseHeroPowerCommand heroPower:
+                    context.Enqueue(new UseHeroPowerAction(heroPower.PlayerId, heroPower.OptionIndex));
+                    break;
+
                 default:
                     throw new NotSupportedException("Unhandled command type: " + command.GetType().Name);
             }
@@ -190,6 +194,49 @@ namespace CoH.Core.Rules
         }
 
         /// <summary>
+        /// Whether this player could use their hero power at all right now,
+        /// before any option has been picked.
+        ///
+        /// This is what the board asks in order to light the button up, and it
+        /// is the same check the command runs. A power the engine would refuse
+        /// can therefore never look usable.
+        /// </summary>
+        public RejectionReason CanUseHeroPower(PlayerId playerId)
+        {
+            if (State.HasEnded)
+            {
+                return RejectionReason.GameAlreadyEnded;
+            }
+
+            return HeroPowerRules.CanActivate(State, playerId, out CardDefinition _);
+        }
+
+        /// <summary>
+        /// The fixed options this player's hero power offers, in authored
+        /// order, or an empty list when they have none.
+        ///
+        /// The presentation builds its menu from this rather than from anything
+        /// it knows about a class, so a hero power with two options or with six
+        /// needs no change on either side.
+        /// </summary>
+        public IReadOnlyList<EffectDefinition> GetHeroPowerOptions(PlayerId playerId)
+        {
+            if (playerId.IsNone)
+            {
+                return Array.Empty<EffectDefinition>();
+            }
+
+            Hero hero = State.GetPlayer(playerId).Hero;
+
+            if (!hero.HasHeroPower || !State.Catalog.TryGet(hero.HeroPowerCardId, out CardDefinition definition))
+            {
+                return Array.Empty<EffectDefinition>();
+            }
+
+            return HeroPowerOptions.Of(definition);
+        }
+
+        /// <summary>
         /// Pushes an internal action through the pipeline.
         ///
         /// Used by tests to build board situations that no command can produce
@@ -242,6 +289,10 @@ namespace CoH.Core.Rules
 
                 case AttackCommand attack:
                     return ValidateAttack(attack);
+
+                case UseHeroPowerCommand heroPower:
+                    return HeroPowerRules.Validate(
+                        State, heroPower.PlayerId, heroPower.OptionIndex, out CardDefinition _);
 
                 default:
                     return RejectionReason.WrongPhase;

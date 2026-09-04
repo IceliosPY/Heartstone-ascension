@@ -27,18 +27,20 @@ namespace CoH.Presentation
 
         [Header("Hover")]
         [Tooltip(
-            "How far a hovered card rises out of the hand. With the cards overlapping, this is " +
-            "what actually reveals one: it has to clear the neighbours standing in front of it.")]
-        [SerializeField] private float hoverLift = 1.3f;
+            "How far a hovered card rises out of the hand, clear above the fan. This is what " +
+            "makes it read as a card being presented rather than merely poking up out of a " +
+            "crowd of neighbours.")]
+        [SerializeField] private float hoverLift = 1.8f;
 
         [Tooltip("How far it comes toward the camera, which is what puts it in front of its neighbours.")]
-        [SerializeField] private float hoverForward = 0.95f;
+        [SerializeField] private float hoverForward = 1f;
 
         [Tooltip(
-            "How much larger a hovered card is than its neighbours. Deliberately modest: what " +
-            "picks a card out of an overlapping hand is rising clear of it and standing in " +
-            "front, not swelling. Past a point more size only takes up more screen.")]
-        [SerializeField] private float hoverScale = 1.12f;
+            "How much larger a hovered card is than its neighbours. Bigger than a small " +
+            "swelling, so a hand card's text, art and stats are actually comfortable to read at " +
+            "a glance, but short of filling the screen - the lift and the approach toward the " +
+            "camera already do most of the work of picking it out.")]
+        [SerializeField] private float hoverScale = 1.2f;
 
         [Tooltip(
             "Extra degrees a hovered card turns to face the camera. The hand lies on a plane " +
@@ -70,6 +72,7 @@ namespace CoH.Presentation
         private Collider _collider;
         private UnityEngine.Rendering.SortingGroup _group;
         private int _handOrder;
+        private bool _keepRestingRotationWhileHovered;
 
         /// <summary>Which card instance in the engine this view stands for.</summary>
         public EntityId EntityId { get; private set; }
@@ -236,6 +239,36 @@ namespace CoH.Presentation
             }
         }
 
+        /// <summary>
+        /// Overrides this specific card's hover response away from the
+        /// hand's own tuned defaults.
+        ///
+        /// A hand card overlaps its neighbours in a fan, so hovering it has
+        /// to rise clear of them and square up to the camera to be read at
+        /// all - that is what <see cref="hoverLift"/>, <see cref="hoverForward"/>
+        /// and the hand's absolute "square to camera" rotation are for. A
+        /// Raise choice card is nothing like that: it already rests exactly
+        /// where the presentation put it, camera-facing, in its own isolated
+        /// slot in a compact row - so hovering it should only need a small
+        /// highlight, and reusing the hand's own geometry is exactly what
+        /// threw a choice card out of its slot and, at large enough lift,
+        /// toward the edge of the screen.
+        ///
+        /// <paramref name="keepRestingRotationWhileHovered"/> is what stops
+        /// <see cref="ApplyPose"/> replacing the resting rotation with the
+        /// hand's absolute facing angle: a choice card's resting rotation is
+        /// already correct (computed to face the camera), so hovering it
+        /// should never touch rotation at all.
+        /// </summary>
+        public void ConfigureHover(
+            float lift, float forward, float scaleMultiplier, bool keepRestingRotationWhileHovered)
+        {
+            hoverLift = lift;
+            hoverForward = forward;
+            hoverScale = scaleMultiplier;
+            _keepRestingRotationWhileHovered = keepRestingRotationWhileHovered;
+        }
+
         /// <summary>Raises the card so it can be read, and brings it in front of its neighbours.</summary>
         public void SetHovered(bool hovered)
         {
@@ -321,6 +354,30 @@ namespace CoH.Presentation
         }
 
         /// <summary>
+        /// Starts this card a short distance below, and a little smaller than,
+        /// the slot the layout just gave it, then lets the ordinary pose easing
+        /// in <see cref="LateUpdate"/> carry it the rest of the way.
+        ///
+        /// For a hand that has just become the one in front of the acting
+        /// player: <see cref="SetRestingPose"/> has already been called with the
+        /// correct target for this turn, so nudging the current transform away
+        /// from that target and doing nothing else is enough to make the very
+        /// next frame ease back up into it - the same smoothing every other
+        /// re-layout already uses, not a second animation system.
+        /// </summary>
+        public void NudgeBelowRestingPose(float drop, float shrinkFactor)
+        {
+            if (_isDragging || !_hasPose)
+            {
+                return;
+            }
+
+            transform.localPosition = _restingPosition + new Vector3(0f, -drop, 0f);
+            transform.localRotation = _restingRotation;
+            transform.localScale = Vector3.one * (_restingScale * shrinkFactor);
+        }
+
+        /// <summary>
         /// Puts the card at its target pose at once, rather than easing there.
         ///
         /// For anything that has to see the finished result without a running
@@ -337,8 +394,12 @@ namespace CoH.Presentation
 
             // A hovered card straightens up out of the fan and turns the rest of
             // the way to face the camera, which is most of what makes it
-            // readable: out of the lean, and out of the keystoning.
-            Quaternion targetRotation = _isHovered
+            // readable: out of the lean, and out of the keystoning. A card
+            // configured to keep its resting rotation (see ConfigureHover)
+            // skips this entirely - it is already facing the camera, and
+            // this absolute angle is meaningless outside the hand's own
+            // fixed fan tilt.
+            Quaternion targetRotation = _isHovered && !_keepRestingRotationWhileHovered
                 ? Quaternion.Euler(hoverFaceOn, 0f, 0f)
                 : _restingRotation;
             float targetScale = _isHovered ? _restingScale * hoverScale : _restingScale;

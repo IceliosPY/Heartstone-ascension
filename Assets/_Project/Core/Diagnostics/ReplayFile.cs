@@ -57,6 +57,8 @@ namespace CoH.Core.Diagnostics
             json.Write("startingPlayerHandSize", record.Config.StartingPlayerHandSize);
             json.Write("secondPlayerHandSize", record.Config.SecondPlayerHandSize);
             json.Write("secondPlayerExtraCard", record.Config.SecondPlayerExtraCard);
+            json.Write("heroPowerForSeatOne", record.Config.HeroPowerForSeatOne);
+            json.Write("heroPowerForSeatTwo", record.Config.HeroPowerForSeatTwo);
             json.EndObject();
 
             WriteDeck(json, "deckOne", record.DeckOne);
@@ -176,6 +178,7 @@ namespace CoH.Core.Diagnostics
             json.Write("boardPosition", entry.Command.BoardPosition);
             json.Write("targetId", entry.Command.TargetId.Value);
             json.Write("attackerId", entry.Command.AttackerId.Value);
+            json.Write("optionIndex", entry.Command.OptionIndex);
 
             json.BeginArray("mulliganSelection");
 
@@ -228,7 +231,8 @@ namespace CoH.Core.Diagnostics
                 command["boardPosition"].AsInt(),
                 new EntityId(command["targetId"].AsInt()),
                 new EntityId(command["attackerId"].AsInt()),
-                mulligan);
+                mulligan,
+                command["optionIndex"].AsInt());
 
             List<string> lines = new List<string>();
             IReadOnlyList<JsonValue> events = raw["events"].Items;
@@ -264,7 +268,9 @@ namespace CoH.Core.Diagnostics
                 raw["deckSize"].AsInt(30),
                 raw["startingPlayerHandSize"].AsInt(3),
                 raw["secondPlayerHandSize"].AsInt(4),
-                raw["secondPlayerExtraCard"].AsString());
+                raw["secondPlayerExtraCard"].AsString(),
+                raw["heroPowerForSeatOne"].AsString(),
+                raw["heroPowerForSeatTwo"].AsString());
         }
 
         private static IReadOnlyList<ReplayMulligan> ReadMulligans(JsonValue raw)

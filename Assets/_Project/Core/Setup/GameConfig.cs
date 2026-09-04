@@ -34,7 +34,9 @@ namespace CoH.Core.Setup
             int deckSize = 30,
             int startingPlayerHandSize = 3,
             int secondPlayerHandSize = 4,
-            CardId secondPlayerExtraCard = default)
+            CardId secondPlayerExtraCard = default,
+            CardId heroPowerForSeatOne = default,
+            CardId heroPowerForSeatTwo = default)
         {
             if (startingHeroHealth <= 0)
             {
@@ -79,7 +81,36 @@ namespace CoH.Core.Setup
             StartingPlayerHandSize = startingPlayerHandSize;
             SecondPlayerHandSize = secondPlayerHandSize;
             SecondPlayerExtraCard = secondPlayerExtraCard.IsNone ? DefaultSecondPlayerExtraCard : secondPlayerExtraCard;
+            HeroPowerForSeatOne = heroPowerForSeatOne;
+            HeroPowerForSeatTwo = heroPowerForSeatTwo;
         }
+
+        /// <summary>
+        /// The hero power each seat brings, or none.
+        ///
+        /// Configuration rather than a rule, for exactly the reason
+        /// <see cref="SecondPlayerExtraCard"/> is: the engine must never need
+        /// to ask which class a seat is. Both default to nothing, so a match
+        /// set up without them behaves precisely as every match did before hero
+        /// powers existed - which is what keeps the existing tests honest.
+        ///
+        /// Who is a Necromancer is therefore decided by whoever builds the
+        /// match, not here.
+        /// </summary>
+        public CardId HeroPowerForSeatOne { get; }
+
+        public CardId HeroPowerForSeatTwo { get; }
+
+        /// <summary>The hero power configured for a seat, or none.</summary>
+        public CardId HeroPowerFor(PlayerId seat) =>
+            seat == PlayerId.Two ? HeroPowerForSeatTwo : HeroPowerForSeatOne;
+
+        /// <summary>This configuration with different hero powers.</summary>
+        public GameConfig WithHeroPowers(CardId seatOne, CardId seatTwo) =>
+            new GameConfig(
+                StartingHeroHealth, MaxHandSize, MaxBoardSize, MaxManaCrystals, DeckSize,
+                StartingPlayerHandSize, SecondPlayerHandSize, SecondPlayerExtraCard,
+                seatOne, seatTwo);
 
         public int StartingHeroHealth { get; }
 

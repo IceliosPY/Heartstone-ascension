@@ -45,6 +45,14 @@ namespace CoH.Presentation
 
         [Tooltip("Gap along the view direction, so overlapping cards stack predictably.")]
         public float DepthStep = 0.035f;
+
+        [Tooltip(
+            "How much extra room a very small hand gets, on top of the usual spacing. Fades away " +
+            "by six cards, where the fan is already wide enough to stand on its own. This is the " +
+            "whole difference for a hand of one or two: comfortably spaced, and close to upright " +
+            "rather than curved - the radius for a small hand is the same baseline as a large one.")]
+        [Range(1f, 1.6f)]
+        public float SmallHandGenerosity = 1.2f;
     }
 
     /// <summary>
@@ -73,6 +81,19 @@ namespace CoH.Presentation
         /// <summary>A card is one unit wide before the hand's scale is applied.</summary>
         private const float CardWidth = 1f;
 
+        /// <summary>A hand at or below this size is "small": it gets extra room to spread out in.</summary>
+        private const float SmallHandSize = 1f;
+
+        /// <summary>The small-hand boost has faded to nothing by here.</summary>
+        private const float MidHandSize = 6f;
+
+        /// <summary>
+        /// 1 at a hand of one, fading to 0 by six cards — where a hand is
+        /// already wide enough that it does not need help standing out.
+        /// </summary>
+        private static float SmallHandTaper(int count) =>
+            Mathf.InverseLerp(MidHandSize, SmallHandSize, count);
+
         /// <summary>
         /// How far apart two neighbours actually end up, once the fan has run
         /// out of room.
@@ -89,7 +110,8 @@ namespace CoH.Presentation
                 return 0f;
             }
 
-            float wanted = CardWidth * settings.Scale * settings.Spacing;
+            float generosity = Mathf.Lerp(1f, settings.SmallHandGenerosity, SmallHandTaper(count));
+            float wanted = CardWidth * settings.Scale * settings.Spacing * generosity;
             float allowed = settings.MaxWidth / (count - 1);
 
             return Mathf.Min(wanted, allowed);
@@ -115,6 +137,13 @@ namespace CoH.Presentation
             // round. A card at the end of a wide fan leans more than one near
             // the middle, and a larger radius flattens all of them at once
             // without moving any of them sideways.
+            //
+            // The radius never varies with the hand's size. A fuller hand
+            // reads as fuller through overlap - SpacingFor tightening once
+            // the hand has reached the width it is allowed - not through a
+            // deeper curve on top of that: once x itself has stopped growing,
+            // holding the radius still is what keeps a hand of ten reading as
+            // a denser hand of seven rather than a wide-open half circle.
             float radius = Mathf.Max(0.01f, settings.PivotDistance);
             float angle = Mathf.Asin(Mathf.Clamp(x / radius, -1f, 1f));
 

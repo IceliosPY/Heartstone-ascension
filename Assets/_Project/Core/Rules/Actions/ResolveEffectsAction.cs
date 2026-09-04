@@ -60,14 +60,16 @@ namespace CoH.Core.Rules.Actions
             // second was going to be.
             SelectorResolver.Resolve(context.State, effect.Selector, _context, _targets);
 
+            int amount = ResolveAmount(context, effect.Action);
+
             switch (effect.Action.Kind)
             {
                 case EffectActionKind.DealDamage:
-                    DealDamage(context, effect.Action.Amount);
+                    DealDamage(context, effect.Trigger, amount);
                     break;
 
                 case EffectActionKind.DrawCards:
-                    DrawCards(context, effect.Action.Amount);
+                    DrawCards(context, amount);
                     break;
 
                 case EffectActionKind.Summon:
@@ -75,25 +77,65 @@ namespace CoH.Core.Rules.Actions
                     break;
 
                 case EffectActionKind.GainTemporaryMana:
-                    GainTemporaryMana(context, effect.Action.Amount);
+                    GainTemporaryMana(context, amount);
                     break;
 
                 case EffectActionKind.ModifyStats:
                     ModifyStats(context, effect.Action);
                     break;
+
+                case EffectActionKind.GrantSpellDamage:
+                    GrantSpellDamage(context, amount);
+                    break;
+
+                case EffectActionKind.RestoreMana:
+                    RestoreMana(context, amount);
+                    break;
             }
         }
+
+        /// <summary>
+        /// What an action's own <see cref="EffectActionDefinition.Amount"/>
+        /// actually resolves to right now. Fixed is the authored number,
+        /// unchanged; every other source reads a live number off the caster
+        /// instead - Huntress Shot's mana restoration is the first card to
+        /// use one, scaling with <see cref="Player.SpellDamageBonus"/>
+        /// rather than an authored constant.
+        /// </summary>
+        private int ResolveAmount(ResolutionContext context, EffectActionDefinition action) =>
+            action.AmountSource switch
+            {
+                EffectValueSource.SpellDamage =>
+                    context.State.GetPlayer(_context.Controller).SpellDamageBonus,
+                _ => action.Amount
+            };
 
         /// <summary>
         /// Every target is hit inside this one action, so a sweep that finishes
         /// several minions produces one grouped death phase afterwards rather
         /// than one death at a time.
+        ///
+        /// Spell Damage is folded in here, once per row, rather than at
+        /// DamageRules itself: <paramref name="trigger"/> tells us whether
+        /// this damage is a spell's own (<see cref="EffectTrigger.OnPlay"/>
+        /// is the trigger a spell's effects resolve under - see
+        /// <c>EffectResolver.TriggerOnPlay</c>) as opposed to a hero power's,
+        /// a battlecry's or a deathrattle's, none of which Spell Damage is
+        /// allowed to touch. A card with two separate DealDamage rows - two
+        /// missiles rather than one bigger hit - gets the bonus applied once
+        /// per row, which is what makes a multi-hit spell scale with Spell
+        /// Damage the way Hearthstone's own does.
         /// </summary>
-        private void DealDamage(ResolutionContext context, int amount)
+        private void DealDamage(ResolutionContext context, EffectTrigger trigger, int amount)
         {
             if (amount <= 0)
             {
                 return;
+            }
+
+            if (trigger == EffectTrigger.OnPlay)
+            {
+                amount = SpellDamageSystem.Apply(context.State.GetPlayer(_context.Controller), amount);
             }
 
             for (int index = 0; index < _targets.Count; index++)
@@ -191,5 +233,24 @@ namespace CoH.Core.Rules.Actions
                 }
             }
         }
+
+        /// <summary>
+        /// A player-level grant, not an entity effect: it belongs to
+        /// whoever controls this effect, not to whatever the Self selector
+        /// resolved as an entity id, so it reads
+        /// <see cref="EffectContext.Controller"/> directly rather than
+        /// walking the resolved target list.
+        /// </summary>
+        private void GrantSpellDamage(ResolutionContext context, int amount) =>
+            SpellDamageSystem.Grant(context, context.State.GetPlayer(_context.Controller), amount);
+
+        /// <summary>
+        /// A player-level effect, exactly like <see cref="GrantSpellDamage"/>
+        /// and for the same reason: mana belongs to the controller, not to
+        /// whatever the selector resolved as an entity, so this reads
+        /// <see cref="EffectContext.Controller"/> directly.
+        /// </summary>
+        private void RestoreMana(ResolutionContext context, int amount) =>
+            ManaSystem.Restore(context, context.State.GetPlayer(_context.Controller), amount);
     }
 }

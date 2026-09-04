@@ -24,18 +24,46 @@ namespace CoH.Tests.PlayMode
         /// <summary>
         /// One minion each, and the first player's is old enough to swing.
         /// Returns with that player acting.
+        ///
+        /// Specifically Test Soldier for both sides, not merely "a minion":
+        /// several tests fed by this drag an attack into a defender and then
+        /// check that the attacker survived it (a two-for-three trade), an
+        /// arithmetic tuned to Test Soldier's own 2/3 and not guaranteed for
+        /// whatever else a hand might hold. Loops rather than assuming one
+        /// attempt each side suffices, since a hand can go a turn or two
+        /// holding nothing else playable first - a spell waiting for a
+        /// target that does not exist yet, for one.
         /// </summary>
         private IEnumerator SetUpATrade()
         {
             yield return LoadMatch();
-            yield return AdvanceUntilSomethingIsPlayable();
 
-            yield return PlayOneMinionDirectly();
-            yield return EndTurn();
+            for (int guard = 0; guard < 40; guard++)
+            {
+                PlayerId a = Session.State.CurrentPlayer;
+                PlayerId b = a.Opponent;
 
-            yield return AdvanceUntilSomethingIsPlayable();
-            yield return PlayOneMinionDirectly();
-            yield return EndTurn();
+                if (Session.State.GetPlayer(a).Board.Count >= 1 &&
+                    Session.State.GetPlayer(b).Board.Count >= 1)
+                {
+                    yield break;
+                }
+
+                if (Session.State.GetPlayer(a).Board.Count < 1)
+                {
+                    CardView soldier = FindCardInHand("test_soldier");
+
+                    if (soldier != null && soldier.IsPlayable)
+                    {
+                        Session.Submit(new PlayCardCommand(a, soldier.EntityId));
+                        yield return Settle();
+                    }
+                }
+
+                yield return EndTurn();
+            }
+
+            Assert.Fail("Both players never reached one Test Soldier each.");
         }
 
         [UnityTest]

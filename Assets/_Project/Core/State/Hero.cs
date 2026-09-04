@@ -19,6 +19,20 @@ namespace CoH.Core.State
             MaxAttacksPerTurn = 1;
         }
 
+        /// <summary>
+        /// The hero power this hero brings to the match, or none.
+        ///
+        /// A card id, like everything else the engine knows about a card: the
+        /// definition behind it lives in the catalog and carries the cost, the
+        /// name and the fixed options. Nothing about a particular class is
+        /// written here - a hero with no power is simply a hero whose id is
+        /// empty, which is every hero the project had before this existed.
+        /// </summary>
+        public CardId HeroPowerCardId { get; internal set; }
+
+        /// <summary>Whether this hero has a power at all.</summary>
+        public bool HasHeroPower => !HeroPowerCardId.IsNone;
+
         public int BaseHealth { get; internal set; }
 
         public int HealthModifier { get; internal set; }

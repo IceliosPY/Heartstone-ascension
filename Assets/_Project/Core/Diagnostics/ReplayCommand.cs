@@ -12,7 +12,8 @@ namespace CoH.Core.Diagnostics
         Mulligan = 1,
         EndTurn = 2,
         PlayCard = 3,
-        Attack = 4
+        Attack = 4,
+        UseHeroPower = 5
     }
 
     /// <summary>
@@ -39,7 +40,8 @@ namespace CoH.Core.Diagnostics
             int boardPosition = 0,
             EntityId targetId = default,
             EntityId attackerId = default,
-            IReadOnlyList<EntityId> mulliganSelection = null)
+            IReadOnlyList<EntityId> mulliganSelection = null,
+            int optionIndex = 0)
         {
             Kind = kind;
             PlayerId = playerId;
@@ -47,6 +49,7 @@ namespace CoH.Core.Diagnostics
             BoardPosition = boardPosition;
             TargetId = targetId;
             AttackerId = attackerId;
+            OptionIndex = optionIndex;
 
             MulliganSelection = mulliganSelection == null
                 ? NoCards
@@ -54,6 +57,9 @@ namespace CoH.Core.Diagnostics
         }
 
         public ReplayCommandKind Kind { get; }
+
+        /// <summary>Which fixed hero power option was chosen. Zero for anything else.</summary>
+        public int OptionIndex { get; }
 
         public PlayerId PlayerId { get; }
 
@@ -90,6 +96,11 @@ namespace CoH.Core.Diagnostics
                         ReplayCommandKind.PlayCard, play.PlayerId,
                         play.CardInstanceId, play.BoardPosition, play.TargetId);
 
+                case UseHeroPowerCommand heroPower:
+                    return new ReplayCommand(
+                        ReplayCommandKind.UseHeroPower, heroPower.PlayerId,
+                        optionIndex: heroPower.OptionIndex);
+
                 case AttackCommand attack:
                     return new ReplayCommand(
                         ReplayCommandKind.Attack, attack.PlayerId,
@@ -119,6 +130,9 @@ namespace CoH.Core.Diagnostics
                 case ReplayCommandKind.Attack:
                     return new AttackCommand(PlayerId, AttackerId, TargetId);
 
+                case ReplayCommandKind.UseHeroPower:
+                    return new UseHeroPowerCommand(PlayerId, OptionIndex);
+
                 default:
                     throw new InvalidOperationException("Replay command kind is not set.");
             }
@@ -134,6 +148,8 @@ namespace CoH.Core.Diagnostics
             ReplayCommandKind.PlayCard =>
                 "P" + PlayerId.Number + " PlayCard card=#" + CardInstanceId.Value +
                 " position=" + BoardPosition,
+            ReplayCommandKind.UseHeroPower =>
+                "P" + PlayerId.Number + " UseHeroPower option=" + OptionIndex,
             ReplayCommandKind.Attack =>
                 "P" + PlayerId.Number + " Attack attacker=#" + AttackerId.Value +
                 " target=#" + TargetId.Value,

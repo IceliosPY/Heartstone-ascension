@@ -26,7 +26,7 @@ namespace CoH.Core.Diagnostics
     public static class StateFingerprint
     {
         /// <summary>Format marker, so an old dump is recognisable as one.</summary>
-        public const string Version = "state-v1";
+        public const string Version = "state-v2";
 
         /// <summary>The exhaustive canonical form. Two identical matches produce identical text.</summary>
         public static string Describe(GameState state)
@@ -82,11 +82,14 @@ namespace CoH.Core.Diagnostics
                 .Append(" temp=").Append(Number(player.TemporaryMana))
                 .Append(" overload=").Append(Number(player.OverloadLocked))
                 .Append('+').Append(Number(player.OverloadOwed))
+                .Append(" spelldmg=").Append(Number(player.SpellDamageBonus))
                 .Append('\n');
 
             text.Append("  fatigue=").Append(Number(player.FatigueCounter))
                 .Append(" turns=").Append(Number(player.TurnsTaken))
                 .Append(" heropower=").Append(Flag(player.HasUsedHeroPowerThisTurn))
+                .Append(" hp=").Append(player.Hero.HeroPowerCardId.IsNone
+                    ? "-" : player.Hero.HeroPowerCardId.Value)
                 .Append(" mulliganed=").Append(Flag(player.HasConfirmedMulligan))
                 .Append('\n');
 
@@ -144,6 +147,7 @@ namespace CoH.Core.Diagnostics
                     .Append('/').Append(Number(minion.BaseHealth))
                     .Append(" mod=").Append(Signed(minion.AttackModifier))
                     .Append('/').Append(Signed(minion.HealthModifier))
+                    .Append(" keywords=").Append(Number((int)minion.Keywords))
                     .Append(" attacks=").Append(Number(minion.AttacksThisTurn))
                     .Append('/').Append(Number(minion.MaxAttacksPerTurn))
                     .Append(" summoned=").Append(Number(minion.SummonedOnTurn))

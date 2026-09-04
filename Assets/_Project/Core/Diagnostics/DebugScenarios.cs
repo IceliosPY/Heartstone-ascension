@@ -26,6 +26,7 @@ namespace CoH.Core.Diagnostics
         public const string TestSummoner = "test_summoner";
         public const string TestBuff = "test_buff";
         public const string TestAoe = "test_aoe";
+        public const string HuntressShot = "starcaller_huntress_shot";
 
         public const string ReadyCombatId = "ready_combat";
         public const string BothSurviveId = "both_survive";
@@ -35,16 +36,22 @@ namespace CoH.Core.Diagnostics
         public const string FatigueId = "fatigue";
         public const string SevenMinionBoardId = "seven_minion_board";
 
+        public const string TwoReadyEachId = "two_ready_each";
+        public const string ThreeReadyEachId = "three_ready_each";
         public const string CoinId = "coin";
         public const string BattlecryTargetId = "battlecry_target";
         public const string DeathrattleId = "deathrattle";
         public const string SummonId = "summon";
         public const string BuffId = "buff";
         public const string AoeId = "aoe";
+        public const string SpellDamageDisplayId = "spell_damage_display";
+        public const string HuntressShotDisplayId = "huntress_shot_display";
 
         private static readonly DebugScenario[] Catalogue =
         {
             ReadyCombat,
+            TwoReadyEach,
+            ThreeReadyEach,
             BothSurvive,
             DoubleDeath,
             HeroLethal,
@@ -56,7 +63,9 @@ namespace CoH.Core.Diagnostics
             Deathrattle,
             Summon,
             Buff,
-            AreaDamage
+            AreaDamage,
+            SpellDamageDisplay,
+            HuntressShotDisplay
         };
 
         /// <summary>Everything on offer, in a fixed order.</summary>
@@ -95,6 +104,24 @@ namespace CoH.Core.Diagnostics
             "One Test Soldier each. Player one is active and free to attack.",
             one: Side(board: new[] { Soldier() }),
             two: Side(board: new[] { Soldier() }),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>Two Test Soldiers each, all four old enough to attack.</summary>
+        public static DebugScenario TwoReadyEach => new DebugScenario(
+            TwoReadyEachId,
+            "Two Test Soldiers each. Player one is active and free to attack with either.",
+            one: Side(board: new[] { Soldier(), Soldier() }),
+            two: Side(board: new[] { Soldier(), Soldier() }),
+            turnNumber: 5,
+            activePlayer: PlayerId.One);
+
+        /// <summary>Three Test Soldiers each, all six old enough to attack.</summary>
+        public static DebugScenario ThreeReadyEach => new DebugScenario(
+            ThreeReadyEachId,
+            "Three Test Soldiers each. Player one is active and free to attack with any.",
+            one: Side(board: new[] { Soldier(), Soldier(), Soldier() }),
+            two: Side(board: new[] { Soldier(), Soldier(), Soldier() }),
             turnNumber: 5,
             activePlayer: PlayerId.One);
 
@@ -231,6 +258,39 @@ namespace CoH.Core.Diagnostics
             two: Side(board: new[] { Soldier(damage: 2), Soldier(damage: 2), Soldier(damage: 2) }),
             turnNumber: 5,
             activePlayer: PlayerId.One);
+
+        /// <summary>
+        /// Player two - the development match's own Starcaller seat - holds
+        /// a damaging spell and has the mana to use Lunar Phase, on their
+        /// own turn. Built for the presentation test proving a hand card's
+        /// own printed damage number updates the instant Spell Damage is
+        /// granted, and reverts the instant it expires - a position that
+        /// would otherwise take several real turns of mana-farming to
+        /// reach.
+        /// </summary>
+        public static DebugScenario SpellDamageDisplay => new DebugScenario(
+            SpellDamageDisplayId,
+            "Player two (Starcaller) holds a damaging spell and can afford Lunar Phase this turn.",
+            one: Side(),
+            two: Side(hand: new[] { TestAoe }),
+            turnNumber: 5,
+            activePlayer: PlayerId.Two);
+
+        /// <summary>
+        /// Player two holds Huntress Shot, with a minion on each side of
+        /// the board to aim it at - one friendly, one enemy - and enough
+        /// mana to cast it and still afford Lunar Phase first. Built for
+        /// the presentation tests: targeting, the printed cost, and the
+        /// generic Spell Damage text display all reached without playing a
+        /// real game up to drawing this specific card.
+        /// </summary>
+        public static DebugScenario HuntressShotDisplay => new DebugScenario(
+            HuntressShotDisplayId,
+            "Player two (Starcaller) holds Huntress Shot with a minion on each side to target.",
+            one: Side(board: new[] { Soldier() }),
+            two: Side(hand: new[] { HuntressShot }, board: new[] { Soldier() }),
+            turnNumber: 5,
+            activePlayer: PlayerId.Two);
 
         // ------------------------------------------------------------------
 

@@ -213,6 +213,24 @@ namespace CoH.Presentation.CardVisuals
 
                 int score = entry.match.Specificity;
 
+                // A class-constrained entry can match two different ways: the
+                // card's own class, or - so a genuine second class can share a
+                // frame with whichever class it is paired with - its second
+                // one. Those are not equally good answers for an ordinary
+                // single-class card, whose second class is never really "set"
+                // so much as defaulted to Neutral: without this, a
+                // Necromancer minion would tie a Neutral-constrained entry
+                // (matched through that default) against its own
+                // Necromancer-constrained entry, and the older entry would
+                // win by nothing more than having been authored first. The
+                // bump only fires for an entry that matched through the
+                // card's actual class, so it changes nothing for a card that
+                // truly does share its second class with an entry's.
+                if (entry.match.constrainClass && entry.match.cardClass == card.Class)
+                {
+                    score += 1;
+                }
+
                 if (score > bestScore)
                 {
                     best = entry;

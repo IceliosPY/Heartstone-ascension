@@ -1,5 +1,7 @@
 using System.Collections;
 using CoH.Core.Events;
+using CoH.Core.Identifiers;
+using CoH.Core.State;
 using UnityEngine;
 
 namespace CoH.Presentation
@@ -15,6 +17,12 @@ namespace CoH.Presentation
     /// </summary>
     public sealed class MatchFlowAnimations : IEventAnimation
     {
+        /// <summary>How far below its slot the newly active hand's cards start.</summary>
+        private const float EntranceDrop = 0.4f;
+
+        /// <summary>How much smaller than their slot the newly active hand's cards start.</summary>
+        private const float EntranceShrink = 0.85f;
+
         private readonly AnimationContext _context;
 
         public MatchFlowAnimations(AnimationContext context)
@@ -49,12 +57,48 @@ namespace CoH.Presentation
             // The board changes sides here, under the banner.
             _context.Presenter.Rebuild();
 
+            // The banner is a small readout, not a curtain: cards changing
+            // sides are visible under it, so the newly active hand gets an
+            // actual settle-in rather than relying on cover that is not
+            // there. The hand that just became inactive is left to Rebuild's
+            // own instant reparent - sliding it across the screen toward the
+            // opponent's side would read as the same cards travelling to
+            // become someone else's, which is exactly the identity confusion
+            // a turn change must not create.
+            PlayHandEntrance(started.PlayerId);
+
             yield return Tweens.Wait(total * 0.36f);
 
             if (hud != null)
             {
                 yield return Tweens.Over(total * 0.36f, Easing.InOutQuad, t => hud.SetBannerAlpha(1f - t));
                 hud.SetBannerAlpha(0f);
+            }
+        }
+
+        /// <summary>
+        /// Nudges every card in the seat's hand a short way below the slot
+        /// Rebuild just gave it, so the ordinary pose easing carries it back
+        /// up into place instead of the hand simply appearing there.
+        /// </summary>
+        private void PlayHandEntrance(PlayerId seat)
+        {
+            GameState state = _context.State;
+            MatchPresenter presenter = _context.Presenter;
+
+            if (state == null || presenter == null || !presenter.IsNear(seat))
+            {
+                return;
+            }
+
+            Player player = state.GetPlayer(seat);
+
+            for (int index = 0; index < player.Hand.Count; index++)
+            {
+                if (presenter.TryGetCardView(player.Hand[index].Id, out CardView view) && view != null)
+                {
+                    view.NudgeBelowRestingPose(EntranceDrop, EntranceShrink);
+                }
             }
         }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
@@ -56,7 +57,11 @@ namespace CoH.Core.Rules
                 return RejectionReason.ZeroAttack;
             }
 
-            if (minion.IsSummoningSick(state.TurnNumber))
+            // Rush does not cure summoning sickness, it narrows what a sick
+            // minion may hit - so a rushing minion passes here and is stopped
+            // later, by the target check, if it aims at the hero. Treating it
+            // as "not sick" instead would let it go face, which is Charge.
+            if (minion.IsSummoningSick(state.TurnNumber) && !minion.HasKeyword(CardKeywords.Rush))
             {
                 return RejectionReason.SummoningSickness;
             }
@@ -77,7 +82,7 @@ namespace CoH.Core.Rules
                 return RejectionReason.InvalidTarget;
             }
 
-            return IsLegalTarget(attacker, target)
+            return IsLegalTarget(state, attacker, target)
                 ? RejectionReason.None
                 : RejectionReason.InvalidTarget;
         }
@@ -103,38 +108,92 @@ namespace CoH.Core.Rules
             for (int index = 0; index < enemy.Board.Count; index++)
             {
                 Minion candidate = enemy.Board[index];
-                if (IsLegalTarget(attacker, candidate))
+                if (IsLegalTarget(state, attacker, candidate))
                 {
                     destination.Add(candidate.Id);
                 }
             }
 
-            if (IsLegalTarget(attacker, enemy.Hero))
+            if (IsLegalTarget(state, attacker, enemy.Hero))
             {
                 destination.Add(enemy.Hero.Id);
             }
         }
 
         /// <summary>
+        /// Whether this player controls anything that forces an attacker to
+        /// come through it.
+        ///
+        /// A taunt minion that cannot itself be attacked - one hidden by
+        /// stealth - does not compel anybody, which is why this asks about
+        /// being attackable rather than only about the keyword.
+        /// </summary>
+        public static bool HasCompellingTaunt(Player defender)
+        {
+            for (int index = 0; index < defender.Board.Count; index++)
+            {
+                if (CompelsAttackers(defender.Board[index]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CompelsAttackers(Minion minion) =>
+            minion.IsInPlay &&
+            !minion.IsPendingDeath &&
+            minion.HasKeyword(CardKeywords.Taunt) &&
+            !minion.HasKeyword(CardKeywords.Stealth);
+
+        /// <summary>
         /// A target is legal when it belongs to the other side and is a
         /// character still in play. Anything else, a card in hand, a card in a
         /// deck, a minion already removed, is not something an attack can reach.
         /// </summary>
-        private static bool IsLegalTarget(Minion attacker, Entity target)
+        private static bool IsLegalTarget(GameState state, Minion attacker, Entity target)
         {
             if (target.Controller == attacker.Controller)
             {
                 return false;
             }
 
+            // Taunt is asked once per attack rather than per candidate, and it
+            // is asked about the defender's whole board: "must I come through
+            // something" is a fact about that side, not about the thing being
+            // pointed at.
+            bool mustGoThroughTaunt =
+                HasCompellingTaunt(state.GetPlayer(attacker.Controller.Opponent));
+
             if (target is Hero hero)
             {
-                return !hero.HasDied;
+                if (hero.HasDied || mustGoThroughTaunt)
+                {
+                    return false;
+                }
+
+                // A minion that has only just arrived may still hit other
+                // minions if it rushes, but never the hero.
+                return !attacker.IsSummoningSick(state.TurnNumber);
             }
 
             if (target is Minion minion)
             {
-                return minion.IsInPlay && !minion.IsPendingDeath;
+                if (!minion.IsInPlay || minion.IsPendingDeath)
+                {
+                    return false;
+                }
+
+                // Stealth hides a minion from the other side's choices. It is
+                // not immunity: nothing here is consulted by damage that never
+                // picked a target.
+                if (minion.HasKeyword(CardKeywords.Stealth))
+                {
+                    return false;
+                }
+
+                return !mustGoThroughTaunt || minion.HasKeyword(CardKeywords.Taunt);
             }
 
             return false;

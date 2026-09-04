@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CoH.Core.Cards;
 using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
@@ -135,14 +136,30 @@ namespace CoH.Core.Rules.Effects
                 Add(destination, enemy.Hero.Id);
             }
 
-            AddBoard(destination, enemy);
+            // The other side's board only. Stealth hides a minion from whoever
+            // does not control it, so it is filtered here and nowhere else -
+            // above, the controller's own board is added whole, because a
+            // player may always point at their own.
+            AddBoard(destination, enemy, hideStealth: true);
         }
 
-        private static void AddBoard(List<EntityId> destination, Player player)
+        private static void AddBoard(List<EntityId> destination, Player player, bool hideStealth = false)
         {
             for (int slot = 0; slot < player.Board.Count; slot++)
             {
-                destination.Add(player.Board[slot].Id);
+                Minion minion = player.Board[slot];
+
+                // Only the list a player chooses from is filtered.
+                // Resolve() above is deliberately untouched: an effect that
+                // names "all enemy minions" never picked anything, so there is
+                // nothing for stealth to hide it from. That is the whole
+                // difference between being hidden and being immune.
+                if (hideStealth && minion.HasKeyword(CardKeywords.Stealth))
+                {
+                    continue;
+                }
+
+                destination.Add(minion.Id);
             }
         }
 

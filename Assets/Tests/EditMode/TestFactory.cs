@@ -91,8 +91,248 @@ namespace CoH.Tests.EditMode
             BuffDefinition(),
             AreaDamageDefinition(),
             TargetedSpellDefinition(),
-            WeaponDefinition()
+            WeaponDefinition(),
+            SkeletalWarriorDefinition(),
+            SkeletalRogueDefinition(),
+            CryptFiendDefinition(),
+            AbominationDefinition(),
+            ChooseYourWeaponsDefinition(),
+            LunarPhaseDefinition(),
+            HeroPowerDamageDefinition(),
+            HuntressShotDefinition()
         };
+
+        // ------------------------------------------------------------------
+        //  Necromancer
+        //
+        //  Written out here rather than loaded from the authored assets,
+        //  because a Core test may never depend on a ScriptableObject. A
+        //  separate data test proves the assets say the same thing, which is
+        //  the only place the two can be compared honestly.
+        // ------------------------------------------------------------------
+
+        public const string SkeletalWarriorCardId = "necromancer_skeletal_warrior";
+        public const string SkeletalRogueCardId = "necromancer_skeletal_rogue";
+        public const string CryptFiendCardId = "necromancer_crypt_fiend";
+        public const string AbominationCardId = "necromancer_abomination";
+        public const string ChooseYourWeaponsCardId = "necromancer_choose_your_weapons";
+
+        /// <summary>The four servants, in the order the hero power offers them.</summary>
+        public static readonly string[] ServantCardIds =
+        {
+            SkeletalWarriorCardId,
+            SkeletalRogueCardId,
+            CryptFiendCardId,
+            AbominationCardId
+        };
+
+        public static CardDefinition SkeletalWarriorDefinition() =>
+            new CardDefinition(
+                new CardId(SkeletalWarriorCardId), "Skeletal Warrior", CardType.Minion,
+                manaCost: 1, attack: 1, health: 1, collectible: false,
+                cardClass: CardClass.Necromancer, text: "Rush",
+                keywords: CardKeywords.Rush);
+
+        public static CardDefinition SkeletalRogueDefinition() =>
+            new CardDefinition(
+                new CardId(SkeletalRogueCardId), "Skeletal Rogue", CardType.Minion,
+                manaCost: 1, attack: 0, health: 1, collectible: false,
+                cardClass: CardClass.Necromancer, text: "Camouflage",
+                keywords: CardKeywords.Stealth);
+
+        public static CardDefinition CryptFiendDefinition() =>
+            new CardDefinition(
+                new CardId(CryptFiendCardId), "Crypt Fiend", CardType.Minion,
+                manaCost: 1, attack: 1, health: 2, collectible: false,
+                cardClass: CardClass.Necromancer);
+
+        public static CardDefinition AbominationDefinition() =>
+            new CardDefinition(
+                new CardId(AbominationCardId), "Abomination", CardType.Minion,
+                manaCost: 1, attack: 0, health: 2, collectible: false,
+                cardClass: CardClass.Necromancer, text: "Provocation",
+                keywords: CardKeywords.Taunt);
+
+        /// <summary>
+        /// The hero power, whose four options are four rows of data. Nothing
+        /// about "four" is written anywhere but here.
+        /// </summary>
+        public static CardDefinition ChooseYourWeaponsDefinition()
+        {
+            EffectDefinition[] options = new EffectDefinition[ServantCardIds.Length];
+
+            for (int index = 0; index < ServantCardIds.Length; index++)
+            {
+                options[index] = new EffectDefinition(
+                    EffectTrigger.HeroPower,
+                    new SelectorDefinition(SelectorKind.Self),
+                    new EffectActionDefinition(
+                        EffectActionKind.Summon,
+                        summonCardId: new CardId(ServantCardIds[index]),
+                        summonCount: 1));
+            }
+
+            return new CardDefinition(
+                new CardId(ChooseYourWeaponsCardId), "Raise", CardType.HeroPower,
+                manaCost: 1, collectible: false, cardClass: CardClass.Necromancer,
+                text: "Choose a minion to summon.", effects: options);
+        }
+
+        /// <summary>A configuration where seat one is a Necromancer and seat two is not.</summary>
+        public static GameConfig NecromancerConfig() =>
+            GameConfig.Default.WithHeroPowers(new CardId(ChooseYourWeaponsCardId), default);
+
+        /// <summary>
+        /// A started match in which player one has the Necromancer hero power,
+        /// it is their turn, and they can afford to use it.
+        /// </summary>
+        public static GameEngine NecromancerMatch(ulong seed = 1UL, int mana = 10)
+        {
+            GameEngine engine = StartedMatch(seed, config: NecromancerConfig());
+
+            // Seed one starts on some seeds and not others; the tests want the
+            // Necromancer holding the turn, not a particular shuffle.
+            if (engine.State.CurrentPlayer != PlayerId.One)
+            {
+                EndTurn(engine);
+            }
+
+            GiveMana(engine, PlayerId.One, mana);
+            return engine;
+        }
+
+        /// <summary>Uses the active player's hero power, choosing one option by index.</summary>
+        public static CommandResult UseHeroPower(GameEngine engine, int optionIndex) =>
+            engine.Execute(new UseHeroPowerCommand(engine.State.CurrentPlayer, optionIndex));
+
+        // ------------------------------------------------------------------
+        //  Starcaller
+        //
+        //  Written out here for the same reason as the Necromancer's own
+        //  cards above: a Core test may never depend on a ScriptableObject.
+        //  The development match seats Starcaller on seat two specifically
+        //  (see MatchBootstrap.DefaultDevelopmentHeroPowerSeatTwo), which
+        //  DevelopmentConfig/DevelopmentMatch below mirror; StarcallerConfig/
+        //  StarcallerMatch put it on seat two as well, for tests that only
+        //  care about Lunar Phase in isolation but still want the mechanism
+        //  exercised on the seat it is actually configured on.
+        // ------------------------------------------------------------------
+
+        public const string LunarPhaseCardId = "starcaller_lunar_phase";
+
+        /// <summary>
+        /// The hero power: a single option, granting Spell Damage rather
+        /// than summoning. Nothing about "one option" is special-cased
+        /// anywhere the option list is read - see
+        /// <see cref="StarcallerHeroPowerTests"/>.
+        /// </summary>
+        public static CardDefinition LunarPhaseDefinition() =>
+            new CardDefinition(
+                new CardId(LunarPhaseCardId), "Lunar Phase", CardType.HeroPower,
+                manaCost: 2, collectible: false, cardClass: CardClass.Starcaller,
+                text: "Spell Damage +1 this turn.",
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.HeroPower,
+                        new SelectorDefinition(SelectorKind.Self),
+                        new EffectActionDefinition(EffectActionKind.GrantSpellDamage, amount: 1))
+                });
+
+        /// <summary>
+        /// A hero power that deals damage directly - not part of any real
+        /// class today, only here to prove Spell Damage does not leak into
+        /// hero power damage merely because both are "damage" (see
+        /// <see cref="EffectTrigger.HeroPower"/> vs <see cref="EffectTrigger.OnPlay"/>).
+        /// </summary>
+        public static CardDefinition HeroPowerDamageDefinition(int amount = 2) =>
+            new CardDefinition(
+                new CardId("test_hero_power_damage"), "Test Hero Power Damage", CardType.HeroPower,
+                manaCost: 1, collectible: false,
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.HeroPower,
+                        new SelectorDefinition(SelectorKind.EnemyHero),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount))
+                });
+
+        public const string HuntressShotCardId = "starcaller_huntress_shot";
+
+        /// <summary>
+        /// Starcaller's first collectible spell: deal 1 to a chosen minion,
+        /// then restore mana equal to the caster's current Spell Damage.
+        /// Two OnPlay rows rather than one, because the two numbers answer
+        /// different questions and are computed differently - the first
+        /// grows with Spell Damage through <see cref="ResolveEffectsAction.DealDamage"/>'s
+        /// own existing rule, the second reads Spell Damage directly as its
+        /// own amount through <see cref="EffectValueSource.SpellDamage"/>,
+        /// and neither derives from the other or from the damage actually
+        /// dealt.
+        /// </summary>
+        public static CardDefinition HuntressShotDefinition() =>
+            new CardDefinition(
+                new CardId(HuntressShotCardId), "Huntress Shot", CardType.Spell,
+                manaCost: 3, collectible: true, cardClass: CardClass.Starcaller,
+                text: "Deal 1 damage to a minion.\nRestore 1 Mana for each Spell Damage you have.",
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.AnyMinion),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount: 1)),
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.Self),
+                        new EffectActionDefinition(
+                            EffectActionKind.RestoreMana, amountSource: EffectValueSource.SpellDamage))
+                });
+
+        /// <summary>A configuration where seat two is a Starcaller and seat one is not.</summary>
+        public static GameConfig StarcallerConfig() =>
+            GameConfig.Default.WithHeroPowers(default, new CardId(LunarPhaseCardId));
+
+        /// <summary>
+        /// The real development match configuration: seat one Necromancer's
+        /// Raise, seat two Starcaller's Lunar Phase - exactly
+        /// <c>MatchBootstrap</c>'s own defaults for Match.unity, reproduced
+        /// here so a Core test can prove the pairing without touching Unity.
+        /// </summary>
+        public static GameConfig DevelopmentConfig() =>
+            GameConfig.Default.WithHeroPowers(
+                new CardId(ChooseYourWeaponsCardId), new CardId(LunarPhaseCardId));
+
+        /// <summary>
+        /// A started match in which player two has the Starcaller hero
+        /// power, it is their turn, and they can afford to use it.
+        /// </summary>
+        public static GameEngine StarcallerMatch(ulong seed = 1UL, int mana = 10)
+        {
+            GameEngine engine = StartedMatch(seed, config: StarcallerConfig());
+
+            if (engine.State.CurrentPlayer != PlayerId.Two)
+            {
+                EndTurn(engine);
+            }
+
+            GiveMana(engine, PlayerId.Two, mana);
+            return engine;
+        }
+
+        /// <summary>The real development match: player one is the active Necromancer, both seats fully mana'd.</summary>
+        public static GameEngine DevelopmentMatch(ulong seed = 1UL, int mana = 10)
+        {
+            GameEngine engine = StartedMatch(seed, config: DevelopmentConfig());
+
+            if (engine.State.CurrentPlayer != PlayerId.One)
+            {
+                EndTurn(engine);
+            }
+
+            GiveMana(engine, PlayerId.One, mana);
+            GiveMana(engine, PlayerId.Two, mana);
+            return engine;
+        }
 
         /// <summary>
         /// A spell that must be aimed at a minion. With no minion in play there
