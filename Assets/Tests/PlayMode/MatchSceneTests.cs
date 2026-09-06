@@ -1,6 +1,8 @@
 using System.Collections;
 using CoH.App;
+using CoH.Core.Cards;
 using CoH.Core.Commands;
+using CoH.Core.Effects;
 using CoH.Core.Identifiers;
 using CoH.Core.State;
 using CoH.Presentation;
@@ -151,6 +153,38 @@ namespace CoH.Tests.PlayMode
             yield return null;
         }
 
+        /// <summary>
+        /// The first minion in hand this player can actually afford and play
+        /// with no target chosen. The hand can also hold a spell wanting a
+        /// target of its own (Ice Barrage, for one), or something too
+        /// expensive yet, and this test is specifically about a minion
+        /// arriving on the board through a plain, unconditional play.
+        /// </summary>
+        private static CardInstance FirstPlayableMinionWithNoTarget(GameSession session, Player player)
+        {
+            foreach (CardInstance card in player.Hand)
+            {
+                if (session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                {
+                    continue;
+                }
+
+                if (session.GetPlayTargetRequirement(player.Id, card.Id) == PlayTargetRequirement.Required)
+                {
+                    continue;
+                }
+
+                if (session.CanPlayCard(player.Id, card.Id) != RejectionReason.None)
+                {
+                    continue;
+                }
+
+                return card;
+            }
+
+            return null;
+        }
+
         [UnityTest]
         public IEnumerator Playing_a_card_puts_a_minion_view_on_the_board()
         {
@@ -171,8 +205,9 @@ namespace CoH.Tests.PlayMode
 
             PlayerId active = session.State.CurrentPlayer;
             Player player = session.State.GetPlayer(active);
-            CardInstance card = player.Hand[0];
+            CardInstance card = FirstPlayableMinionWithNoTarget(session, player);
 
+            Assert.That(card, Is.Not.Null, "No plain, immediately playable minion in hand.");
             Assert.That(session.Submit(new PlayCardCommand(active, card.Id)), Is.True);
 
             while (session.IsBusy)
@@ -180,7 +215,11 @@ namespace CoH.Tests.PlayMode
                 yield return null;
             }
 
-            Assert.That(player.Board.Count, Is.EqualTo(1));
+            // At least one: a plain body adds exactly one, but a battlecry
+            // that also summons (Test Summoner, for one) legitimately adds
+            // more - this test is about a view existing for what got played,
+            // not about counting how many minions answered it.
+            Assert.That(player.Board.Count, Is.GreaterThan(0));
 
             Minion summoned = player.Board[0];
             Assert.That(presenter.TryGetMinionView(summoned.Id, out MinionView view), Is.True,

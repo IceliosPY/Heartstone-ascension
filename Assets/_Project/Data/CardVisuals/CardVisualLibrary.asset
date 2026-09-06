@@ -77,3 +77,10 @@ MonoBehaviour:
     expansion: 
     overrides:
       properties: []
+  - cardId: necromancer_ice_barrage
+    artwork: {fileID: 21300000, guid: da6a0897c995bc7428f6a6af9307ae6e, type: 3}
+    style:
+      value: 
+    expansion: 
+    overrides:
+      properties: []

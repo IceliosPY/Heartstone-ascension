@@ -250,6 +250,15 @@ namespace CoH.Tests.PlayMode
             yield return LoadMatch();
             yield return HandAtRest();
 
+            // A frame for anything that dirties the text - a card dimmed
+            // because it cannot be played yet is the usual one, and an
+            // opening hand can now hold a spell wanting a target nothing on
+            // an empty board can supply - and a frame for the warp to be put
+            // back. Every_title_in_hand_is_still_curved... waits on exactly
+            // this for the same reason.
+            yield return null;
+            yield return null;
+
             List<CardView> hand = Hand();
 
             TextMeshPro shortest = null;

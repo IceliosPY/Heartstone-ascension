@@ -17,13 +17,16 @@ namespace CoH.Core.Rules
     {
         /// <summary>
         /// Checks a minion is in a state to attack anything at all, ignoring
-        /// the target.
+        /// the target and ignoring Freeze.
         ///
-        /// Freeze would slot in here as one more check. There is no frozen flag
-        /// on Minion today and none was added: a field nothing can ever set
-        /// would be dead weight, and the mechanic belongs to a later phase.
+        /// Kept apart from <see cref="ValidateAttacker"/> so that
+        /// <see cref="FreezeRules"/> can ask "would this minion have a real
+        /// attack opportunity right now" without asking about Freeze itself -
+        /// the question Freeze's own Case A/B split needs answered, and one
+        /// that would recurse into Freeze if it were asked through the
+        /// method that checks Freeze.
         /// </summary>
-        public static RejectionReason ValidateAttacker(
+        public static RejectionReason ValidateAttackerIgnoringFreeze(
             GameState state,
             PlayerId playerId,
             EntityId attackerId,
@@ -72,6 +75,33 @@ namespace CoH.Core.Rules
             }
 
             attacker = minion;
+            return RejectionReason.None;
+        }
+
+        /// <summary>
+        /// Everything <see cref="ValidateAttackerIgnoringFreeze"/> checks,
+        /// plus Freeze itself. The one place a command or a highlight asks
+        /// whether a minion may attack at all.
+        /// </summary>
+        public static RejectionReason ValidateAttacker(
+            GameState state,
+            PlayerId playerId,
+            EntityId attackerId,
+            out Minion attacker)
+        {
+            RejectionReason reason = ValidateAttackerIgnoringFreeze(state, playerId, attackerId, out attacker);
+
+            if (reason != RejectionReason.None)
+            {
+                return reason;
+            }
+
+            if (attacker.IsFrozen)
+            {
+                attacker = null;
+                return RejectionReason.Frozen;
+            }
+
             return RejectionReason.None;
         }
 

@@ -547,7 +547,7 @@ MonoBehaviour:
     fill: 0
     maskSlot: 0
     textStyle: SpellTitle
-    fontSize: 11
+    fontSize: 0.685
     fontSizeMin: 0.55
     bold: 1
     alignment: 0

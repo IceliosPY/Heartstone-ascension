@@ -74,6 +74,7 @@ namespace CoH.Core.Diagnostics
                 .Append('/').Append(Number(hero.MaxAttacksPerTurn))
                 .Append(" doomed=").Append(Flag(hero.IsMarkedForDestruction))
                 .Append(" died=").Append(Flag(hero.HasDied))
+                .Append(" frozen=").Append(FrozenUntil(hero.FrozenUntilTurn))
                 .Append(" ts=").Append(Number(hero.Timestamp))
                 .Append('\n');
 
@@ -151,6 +152,7 @@ namespace CoH.Core.Diagnostics
                     .Append(" attacks=").Append(Number(minion.AttacksThisTurn))
                     .Append('/').Append(Number(minion.MaxAttacksPerTurn))
                     .Append(" summoned=").Append(Number(minion.SummonedOnTurn))
+                    .Append(" frozen=").Append(FrozenUntil(minion.FrozenUntilTurn))
                     .Append(" zone=").Append(minion.Zone)
                     .Append(" doomed=").Append(Flag(minion.IsMarkedForDestruction))
                     .Append(" owner=").Append(Seat(minion.Owner))
@@ -212,5 +214,14 @@ namespace CoH.Core.Diagnostics
             (value >= 0 ? "+" : string.Empty) + value.ToString(CultureInfo.InvariantCulture);
 
         private static string Flag(bool value) => value ? "1" : "0";
+
+        /// <summary>
+        /// "-" when not Frozen, otherwise the turn it thaws at the end of.
+        /// Distinguishing two different expirations matters exactly as much
+        /// as distinguishing Frozen from not: a replay that reaches the same
+        /// boolean by two different routes has still diverged.
+        /// </summary>
+        private static string FrozenUntil(int? frozenUntilTurn) =>
+            frozenUntilTurn.HasValue ? Number(frozenUntilTurn.Value) : "-";
     }
 }

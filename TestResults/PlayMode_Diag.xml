@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Failed(Child)" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1,6526186">
+  <test-suite type="TestSuite" id="1244" name="Conquest of Hearthstone" fullname="Conquest of Hearthstone" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.652619" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1237" name="CoH.Tests.PlayMode.dll" fullname="D:/Unity/ConquestOfHearthstone/Library/ScriptAssemblies/CoH.Tests.PlayMode.dll" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.637726" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38668" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1238" name="CoH" fullname="CoH" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.633595" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1239" name="Tests" fullname="CoH.Tests" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.629395" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1240" name="PlayMode" fullname="CoH.Tests.PlayMode" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.625681" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1233" name="TitleWarpTests" fullname="CoH.Tests.PlayMode.TitleWarpTests" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:44Z" duration="1.621767" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1236" name="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" methodname="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="523660095" result="Failed" start-time="2026-09-06 17:20:42Z" end-time="2026-09-06 17:20:43Z" duration="1.007579" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  The title "Ice Barrage" was not set at the size its recipe chose: 1 against a ceiling of 11.
+  Expected: greater than or equal to 10.4499998f
+  But was:  1.0f
+]]></message>
+                  <stack-trace><![CDATA[at CoH.Tests.PlayMode.TitleWarpTests+<A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny>d__6.MoveNext () [0x00288] in D:\Unity\ConquestOfHearthstone\Assets\Tests\PlayMode\TitleWarpTests.cs:308
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@dfdbd02f5918\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[DIAG shortest='Ice Barrage' fontSize=1 fontSizeMax=11 fontSizeMin=0,55 autoSize=True rect=(x:-0.36, y:-0.06, width:0.71, height:0.13) sizeDelta=(0.71, 0.13) activeInHierarchy=True isTextObjectScaleStatic=False havePropertiesChanged=False
+]]></output>
+              </test-case>
+              <test-case id="1235" name="A_title_stays_curved_when_its_card_is_dimmed" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_title_stays_curved_when_its_card_is_dimmed" methodname="A_title_stays_curved_when_its_card_is_dimmed" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="337908541" result="Passed" start-time="2026-09-06 17:20:43Z" end-time="2026-09-06 17:20:43Z" duration="0.295199" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1234" name="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" fullname="CoH.Tests.PlayMode.TitleWarpTests.Every_title_in_hand_is_still_curved_once_the_cards_have_settled" methodname="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="1910074938" result="Passed" start-time="2026-09-06 17:20:43Z" end-time="2026-09-06 17:20:44Z" duration="0.302297" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Titles curved on the table:
+  "Ice Barrage" on table 0,0302 vs flat 0,0141
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+  "Test Scribe" on table 0,0455 vs flat 0,0074
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+
+Saving results to: C:/Users/Utilisateur/AppData/LocalLow/Icelios/Conquest of Hearthstone\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

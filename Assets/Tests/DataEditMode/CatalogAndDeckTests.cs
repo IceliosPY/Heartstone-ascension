@@ -42,6 +42,9 @@ namespace CoH.Tests.DataEditMode
             "necromancer_abomination",
             "necromancer_choose_your_weapons",
 
+            // Necromancer's second collectible spell.
+            "necromancer_ice_barrage",
+
             // Starcaller's first collectible spell.
             "starcaller_huntress_shot",
 

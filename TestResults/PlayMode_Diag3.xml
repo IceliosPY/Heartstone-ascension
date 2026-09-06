@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1,2412921">
+  <test-suite type="TestSuite" id="1244" name="Conquest of Hearthstone" fullname="Conquest of Hearthstone" runstate="Runnable" testcasecount="212" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.241292" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1237" name="CoH.Tests.PlayMode.dll" fullname="D:/Unity/ConquestOfHearthstone/Library/ScriptAssemblies/CoH.Tests.PlayMode.dll" runstate="Runnable" testcasecount="212" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.230664" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="29964" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1238" name="CoH" fullname="CoH" runstate="Runnable" testcasecount="212" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.226646" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1239" name="Tests" fullname="CoH.Tests" runstate="Runnable" testcasecount="212" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.223492" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1240" name="PlayMode" fullname="CoH.Tests.PlayMode" runstate="Runnable" testcasecount="212" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.221070" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1233" name="TitleWarpTests" fullname="CoH.Tests.PlayMode.TitleWarpTests" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="1.217872" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1236" name="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" methodname="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="1061132715" result="Passed" start-time="2026-09-06 17:23:42Z" end-time="2026-09-06 17:23:43Z" duration="0.783149" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[DIAG card='Ice Barrage' warped=True labelNull=False fontSize=0,685 fontSizeMax=0,685 fontSizeMin=0,55 autoSize=True rect=(x:-0.36, y:-0.06, width:0.71, height:0.13) localScale=(1.00, 1.00, 1.00)
+DIAG card='Test Sharpshooter' warped=True labelNull=False fontSize=0,685 fontSizeMax=0,685 fontSizeMin=0,55 autoSize=True rect=(x:-0.42, y:-0.08, width:0.84, height:0.17) localScale=(1.00, 1.00, 1.00)
+DIAG card='Test Scribe' warped=True labelNull=False fontSize=0,685 fontSizeMax=0,685 fontSizeMin=0,55 autoSize=True rect=(x:-0.42, y:-0.08, width:0.84, height:0.17) localScale=(1.00, 1.00, 1.00)
+DIAG card='Test Sharpshooter' warped=True labelNull=False fontSize=0,685 fontSizeMax=0,685 fontSizeMin=0,55 autoSize=True rect=(x:-0.42, y:-0.08, width:0.84, height:0.17) localScale=(1.00, 1.00, 1.00)
+]]></output>
+              </test-case>
+              <test-case id="1235" name="A_title_stays_curved_when_its_card_is_dimmed" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_title_stays_curved_when_its_card_is_dimmed" methodname="A_title_stays_curved_when_its_card_is_dimmed" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="2072000483" result="Passed" start-time="2026-09-06 17:23:43Z" end-time="2026-09-06 17:23:43Z" duration="0.216075" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1234" name="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" fullname="CoH.Tests.PlayMode.TitleWarpTests.Every_title_in_hand_is_still_curved_once_the_cards_have_settled" methodname="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="970773955" result="Passed" start-time="2026-09-06 17:23:43Z" end-time="2026-09-06 17:23:43Z" duration="0.205823" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Titles curved on the table:
+  "Ice Barrage" on table 0,0156 vs flat 0,0096
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+  "Test Scribe" on table 0,0455 vs flat 0,0074
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+
+Saving results to: C:/Users/Utilisateur/AppData/LocalLow/Icelios/Conquest of Hearthstone\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

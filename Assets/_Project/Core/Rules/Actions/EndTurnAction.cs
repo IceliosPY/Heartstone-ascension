@@ -33,6 +33,11 @@ namespace CoH.Core.Rules.Actions
             Player player = context.State.GetPlayer(_playerId);
             SpellDamageSystem.ExpireAtEndOfTurn(context, player);
 
+            // A character Frozen for exactly this turn thaws now, explicitly -
+            // not merely by ceasing to be read as Frozen once the turn number
+            // moves on.
+            FreezeRules.ThawAtEndOfTurn(context, player);
+
             // Extension point (Phase 11): end-of-turn triggers are queued here,
             // before the next turn starts.
 

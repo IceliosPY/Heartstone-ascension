@@ -74,6 +74,17 @@ namespace CoH.Core.State
         /// <summary>Down but not yet processed by a death phase.</summary>
         public bool IsPendingDeath => !HasDied && (IsMarkedForDestruction || CurrentHealth <= 0);
 
+        /// <summary>
+        /// The controller's turn during which this hero must lose its next
+        /// attack opportunity, or null when it is not Frozen. Heroes cannot
+        /// attack yet, so this is inert today; it exists so the mechanic
+        /// does not have to be retrofitted onto heroes later. See
+        /// <see cref="Minion.FrozenUntilTurn"/> for how it is used.
+        /// </summary>
+        public int? FrozenUntilTurn { get; internal set; }
+
+        public bool IsFrozen => FrozenUntilTurn.HasValue;
+
         public override string ToString() =>
             "Hero " + Id + " (" + CurrentHealth + " hp, " + Armor + " armor)";
     }

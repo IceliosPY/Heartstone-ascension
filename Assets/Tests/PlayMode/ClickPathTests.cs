@@ -138,7 +138,11 @@ namespace CoH.Tests.PlayMode
 
             yield return Settle();
 
-            Assert.That(_session.State.GetPlayer(acting).Board.Count, Is.EqualTo(before + 1),
+            // At least one: a plain body adds exactly one, but a battlecry that
+            // summons besides (Test Summoner, for one) legitimately adds more,
+            // and this file is about the click routing working, not about
+            // counting which particular card answered it.
+            Assert.That(_session.State.GetPlayer(acting).Board.Count, Is.GreaterThan(before),
                 who + ": clicking the card then the board summoned nothing." +
                 " The second click landed on " + _input.LastHit + ", which has to carry" +
                 " a BoardDropZone marked as the near side for the play to go through.");

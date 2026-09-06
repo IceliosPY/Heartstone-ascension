@@ -1,0 +1,1780 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="212" result="Failed(Child)" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-06 17:06:51Z" end-time="2026-09-06 17:08:01Z" duration="69,6285231">
+  <test-suite type="TestSuite" id="1244" name="Conquest of Hearthstone" fullname="Conquest of Hearthstone" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:06:51Z" end-time="2026-09-06 17:08:01Z" duration="69.628523" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1237" name="CoH.Tests.PlayMode.dll" fullname="D:/Unity/ConquestOfHearthstone/Library/ScriptAssemblies/CoH.Tests.PlayMode.dll" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:08:01Z" duration="69.617301" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="22096" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1238" name="CoH" fullname="CoH" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:08:01Z" duration="69.614062" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1239" name="Tests" fullname="CoH.Tests" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:08:01Z" duration="69.611820" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1240" name="PlayMode" fullname="CoH.Tests.PlayMode" runstate="Runnable" testcasecount="212" result="Failed" site="Child" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:08:01Z" duration="69.607783" total="212" passed="209" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="AnimationPrimitiveTests" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.036240" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="A_real_duration_tween_does_yield" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.A_real_duration_tween_does_yield" methodname="A_real_duration_tween_does_yield" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="2003685893" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.008567" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="A_shake_returns_the_transform_to_where_it_started" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.A_shake_returns_the_transform_to_where_it_started" methodname="A_shake_returns_the_transform_to_where_it_started" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="193834243" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.005703" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="A_zero_duration_tween_finishes_without_yielding" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.A_zero_duration_tween_finishes_without_yielding" methodname="A_zero_duration_tween_finishes_without_yielding" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="2079196890" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.004951" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="A_zero_wait_finishes_without_yielding" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.A_zero_wait_finishes_without_yielding" methodname="A_zero_wait_finishes_without_yielding" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="117556202" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.000372" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="Every_easing_starts_at_zero_and_ends_at_one" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.Every_easing_starts_at_zero_and_ends_at_one" methodname="Every_easing_starts_at_zero_and_ends_at_one" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="81130615" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.000434" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="OutBack_overshoots_before_it_settles" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.OutBack_overshoots_before_it_settles" methodname="OutBack_overshoots_before_it_settles" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="1363942990" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.000178" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="OutQuad_covers_most_of_the_distance_early" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.OutQuad_covers_most_of_the_distance_early" methodname="OutQuad_covers_most_of_the_distance_early" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="547709128" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.000205" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="Pulse_rises_and_falls" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.Pulse_rises_and_falls" methodname="Pulse_rises_and_falls" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="106601304" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.000753" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="Timings_scale_with_speed_and_collapse_when_instant" fullname="CoH.Tests.PlayMode.AnimationPrimitiveTests.Timings_scale_with_speed_and_collapse_when_instant" methodname="Timings_scale_with_speed_and_collapse_when_instant" classname="CoH.Tests.PlayMode.AnimationPrimitiveTests" runstate="Runnable" seed="983711719" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:52Z" duration="0.001150" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="AttackTargetingTests" fullname="CoH.Tests.PlayMode.AttackTargetingTests" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:55Z" duration="2.958700" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1013" name="A_minion_summoned_this_turn_cannot_be_aimed" fullname="CoH.Tests.PlayMode.AttackTargetingTests.A_minion_summoned_this_turn_cannot_be_aimed" methodname="A_minion_summoned_this_turn_cannot_be_aimed" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="51709600" result="Passed" start-time="2026-09-06 17:06:52Z" end-time="2026-09-06 17:06:53Z" duration="0.960584" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="A_minion_that_has_attacked_waits_for_its_next_turn" fullname="CoH.Tests.PlayMode.AttackTargetingTests.A_minion_that_has_attacked_waits_for_its_next_turn" methodname="A_minion_that_has_attacked_waits_for_its_next_turn" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="1192094823" result="Passed" start-time="2026-09-06 17:06:53Z" end-time="2026-09-06 17:06:53Z" duration="0.400765" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="A_ready_minion_starts_targeting_and_shows_the_engines_targets" fullname="CoH.Tests.PlayMode.AttackTargetingTests.A_ready_minion_starts_targeting_and_shows_the_engines_targets" methodname="A_ready_minion_starts_targeting_and_shows_the_engines_targets" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="1215334798" result="Passed" start-time="2026-09-06 17:06:53Z" end-time="2026-09-06 17:06:53Z" duration="0.336721" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="Releasing_on_a_friendly_character_cancels" fullname="CoH.Tests.PlayMode.AttackTargetingTests.Releasing_on_a_friendly_character_cancels" methodname="Releasing_on_a_friendly_character_cancels" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="54743883" result="Passed" start-time="2026-09-06 17:06:53Z" end-time="2026-09-06 17:06:54Z" duration="0.308327" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="Releasing_on_an_enemy_minion_attacks_it" fullname="CoH.Tests.PlayMode.AttackTargetingTests.Releasing_on_an_enemy_minion_attacks_it" methodname="Releasing_on_an_enemy_minion_attacks_it" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="1277286802" result="Passed" start-time="2026-09-06 17:06:54Z" end-time="2026-09-06 17:06:54Z" duration="0.311021" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="Releasing_on_nothing_cancels_and_costs_the_attack_nothing" fullname="CoH.Tests.PlayMode.AttackTargetingTests.Releasing_on_nothing_cancels_and_costs_the_attack_nothing" methodname="Releasing_on_nothing_cancels_and_costs_the_attack_nothing" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="1510073291" result="Passed" start-time="2026-09-06 17:06:54Z" end-time="2026-09-06 17:06:54Z" duration="0.328602" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="Releasing_on_the_enemy_hero_attacks_it" fullname="CoH.Tests.PlayMode.AttackTargetingTests.Releasing_on_the_enemy_hero_attacks_it" methodname="Releasing_on_the_enemy_hero_attacks_it" classname="CoH.Tests.PlayMode.AttackTargetingTests" runstate="Runnable" seed="920743711" result="Passed" start-time="2026-09-06 17:06:54Z" end-time="2026-09-06 17:06:55Z" duration="0.309904" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1019" name="BoardDropResolverTests" fullname="CoH.Tests.PlayMode.BoardDropResolverTests" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.004143" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1025" name="A_held_open_slot_pushes_its_neighbours_apart" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.A_held_open_slot_pushes_its_neighbours_apart" methodname="A_held_open_slot_pushes_its_neighbours_apart" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="870827363" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000667" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="An_empty_board_always_takes_the_first_slot" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.An_empty_board_always_takes_the_first_slot" methodname="An_empty_board_always_takes_the_first_slot" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="1691801375" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000259" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="Every_slot_of_a_full_row_can_be_pointed_at" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.Every_slot_of_a_full_row_can_be_pointed_at" methodname="Every_slot_of_a_full_row_can_be_pointed_at" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="1649231187" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000412" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="Pointing_between_two_minions_inserts_between_them" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.Pointing_between_two_minions_inserts_between_them" methodname="Pointing_between_two_minions_inserts_between_them" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="347432680" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000270" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="Pointing_left_of_everything_inserts_at_the_far_left" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.Pointing_left_of_everything_inserts_at_the_far_left" methodname="Pointing_left_of_everything_inserts_at_the_far_left" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="437882713" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000117" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="Pointing_right_of_everything_appends" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.Pointing_right_of_everything_appends" methodname="Pointing_right_of_everything_appends" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="428203606" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000100" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="With_no_gap_the_row_is_laid_out_normally" fullname="CoH.Tests.PlayMode.BoardDropResolverTests.With_no_gap_the_row_is_laid_out_normally" methodname="With_no_gap_the_row_is_laid_out_normally" classname="CoH.Tests.PlayMode.BoardDropResolverTests" runstate="Runnable" seed="475125984" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.000409" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1027" name="CardCompositionTests" fullname="CoH.Tests.PlayMode.CardCompositionTests" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:56Z" duration="1.064680" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1030" name="A_card_can_be_turned_over_and_back" fullname="CoH.Tests.PlayMode.CardCompositionTests.A_card_can_be_turned_over_and_back" methodname="A_card_can_be_turned_over_and_back" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" seed="245583519" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.207999" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="Every_card_in_a_real_hand_composes_completely" fullname="CoH.Tests.PlayMode.CardCompositionTests.Every_card_in_a_real_hand_composes_completely" methodname="Every_card_in_a_real_hand_composes_completely" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" seed="66473258" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.211083" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="One_card_view_becomes_three_different_cards_without_a_second_prefab" fullname="CoH.Tests.PlayMode.CardCompositionTests.One_card_view_becomes_three_different_cards_without_a_second_prefab" methodname="One_card_view_becomes_three_different_cards_without_a_second_prefab" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" seed="33878473" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.214080" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1029" name="Rarity_changes_only_the_layers_rarity_should_change" fullname="CoH.Tests.PlayMode.CardCompositionTests.Rarity_changes_only_the_layers_rarity_should_change" methodname="Rarity_changes_only_the_layers_rarity_should_change" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" seed="1722994327" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:55Z" duration="0.214012" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="Re_binding_the_same_card_with_new_numbers_keeps_the_same_pictures" fullname="CoH.Tests.PlayMode.CardCompositionTests.Re_binding_the_same_card_with_new_numbers_keeps_the_same_pictures" methodname="Re_binding_the_same_card_with_new_numbers_keeps_the_same_pictures" classname="CoH.Tests.PlayMode.CardCompositionTests" runstate="Runnable" seed="411881050" result="Passed" start-time="2026-09-06 17:06:55Z" end-time="2026-09-06 17:06:56Z" duration="0.214955" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1033" name="CardInteractionTests" fullname="CoH.Tests.PlayMode.CardInteractionTests" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-09-06 17:06:56Z" end-time="2026-09-06 17:07:00Z" duration="4.106497" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1043" name="A_card_is_summoned_into_the_slot_that_was_shown" fullname="CoH.Tests.PlayMode.CardInteractionTests.A_card_is_summoned_into_the_slot_that_was_shown" methodname="A_card_is_summoned_into_the_slot_that_was_shown" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="402805672" result="Passed" start-time="2026-09-06 17:06:56Z" end-time="2026-09-06 17:06:56Z" duration="0.335912" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1044" name="A_full_board_offers_no_drop_and_the_card_stays_in_hand" fullname="CoH.Tests.PlayMode.CardInteractionTests.A_full_board_offers_no_drop_and_the_card_stays_in_hand" methodname="A_full_board_offers_no_drop_and_the_card_stays_in_hand" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1891768414" result="Passed" start-time="2026-09-06 17:06:56Z" end-time="2026-09-06 17:06:56Z" duration="0.447256" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="An_unplayable_card_can_still_be_hovered_and_read" fullname="CoH.Tests.PlayMode.CardInteractionTests.An_unplayable_card_can_still_be_hovered_and_read" methodname="An_unplayable_card_can_still_be_hovered_and_read" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1974734594" result="Passed" start-time="2026-09-06 17:06:56Z" end-time="2026-09-06 17:06:57Z" duration="0.212638" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="An_unplayable_card_cannot_be_picked_up_and_sends_no_command" fullname="CoH.Tests.PlayMode.CardInteractionTests.An_unplayable_card_cannot_be_picked_up_and_sends_no_command" methodname="An_unplayable_card_cannot_be_picked_up_and_sends_no_command" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="49599035" result="Passed" start-time="2026-09-06 17:06:57Z" end-time="2026-09-06 17:06:57Z" duration="0.215553" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="Dropping_a_card_away_from_the_board_returns_it_to_the_hand" fullname="CoH.Tests.PlayMode.CardInteractionTests.Dropping_a_card_away_from_the_board_returns_it_to_the_hand" methodname="Dropping_a_card_away_from_the_board_returns_it_to_the_hand" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1562902657" result="Passed" start-time="2026-09-06 17:06:57Z" end-time="2026-09-06 17:06:57Z" duration="0.580378" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="Dropping_a_card_on_the_board_plays_it_exactly_once" fullname="CoH.Tests.PlayMode.CardInteractionTests.Dropping_a_card_on_the_board_plays_it_exactly_once" methodname="Dropping_a_card_on_the_board_plays_it_exactly_once" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="268461409" result="Passed" start-time="2026-09-06 17:06:57Z" end-time="2026-09-06 17:06:58Z" duration="0.261633" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="Hovering_a_card_raises_it_and_leaving_puts_it_back" fullname="CoH.Tests.PlayMode.CardInteractionTests.Hovering_a_card_raises_it_and_leaving_puts_it_back" methodname="Hovering_a_card_raises_it_and_leaving_puts_it_back" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1222261079" result="Passed" start-time="2026-09-06 17:06:58Z" end-time="2026-09-06 17:06:58Z" duration="0.409577" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="Hovering_many_times_leaves_the_card_where_it_started" fullname="CoH.Tests.PlayMode.CardInteractionTests.Hovering_many_times_leaves_the_card_where_it_started" methodname="Hovering_many_times_leaves_the_card_where_it_started" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1757296521" result="Passed" start-time="2026-09-06 17:06:58Z" end-time="2026-09-06 17:06:59Z" duration="0.797430" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="One_release_never_plays_two_cards" fullname="CoH.Tests.PlayMode.CardInteractionTests.One_release_never_plays_two_cards" methodname="One_release_never_plays_two_cards" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="1008464588" result="Passed" start-time="2026-09-06 17:06:59Z" end-time="2026-09-06 17:06:59Z" duration="0.264168" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="Picking_a_card_up_takes_it_out_of_the_hand_and_it_follows_the_pointer" fullname="CoH.Tests.PlayMode.CardInteractionTests.Picking_a_card_up_takes_it_out_of_the_hand_and_it_follows_the_pointer" methodname="Picking_a_card_up_takes_it_out_of_the_hand_and_it_follows_the_pointer" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="235860103" result="Passed" start-time="2026-09-06 17:06:59Z" end-time="2026-09-06 17:06:59Z" duration="0.245221" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="The_drop_slot_follows_the_pointer_across_the_row" fullname="CoH.Tests.PlayMode.CardInteractionTests.The_drop_slot_follows_the_pointer_across_the_row" methodname="The_drop_slot_follows_the_pointer_across_the_row" classname="CoH.Tests.PlayMode.CardInteractionTests" runstate="Runnable" seed="2099246181" result="Passed" start-time="2026-09-06 17:06:59Z" end-time="2026-09-06 17:07:00Z" duration="0.333655" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1045" name="ClickPathTests" fullname="CoH.Tests.PlayMode.ClickPathTests" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2026-09-06 17:07:00Z" end-time="2026-09-06 17:07:02Z" duration="2.028125" total="5" passed="4" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1046" name="A_card_is_played_by_clicking_it_then_the_board" fullname="CoH.Tests.PlayMode.ClickPathTests.A_card_is_played_by_clicking_it_then_the_board" methodname="A_card_is_played_by_clicking_it_then_the_board" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" seed="572480424" result="Passed" start-time="2026-09-06 17:07:00Z" end-time="2026-09-06 17:07:00Z" duration="0.312578" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="A_full_hand_does_not_stop_a_card_being_played" fullname="CoH.Tests.PlayMode.ClickPathTests.A_full_hand_does_not_stop_a_card_being_played" methodname="A_full_hand_does_not_stop_a_card_being_played" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" seed="1815429302" result="Passed" start-time="2026-09-06 17:07:00Z" end-time="2026-09-06 17:07:01Z" duration="0.840877" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="Cards_stay_clickable_across_many_turn_changes" fullname="CoH.Tests.PlayMode.ClickPathTests.Cards_stay_clickable_across_many_turn_changes" methodname="Cards_stay_clickable_across_many_turn_changes" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" seed="653040375" result="Failed" start-time="2026-09-06 17:07:01Z" end-time="2026-09-06 17:07:01Z" duration="0.447906" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  round 5, P1: clicking the card then the board summoned nothing. The second click landed on BoardDropZone EntityId.None (NearDropZone) at 12,08, None EntityId.None (Board) at 12,58, which has to carry a BoardDropZone marked as the near side for the play to go through.
+  Expected: 4
+  But was:  6
+]]></message>
+                  <stack-trace><![CDATA[at CoH.Tests.PlayMode.ClickPathTests+<PlayOneCardByClicking>d__12.MoveNext () [0x0018c] in D:\Unity\ConquestOfHearthstone\Assets\Tests\PlayMode\ClickPathTests.cs:141
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@dfdbd02f5918\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1049" name="Every_component_in_the_scene_resolves_to_a_script" fullname="CoH.Tests.PlayMode.ClickPathTests.Every_component_in_the_scene_resolves_to_a_script" methodname="Every_component_in_the_scene_resolves_to_a_script" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" seed="173811983" result="Passed" start-time="2026-09-06 17:07:01Z" end-time="2026-09-06 17:07:01Z" duration="0.209791" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="The_board_has_a_near_drop_zone_and_a_far_one" fullname="CoH.Tests.PlayMode.ClickPathTests.The_board_has_a_near_drop_zone_and_a_far_one" methodname="The_board_has_a_near_drop_zone_and_a_far_one" classname="CoH.Tests.PlayMode.ClickPathTests" runstate="Runnable" seed="433653809" result="Passed" start-time="2026-09-06 17:07:01Z" end-time="2026-09-06 17:07:02Z" duration="0.214715" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1051" name="DebugToolingTests" fullname="CoH.Tests.PlayMode.DebugToolingTests" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-06 17:07:02Z" end-time="2026-09-06 17:07:04Z" duration="2.582810" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1054" name="A_normal_session_records_itself_without_being_asked" fullname="CoH.Tests.PlayMode.DebugToolingTests.A_normal_session_records_itself_without_being_asked" methodname="A_normal_session_records_itself_without_being_asked" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="687820845" result="Passed" start-time="2026-09-06 17:07:02Z" end-time="2026-09-06 17:07:02Z" duration="0.260047" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="A_session_started_from_a_scenario_records_which_one" fullname="CoH.Tests.PlayMode.DebugToolingTests.A_session_started_from_a_scenario_records_which_one" methodname="A_session_started_from_a_scenario_records_which_one" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1767162591" result="Passed" start-time="2026-09-06 17:07:02Z" end-time="2026-09-06 17:07:02Z" duration="0.234820" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1060" name="A_visual_replay_goes_through_the_session_and_the_queue" fullname="CoH.Tests.PlayMode.DebugToolingTests.A_visual_replay_goes_through_the_session_and_the_queue" methodname="A_visual_replay_goes_through_the_session_and_the_queue" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="327281679" result="Passed" start-time="2026-09-06 17:07:02Z" end-time="2026-09-06 17:07:02Z" duration="0.246459" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1061" name="A_visual_replay_hands_the_input_back_when_it_finishes" fullname="CoH.Tests.PlayMode.DebugToolingTests.A_visual_replay_hands_the_input_back_when_it_finishes" methodname="A_visual_replay_hands_the_input_back_when_it_finishes" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="775629334" result="Passed" start-time="2026-09-06 17:07:02Z" end-time="2026-09-06 17:07:03Z" duration="0.242542" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="Exporting_a_replay_writes_a_file_that_reads_back" fullname="CoH.Tests.PlayMode.DebugToolingTests.Exporting_a_replay_writes_a_file_that_reads_back" methodname="Exporting_a_replay_writes_a_file_that_reads_back" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1900382490" result="Passed" start-time="2026-09-06 17:07:03Z" end-time="2026-09-06 17:07:03Z" duration="0.289945" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Replay exported to C:/Users/Utilisateur/AppData/LocalLow/Icelios/Conquest of Hearthstone\Debug\Replays\match-20260906-170703.cohreplay.json
+]]></output>
+              </test-case>
+              <test-case id="1057" name="Loading_a_scenario_puts_it_on_the_board_and_leaves_the_game_playable" fullname="CoH.Tests.PlayMode.DebugToolingTests.Loading_a_scenario_puts_it_on_the_board_and_leaves_the_game_playable" methodname="Loading_a_scenario_puts_it_on_the_board_and_leaves_the_game_playable" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1650258632" result="Passed" start-time="2026-09-06 17:07:03Z" end-time="2026-09-06 17:07:03Z" duration="0.230959" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="The_current_session_verifies_as_deterministic" fullname="CoH.Tests.PlayMode.DebugToolingTests.The_current_session_verifies_as_deterministic" methodname="The_current_session_verifies_as_deterministic" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1452462088" result="Passed" start-time="2026-09-06 17:07:03Z" end-time="2026-09-06 17:07:04Z" duration="0.300672" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="The_debug_panel_opens_and_closes_and_starts_closed" fullname="CoH.Tests.PlayMode.DebugToolingTests.The_debug_panel_opens_and_closes_and_starts_closed" methodname="The_debug_panel_opens_and_closes_and_starts_closed" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1538388610" result="Passed" start-time="2026-09-06 17:07:04Z" end-time="2026-09-06 17:07:04Z" duration="0.248131" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="The_double_death_scenario_really_kills_both_on_screen" fullname="CoH.Tests.PlayMode.DebugToolingTests.The_double_death_scenario_really_kills_both_on_screen" methodname="The_double_death_scenario_really_kills_both_on_screen" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="1746132735" result="Passed" start-time="2026-09-06 17:07:04Z" end-time="2026-09-06 17:07:04Z" duration="0.236454" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="The_panel_can_be_refreshed_at_any_point_of_a_match" fullname="CoH.Tests.PlayMode.DebugToolingTests.The_panel_can_be_refreshed_at_any_point_of_a_match" methodname="The_panel_can_be_refreshed_at_any_point_of_a_match" classname="CoH.Tests.PlayMode.DebugToolingTests" runstate="Runnable" seed="2050511814" result="Passed" start-time="2026-09-06 17:07:04Z" end-time="2026-09-06 17:07:04Z" duration="0.289239" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1062" name="EffectPresentationTests" fullname="CoH.Tests.PlayMode.EffectPresentationTests" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-06 17:07:04Z" end-time="2026-09-06 17:07:07Z" duration="2.566075" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1068" name="A_buff_shows_the_new_numbers_on_the_minion" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_buff_shows_the_new_numbers_on_the_minion" methodname="A_buff_shows_the_new_numbers_on_the_minion" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="1513315884" result="Passed" start-time="2026-09-06 17:07:04Z" end-time="2026-09-06 17:07:05Z" duration="0.328350" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="A_deathrattle_draws_and_the_draw_is_animated" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_deathrattle_draws_and_the_draw_is_animated" methodname="A_deathrattle_draws_and_the_draw_is_animated" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="418006925" result="Passed" start-time="2026-09-06 17:07:05Z" end-time="2026-09-06 17:07:05Z" duration="0.328768" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="A_session_using_effects_verifies_as_deterministic" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_session_using_effects_verifies_as_deterministic" methodname="A_session_using_effects_verifies_as_deterministic" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="1825176243" result="Passed" start-time="2026-09-06 17:07:05Z" end-time="2026-09-06 17:07:05Z" duration="0.325517" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1067" name="A_summoning_battlecry_puts_real_minions_on_the_board" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_summoning_battlecry_puts_real_minions_on_the_board" methodname="A_summoning_battlecry_puts_real_minions_on_the_board" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="1258197154" result="Passed" start-time="2026-09-06 17:07:05Z" end-time="2026-09-06 17:07:06Z" duration="0.309760" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="A_sweep_damages_every_enemy_minion_and_the_views_end_up_correct" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_sweep_damages_every_enemy_minion_and_the_views_end_up_correct" methodname="A_sweep_damages_every_enemy_minion_and_the_views_end_up_correct" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="165302253" result="Passed" start-time="2026-09-06 17:07:06Z" end-time="2026-09-06 17:07:06Z" duration="0.316208" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1063" name="A_targeted_card_asks_for_a_target_and_highlights_the_legal_ones" fullname="CoH.Tests.PlayMode.EffectPresentationTests.A_targeted_card_asks_for_a_target_and_highlights_the_legal_ones" methodname="A_targeted_card_asks_for_a_target_and_highlights_the_legal_ones" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="176496225" result="Passed" start-time="2026-09-06 17:07:06Z" end-time="2026-09-06 17:07:06Z" duration="0.316319" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="Releasing_on_a_legal_target_plays_the_card_and_its_battlecry_lands" fullname="CoH.Tests.PlayMode.EffectPresentationTests.Releasing_on_a_legal_target_plays_the_card_and_its_battlecry_lands" methodname="Releasing_on_a_legal_target_plays_the_card_and_its_battlecry_lands" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="717876963" result="Passed" start-time="2026-09-06 17:07:06Z" end-time="2026-09-06 17:07:07Z" duration="0.334110" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="Releasing_somewhere_illegal_cancels_and_leaves_the_card_in_hand" fullname="CoH.Tests.PlayMode.EffectPresentationTests.Releasing_somewhere_illegal_cancels_and_leaves_the_card_in_hand" methodname="Releasing_somewhere_illegal_cancels_and_leaves_the_card_in_hand" classname="CoH.Tests.PlayMode.EffectPresentationTests" runstate="Runnable" seed="112776196" result="Passed" start-time="2026-09-06 17:07:07Z" end-time="2026-09-06 17:07:07Z" duration="0.302466" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1071" name="HandLayoutTests" fullname="CoH.Tests.PlayMode.HandLayoutTests" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-06 17:07:07Z" end-time="2026-09-06 17:07:10Z" duration="2.755487" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1074" name="A_player_switch_never_reuses_a_view_as_the_other_seats_card" fullname="CoH.Tests.PlayMode.HandLayoutTests.A_player_switch_never_reuses_a_view_as_the_other_seats_card" methodname="A_player_switch_never_reuses_a_view_as_the_other_seats_card" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="1541774927" result="Passed" start-time="2026-09-06 17:07:07Z" end-time="2026-09-06 17:07:07Z" duration="0.392977" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="Cancelling_a_drag_returns_the_card_to_its_own_slot" fullname="CoH.Tests.PlayMode.HandLayoutTests.Cancelling_a_drag_returns_the_card_to_its_own_slot" methodname="Cancelling_a_drag_returns_the_card_to_its_own_slot" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="1362005578" result="Passed" start-time="2026-09-06 17:07:07Z" end-time="2026-09-06 17:07:08Z" duration="0.548404" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="Drawing_a_card_does_not_recreate_the_hand_it_was_drawn_into" fullname="CoH.Tests.PlayMode.HandLayoutTests.Drawing_a_card_does_not_recreate_the_hand_it_was_drawn_into" methodname="Drawing_a_card_does_not_recreate_the_hand_it_was_drawn_into" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="2036452807" result="Passed" start-time="2026-09-06 17:07:08Z" end-time="2026-09-06 17:07:08Z" duration="0.444544" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="Nudging_a_card_below_its_slot_settles_back_into_the_slot" fullname="CoH.Tests.PlayMode.HandLayoutTests.Nudging_a_card_below_its_slot_settles_back_into_the_slot" methodname="Nudging_a_card_below_its_slot_settles_back_into_the_slot" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="2125153815" result="Passed" start-time="2026-09-06 17:07:08Z" end-time="2026-09-06 17:07:09Z" duration="0.447028" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="Playing_a_card_does_not_recreate_the_views_left_behind" fullname="CoH.Tests.PlayMode.HandLayoutTests.Playing_a_card_does_not_recreate_the_views_left_behind" methodname="Playing_a_card_does_not_recreate_the_views_left_behind" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="1987280883" result="Passed" start-time="2026-09-06 17:07:09Z" end-time="2026-09-06 17:07:09Z" duration="0.490976" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="Switching_back_restores_the_same_views_for_the_cards_still_in_hand" fullname="CoH.Tests.PlayMode.HandLayoutTests.Switching_back_restores_the_same_views_for_the_cards_still_in_hand" methodname="Switching_back_restores_the_same_views_for_the_cards_still_in_hand" classname="CoH.Tests.PlayMode.HandLayoutTests" runstate="Runnable" seed="1262678122" result="Passed" start-time="2026-09-06 17:07:09Z" end-time="2026-09-06 17:07:10Z" duration="0.429582" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1078" name="HandReadabilityTests" fullname="CoH.Tests.PlayMode.HandReadabilityTests" classname="CoH.Tests.PlayMode.HandReadabilityTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:10Z" duration="0.634288" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1081" name="A_card_read_and_put_down_returns_to_the_pose_it_left" fullname="CoH.Tests.PlayMode.HandReadabilityTests.A_card_read_and_put_down_returns_to_the_pose_it_left" methodname="A_card_read_and_put_down_returns_to_the_pose_it_left" classname="CoH.Tests.PlayMode.HandReadabilityTests" runstate="Runnable" seed="1237869006" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:10Z" duration="0.213090" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="Reading_a_card_makes_it_bigger_without_pushing_it_off_screen" fullname="CoH.Tests.PlayMode.HandReadabilityTests.Reading_a_card_makes_it_bigger_without_pushing_it_off_screen" methodname="Reading_a_card_makes_it_bigger_without_pushing_it_off_screen" classname="CoH.Tests.PlayMode.HandReadabilityTests" runstate="Runnable" seed="2118487034" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:10Z" duration="0.209458" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="Report_how_big_a_card_in_hand_actually_is_on_screen" fullname="CoH.Tests.PlayMode.HandReadabilityTests.Report_how_big_a_card_in_hand_actually_is_on_screen" methodname="Report_how_big_a_card_in_hand_actually_is_on_screen" classname="CoH.Tests.PlayMode.HandReadabilityTests" runstate="Runnable" seed="1121197160" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:10Z" duration="0.210461" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[=== the hand, in pixels of a 1080 line view ===
+screen 640 x 480, reported against 1080   (4 cards)
+
+rest, middle          card  305 x  344   title h  28 w  124   rules h  57   at y     2..  346
+rest, edge            card  353 x  361   title h  37 w  197   rules h  65   at y   -26..  335
+hovered, middle       card  414 x  569   title h  24 w  174   rules h  96   at y   104..  673
+hovered, edge         card  414 x  569   title h  29 w  291   rules h 102   at y    78..  648
+back at rest, edge    card  353 x  361   title h  35 w  192   rules h  65   at y   -26..  335
+
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1082" name="HotseatInteractionTests" fullname="CoH.Tests.PlayMode.HotseatInteractionTests" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:12Z" duration="1.886938" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1088" name="An_interaction_in_progress_is_dropped_when_the_queue_starts" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.An_interaction_in_progress_is_dropped_when_the_queue_starts" methodname="An_interaction_in_progress_is_dropped_when_the_queue_starts" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="225622050" result="Passed" start-time="2026-09-06 17:07:10Z" end-time="2026-09-06 17:07:11Z" duration="0.272951" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="Both_players_can_aim_and_attack" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.Both_players_can_aim_and_attack" methodname="Both_players_can_aim_and_attack" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="544211875" result="Passed" start-time="2026-09-06 17:07:11Z" end-time="2026-09-06 17:07:11Z" duration="0.323650" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="Both_players_can_hover_a_card_after_a_flip" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.Both_players_can_hover_a_card_after_a_flip" methodname="Both_players_can_hover_a_card_after_a_flip" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="117027722" result="Passed" start-time="2026-09-06 17:07:11Z" end-time="2026-09-06 17:07:11Z" duration="0.270590" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="Both_players_drag_and_drop_with_the_same_code" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.Both_players_drag_and_drop_with_the_same_code" methodname="Both_players_drag_and_drop_with_the_same_code" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="1944585170" result="Passed" start-time="2026-09-06 17:07:11Z" end-time="2026-09-06 17:07:11Z" duration="0.365663" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1087" name="No_interaction_starts_while_the_queue_is_replaying" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.No_interaction_starts_while_the_queue_is_replaying" methodname="No_interaction_starts_while_the_queue_is_replaying" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="50021587" result="Passed" start-time="2026-09-06 17:07:11Z" end-time="2026-09-06 17:07:12Z" duration="0.270893" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="Pointing_at_the_row_resolves_the_same_slot_after_every_flip" fullname="CoH.Tests.PlayMode.HotseatInteractionTests.Pointing_at_the_row_resolves_the_same_slot_after_every_flip" methodname="Pointing_at_the_row_resolves_the_same_slot_after_every_flip" classname="CoH.Tests.PlayMode.HotseatInteractionTests" runstate="Runnable" seed="533508102" result="Passed" start-time="2026-09-06 17:07:12Z" end-time="2026-09-06 17:07:12Z" duration="0.381301" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1089" name="HotseatTests" fullname="CoH.Tests.PlayMode.HotseatTests" classname="CoH.Tests.PlayMode.HotseatTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-06 17:07:12Z" end-time="2026-09-06 17:07:13Z" duration="0.996204" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1090" name="Both_players_can_play_a_card_in_turn" fullname="CoH.Tests.PlayMode.HotseatTests.Both_players_can_play_a_card_in_turn" methodname="Both_players_can_play_a_card_in_turn" classname="CoH.Tests.PlayMode.HotseatTests" runstate="Runnable" seed="1560041261" result="Passed" start-time="2026-09-06 17:07:12Z" end-time="2026-09-06 17:07:12Z" duration="0.286986" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1092" name="Every_card_of_the_active_hand_stays_on_screen" fullname="CoH.Tests.PlayMode.HotseatTests.Every_card_of_the_active_hand_stays_on_screen" methodname="Every_card_of_the_active_hand_stays_on_screen" classname="CoH.Tests.PlayMode.HotseatTests" runstate="Runnable" seed="857201455" result="Passed" start-time="2026-09-06 17:07:12Z" end-time="2026-09-06 17:07:13Z" duration="0.468559" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1091" name="The_active_players_hand_is_always_the_one_in_front" fullname="CoH.Tests.PlayMode.HotseatTests.The_active_players_hand_is_always_the_one_in_front" methodname="The_active_players_hand_is_always_the_one_in_front" classname="CoH.Tests.PlayMode.HotseatTests" runstate="Runnable" seed="870307800" result="Passed" start-time="2026-09-06 17:07:13Z" end-time="2026-09-06 17:07:13Z" duration="0.239158" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1093" name="HuntressShotTests" fullname="CoH.Tests.PlayMode.HuntressShotTests" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-06 17:07:13Z" end-time="2026-09-06 17:07:15Z" duration="2.199744" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1097" name="A_frame_is_resolved_even_without_a_dedicated_starcaller_spell_frame" fullname="CoH.Tests.PlayMode.HuntressShotTests.A_frame_is_resolved_even_without_a_dedicated_starcaller_spell_frame" methodname="A_frame_is_resolved_even_without_a_dedicated_starcaller_spell_frame" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="1049876220" result="Passed" start-time="2026-09-06 17:07:13Z" end-time="2026-09-06 17:07:13Z" duration="0.220187" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1099" name="Clicking_it_down_and_aiming_at_the_enemy_minion_resolves_it" fullname="CoH.Tests.PlayMode.HuntressShotTests.Clicking_it_down_and_aiming_at_the_enemy_minion_resolves_it" methodname="Clicking_it_down_and_aiming_at_the_enemy_minion_resolves_it" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="2038319624" result="Passed" start-time="2026-09-06 17:07:13Z" end-time="2026-09-06 17:07:14Z" duration="0.244500" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1094" name="Huntress_shot_renders_as_an_ordinary_spell_card_view" fullname="CoH.Tests.PlayMode.HuntressShotTests.Huntress_shot_renders_as_an_ordinary_spell_card_view" methodname="Huntress_shot_renders_as_an_ordinary_spell_card_view" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="927474835" result="Passed" start-time="2026-09-06 17:07:14Z" end-time="2026-09-06 17:07:14Z" duration="0.214018" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1098" name="Targeting_requires_a_minion_and_offers_both_sides" fullname="CoH.Tests.PlayMode.HuntressShotTests.Targeting_requires_a_minion_and_offers_both_sides" methodname="Targeting_requires_a_minion_and_offers_both_sides" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="426299816" result="Passed" start-time="2026-09-06 17:07:14Z" end-time="2026-09-06 17:07:14Z" duration="0.212736" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1096" name="The_card_visual_library_resolves_the_final_production_artwork" fullname="CoH.Tests.PlayMode.HuntressShotTests.The_card_visual_library_resolves_the_final_production_artwork" methodname="The_card_visual_library_resolves_the_final_production_artwork" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="200770051" result="Passed" start-time="2026-09-06 17:07:14Z" end-time="2026-09-06 17:07:14Z" duration="0.215098" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1103" name="The_cards_own_authored_text_is_never_mutated" fullname="CoH.Tests.PlayMode.HuntressShotTests.The_cards_own_authored_text_is_never_mutated" methodname="The_cards_own_authored_text_is_never_mutated" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="585130935" result="Passed" start-time="2026-09-06 17:07:14Z" end-time="2026-09-06 17:07:14Z" duration="0.222967" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="The_mana_restoration_wording_is_never_numerically_altered" fullname="CoH.Tests.PlayMode.HuntressShotTests.The_mana_restoration_wording_is_never_numerically_altered" methodname="The_mana_restoration_wording_is_never_numerically_altered" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="1579485882" result="Passed" start-time="2026-09-06 17:07:14Z" end-time="2026-09-06 17:07:15Z" duration="0.214736" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1095" name="The_printed_cost_is_three" fullname="CoH.Tests.PlayMode.HuntressShotTests.The_printed_cost_is_three" methodname="The_printed_cost_is_three" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="2094652468" result="Passed" start-time="2026-09-06 17:07:15Z" end-time="2026-09-06 17:07:15Z" duration="0.220107" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="With_plus_one_spell_damage_the_displayed_damage_becomes_buffed_two" fullname="CoH.Tests.PlayMode.HuntressShotTests.With_plus_one_spell_damage_the_displayed_damage_becomes_buffed_two" methodname="With_plus_one_spell_damage_the_displayed_damage_becomes_buffed_two" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="1125464080" result="Passed" start-time="2026-09-06 17:07:15Z" end-time="2026-09-06 17:07:15Z" duration="0.213023" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1100" name="Without_spell_damage_the_hand_card_shows_its_printed_amount" fullname="CoH.Tests.PlayMode.HuntressShotTests.Without_spell_damage_the_hand_card_shows_its_printed_amount" methodname="Without_spell_damage_the_hand_card_shows_its_printed_amount" classname="CoH.Tests.PlayMode.HuntressShotTests" runstate="Runnable" seed="2007900338" result="Passed" start-time="2026-09-06 17:07:15Z" end-time="2026-09-06 17:07:15Z" duration="0.219068" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1104" name="MatchSceneTests" fullname="CoH.Tests.PlayMode.MatchSceneTests" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" testcasecount="8" result="Failed" site="Child" start-time="2026-09-06 17:07:15Z" end-time="2026-09-06 17:07:17Z" duration="1.806285" total="8" passed="7" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1109" name="A_card_view_exists_for_every_card_in_hand" fullname="CoH.Tests.PlayMode.MatchSceneTests.A_card_view_exists_for_every_card_in_hand" methodname="A_card_view_exists_for_every_card_in_hand" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="1594085586" result="Passed" start-time="2026-09-06 17:07:15Z" end-time="2026-09-06 17:07:16Z" duration="0.213056" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1111" name="A_refused_command_leaves_the_match_alone" fullname="CoH.Tests.PlayMode.MatchSceneTests.A_refused_command_leaves_the_match_alone" methodname="A_refused_command_leaves_the_match_alone" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="727606944" result="Passed" start-time="2026-09-06 17:07:16Z" end-time="2026-09-06 17:07:16Z" duration="0.215363" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1110" name="Ending_a_turn_through_the_session_hands_play_over" fullname="CoH.Tests.PlayMode.MatchSceneTests.Ending_a_turn_through_the_session_hands_play_over" methodname="Ending_a_turn_through_the_session_hands_play_over" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="2125086166" result="Passed" start-time="2026-09-06 17:07:16Z" end-time="2026-09-06 17:07:16Z" duration="0.236203" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1112" name="Playing_a_card_puts_a_minion_view_on_the_board" fullname="CoH.Tests.PlayMode.MatchSceneTests.Playing_a_card_puts_a_minion_view_on_the_board" methodname="Playing_a_card_puts_a_minion_view_on_the_board" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="1394178794" result="Failed" start-time="2026-09-06 17:07:16Z" end-time="2026-09-06 17:07:16Z" duration="0.251609" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at CoH.Tests.PlayMode.MatchSceneTests+<Playing_a_card_puts_a_minion_view_on_the_board>d__9.MoveNext () [0x00101] in D:\Unity\ConquestOfHearthstone\Assets\Tests\PlayMode\MatchSceneTests.cs:176
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@dfdbd02f5918\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1107" name="The_decks_and_hands_come_from_the_authored_assets" fullname="CoH.Tests.PlayMode.MatchSceneTests.The_decks_and_hands_come_from_the_authored_assets" methodname="The_decks_and_hands_come_from_the_authored_assets" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="176042161" result="Passed" start-time="2026-09-06 17:07:16Z" end-time="2026-09-06 17:07:16Z" duration="0.217077" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1108" name="The_main_views_are_present" fullname="CoH.Tests.PlayMode.MatchSceneTests.The_main_views_are_present" methodname="The_main_views_are_present" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="1687139580" result="Passed" start-time="2026-09-06 17:07:16Z" end-time="2026-09-06 17:07:17Z" duration="0.221540" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1106" name="The_match_reaches_the_playing_phase_with_a_first_turn" fullname="CoH.Tests.PlayMode.MatchSceneTests.The_match_reaches_the_playing_phase_with_a_first_turn" methodname="The_match_reaches_the_playing_phase_with_a_first_turn" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="922136020" result="Passed" start-time="2026-09-06 17:07:17Z" end-time="2026-09-06 17:07:17Z" duration="0.234789" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1105" name="The_scene_loads_and_builds_a_match" fullname="CoH.Tests.PlayMode.MatchSceneTests.The_scene_loads_and_builds_a_match" methodname="The_scene_loads_and_builds_a_match" classname="CoH.Tests.PlayMode.MatchSceneTests" runstate="Runnable" seed="936261352" result="Passed" start-time="2026-09-06 17:07:17Z" end-time="2026-09-06 17:07:17Z" duration="0.214514" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1113" name="MinionPoseTests" fullname="CoH.Tests.PlayMode.MinionPoseTests" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-06 17:07:17Z" end-time="2026-09-06 17:07:31Z" duration="14.055999" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1119" name="Attacking_by_dragging_leaves_the_row_at_rest" fullname="CoH.Tests.PlayMode.MinionPoseTests.Attacking_by_dragging_leaves_the_row_at_rest" methodname="Attacking_by_dragging_leaves_the_row_at_rest" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="2139091019" result="Passed" start-time="2026-09-06 17:07:17Z" end-time="2026-09-06 17:07:19Z" duration="1.884359" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1117" name="Both_die_and_every_other_minion_stays_on_its_slot" fullname="CoH.Tests.PlayMode.MinionPoseTests.Both_die_and_every_other_minion_stays_on_its_slot" methodname="Both_die_and_every_other_minion_stays_on_its_slot" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="1735116897" result="Passed" start-time="2026-09-06 17:07:19Z" end-time="2026-09-06 17:07:20Z" duration="1.093776" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1114" name="Both_survive_and_both_end_on_their_slots" fullname="CoH.Tests.PlayMode.MinionPoseTests.Both_survive_and_both_end_on_their_slots" methodname="Both_survive_and_both_end_on_their_slots" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="1729751426" result="Passed" start-time="2026-09-06 17:07:20Z" end-time="2026-09-06 17:07:21Z" duration="0.429982" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1118" name="Repeated_attacks_never_leave_a_minion_off_its_slot" fullname="CoH.Tests.PlayMode.MinionPoseTests.Repeated_attacks_never_leave_a_minion_off_its_slot" methodname="Repeated_attacks_never_leave_a_minion_off_its_slot" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="266244045" result="Passed" start-time="2026-09-06 17:07:21Z" end-time="2026-09-06 17:07:29Z" duration="8.596861" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1116" name="The_attacker_dies_and_the_defender_returns_to_its_slot" fullname="CoH.Tests.PlayMode.MinionPoseTests.The_attacker_dies_and_the_defender_returns_to_its_slot" methodname="The_attacker_dies_and_the_defender_returns_to_its_slot" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="1040403791" result="Passed" start-time="2026-09-06 17:07:29Z" end-time="2026-09-06 17:07:30Z" duration="1.127012" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1115" name="The_defender_dies_and_the_attacker_returns_to_its_slot" fullname="CoH.Tests.PlayMode.MinionPoseTests.The_defender_dies_and_the_attacker_returns_to_its_slot" methodname="The_defender_dies_and_the_attacker_returns_to_its_slot" classname="CoH.Tests.PlayMode.MinionPoseTests" runstate="Runnable" seed="584958811" result="Passed" start-time="2026-09-06 17:07:30Z" end-time="2026-09-06 17:07:31Z" duration="0.921751" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1120" name="NecromancerBoardTests" fullname="CoH.Tests.PlayMode.NecromancerBoardTests" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" testcasecount="58" result="Passed" start-time="2026-09-06 17:07:31Z" end-time="2026-09-06 17:07:44Z" duration="12.553671" total="58" passed="58" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1163" name="All_four_choice_cards_are_fully_inside_the_viewport_safe_margins" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.All_four_choice_cards_are_fully_inside_the_viewport_safe_margins" methodname="All_four_choice_cards_are_fully_inside_the_viewport_safe_margins" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="480480486" result="Passed" start-time="2026-09-06 17:07:31Z" end-time="2026-09-06 17:07:31Z" duration="0.219218" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1166" name="All_four_choice_cards_use_identical_visual_scale" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.All_four_choice_cards_use_identical_visual_scale" methodname="All_four_choice_cards_use_identical_visual_scale" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="496984979" result="Passed" start-time="2026-09-06 17:07:31Z" end-time="2026-09-06 17:07:32Z" duration="0.215789" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1159" name="Cancel_still_closes_the_real_choice_cards_and_hides_them" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Cancel_still_closes_the_real_choice_cards_and_hides_them" methodname="Cancel_still_closes_the_real_choice_cards_and_hides_them" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1754195509" result="Passed" start-time="2026-09-06 17:07:32Z" end-time="2026-09-06 17:07:32Z" duration="0.205475" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1148" name="Center_art_is_clipped_by_a_mask_not_a_hand_edited_picture" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Center_art_is_clipped_by_a_mask_not_a_hand_edited_picture" methodname="Center_art_is_clipped_by_a_mask_not_a_hand_edited_picture" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1138055936" result="Passed" start-time="2026-09-06 17:07:32Z" end-time="2026-09-06 17:07:32Z" duration="0.201194" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1144" name="Center_art_is_sized_for_sharpness_around_86_reference_pixels" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Center_art_is_sized_for_sharpness_around_86_reference_pixels" methodname="Center_art_is_sized_for_sharpness_around_86_reference_pixels" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="641262583" result="Passed" start-time="2026-09-06 17:07:32Z" end-time="2026-09-06 17:07:32Z" duration="0.201793" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1139" name="Center_art_resolves_to_raises_own_bound_painting" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Center_art_resolves_to_raises_own_bound_painting" methodname="Center_art_resolves_to_raises_own_bound_painting" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="197481519" result="Passed" start-time="2026-09-06 17:07:32Z" end-time="2026-09-06 17:07:32Z" duration="0.204797" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1149" name="Changing_center_art_does_not_touch_the_frame_or_the_mana_gem" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Changing_center_art_does_not_touch_the_frame_or_the_mana_gem" methodname="Changing_center_art_does_not_touch_the_frame_or_the_mana_gem" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1573905795" result="Passed" start-time="2026-09-06 17:07:32Z" end-time="2026-09-06 17:07:33Z" duration="0.204676" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1165" name="Choice_card_centers_are_ordered_and_symmetric_around_screen_center" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_centers_are_ordered_and_symmetric_around_screen_center" methodname="Choice_card_centers_are_ordered_and_symmetric_around_screen_center" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="30842383" result="Passed" start-time="2026-09-06 17:07:33Z" end-time="2026-09-06 17:07:33Z" duration="0.219129" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1162" name="Choice_card_frame_world_size_stays_close_to_a_hand_cards" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_frame_world_size_stays_close_to_a_hand_cards" methodname="Choice_card_frame_world_size_stays_close_to_a_hand_cards" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1998498276" result="Passed" start-time="2026-09-06 17:07:33Z" end-time="2026-09-06 17:07:33Z" duration="0.213189" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1168" name="Choice_card_gaps_between_consecutive_cards_are_equal" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_gaps_between_consecutive_cards_are_equal" methodname="Choice_card_gaps_between_consecutive_cards_are_equal" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="296345976" result="Passed" start-time="2026-09-06 17:07:33Z" end-time="2026-09-06 17:07:33Z" duration="0.216624" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1167" name="Choice_card_group_is_centered_on_screen_horizontally" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_group_is_centered_on_screen_horizontally" methodname="Choice_card_group_is_centered_on_screen_horizontally" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="133162178" result="Passed" start-time="2026-09-06 17:07:33Z" end-time="2026-09-06 17:07:34Z" duration="0.211853" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1176" name="Choice_card_rules_text_shares_one_font_size_where_present" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_rules_text_shares_one_font_size_where_present" methodname="Choice_card_rules_text_shares_one_font_size_where_present" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1410778990" result="Passed" start-time="2026-09-06 17:07:34Z" end-time="2026-09-06 17:07:34Z" duration="0.219536" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1160" name="Choice_card_stat_text_renders_at_the_same_fitted_size_as_a_hand_cards" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_stat_text_renders_at_the_same_fitted_size_as_a_hand_cards" methodname="Choice_card_stat_text_renders_at_the_same_fitted_size_as_a_hand_cards" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="485624616" result="Passed" start-time="2026-09-06 17:07:34Z" end-time="2026-09-06 17:07:34Z" duration="0.212951" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1154" name="Choice_card_stats_match_the_authored_servant_definitions" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_stats_match_the_authored_servant_definitions" methodname="Choice_card_stats_match_the_authored_servant_definitions" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="2012575808" result="Passed" start-time="2026-09-06 17:07:34Z" end-time="2026-09-06 17:07:34Z" duration="0.213088" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1161" name="Choice_card_text_never_renders_near_its_uncapped_auto_size_ceiling" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_text_never_renders_near_its_uncapped_auto_size_ceiling" methodname="Choice_card_text_never_renders_near_its_uncapped_auto_size_ceiling" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="683136549" result="Passed" start-time="2026-09-06 17:07:34Z" end-time="2026-09-06 17:07:34Z" duration="0.208710" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1175" name="Choice_card_titles_share_one_font_size_within_the_group" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_card_titles_share_one_font_size_within_the_group" methodname="Choice_card_titles_share_one_font_size_within_the_group" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="56806093" result="Passed" start-time="2026-09-06 17:07:34Z" end-time="2026-09-06 17:07:35Z" duration="0.214053" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1156" name="Choice_cards_carry_no_entity_id_and_are_not_hand_cards" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_cards_carry_no_entity_id_and_are_not_hand_cards" methodname="Choice_cards_carry_no_entity_id_and_are_not_hand_cards" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1571060401" result="Passed" start-time="2026-09-06 17:07:35Z" end-time="2026-09-06 17:07:35Z" duration="0.204234" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1164" name="Choice_cards_do_not_overlap_each_other" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_cards_do_not_overlap_each_other" methodname="Choice_cards_do_not_overlap_each_other" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1054112000" result="Passed" start-time="2026-09-06 17:07:35Z" end-time="2026-09-06 17:07:35Z" duration="0.214614" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1171" name="Choice_cards_do_not_overlap_the_hand_region" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_cards_do_not_overlap_the_hand_region" methodname="Choice_cards_do_not_overlap_the_hand_region" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="565189656" result="Passed" start-time="2026-09-06 17:07:35Z" end-time="2026-09-06 17:07:35Z" duration="0.211645" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1170" name="Choice_cards_stay_above_the_player_one_hero_area" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_cards_stay_above_the_player_one_hero_area" methodname="Choice_cards_stay_above_the_player_one_hero_area" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1191584307" result="Passed" start-time="2026-09-06 17:07:35Z" end-time="2026-09-06 17:07:35Z" duration="0.209375" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1169" name="Choice_group_is_as_compact_as_the_cards_own_width_allows" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_group_is_as_compact_as_the_cards_own_width_allows" methodname="Choice_group_is_as_compact_as_the_cards_own_width_allows" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1924533271" result="Passed" start-time="2026-09-06 17:07:35Z" end-time="2026-09-06 17:07:36Z" duration="0.211642" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1173" name="Choice_layout_stays_sane_at_a_different_aspect_ratio" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choice_layout_stays_sane_at_a_different_aspect_ratio" methodname="Choice_layout_stays_sane_at_a_different_aspect_ratio" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="948921875" result="Passed" start-time="2026-09-06 17:07:36Z" end-time="2026-09-06 17:07:36Z" duration="0.217471" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1129" name="Choosing_an_option_summons_that_servant_onto_the_board" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Choosing_an_option_summons_that_servant_onto_the_board" methodname="Choosing_an_option_summons_that_servant_onto_the_board" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="786602647" result="Passed" start-time="2026-09-06 17:07:36Z" end-time="2026-09-06 17:07:36Z" duration="0.207604" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1158" name="Clicking_a_choice_card_submits_its_own_hero_power_option" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Clicking_a_choice_card_submits_its_own_hero_power_option" methodname="Clicking_a_choice_card_submits_its_own_hero_power_option" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="2024609974" result="Passed" start-time="2026-09-06 17:07:36Z" end-time="2026-09-06 17:07:36Z" duration="0.211016" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1134" name="Clicking_the_real_button_opens_the_choices" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Clicking_the_real_button_opens_the_choices" methodname="Clicking_the_real_button_opens_the_choices" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="869901517" result="Passed" start-time="2026-09-06 17:07:36Z" end-time="2026-09-06 17:07:36Z" duration="0.209658" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1177" name="Crypt_fiends_rules_region_stays_correctly_empty" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Crypt_fiends_rules_region_stays_correctly_empty" methodname="Crypt_fiends_rules_region_stays_correctly_empty" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="675880948" result="Passed" start-time="2026-09-06 17:07:36Z" end-time="2026-09-06 17:07:37Z" duration="0.213971" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1157" name="Displaying_choices_creates_no_hand_card_and_spends_no_mana" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Displaying_choices_creates_no_hand_card_and_spends_no_mana" methodname="Displaying_choices_creates_no_hand_card_and_spends_no_mana" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1153878" result="Passed" start-time="2026-09-06 17:07:37Z" end-time="2026-09-06 17:07:37Z" duration="0.217205" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1153" name="Each_choice_card_resolves_its_own_final_artwork" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Each_choice_card_resolves_its_own_final_artwork" methodname="Each_choice_card_resolves_its_own_final_artwork" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="547655850" result="Passed" start-time="2026-09-06 17:07:37Z" end-time="2026-09-06 17:07:37Z" duration="0.210126" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1152" name="Each_choice_card_resolves_the_necromancer_minion_frame" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Each_choice_card_resolves_the_necromancer_minion_frame" methodname="Each_choice_card_resolves_the_necromancer_minion_frame" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="2002673292" result="Passed" start-time="2026-09-06 17:07:37Z" end-time="2026-09-06 17:07:37Z" duration="0.211351" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1151" name="Each_choice_card_shows_the_correct_servant_in_order" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Each_choice_card_shows_the_correct_servant_in_order" methodname="Each_choice_card_shows_the_correct_servant_in_order" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1391132356" result="Passed" start-time="2026-09-06 17:07:37Z" end-time="2026-09-06 17:07:38Z" duration="0.224875" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1174" name="End_turn_is_visibly_dimmed_and_non_interactive_while_the_choice_menu_is_open" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.End_turn_is_visibly_dimmed_and_non_interactive_while_the_choice_menu_is_open" methodname="End_turn_is_visibly_dimmed_and_non_interactive_while_the_choice_menu_is_open" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1213678700" result="Passed" start-time="2026-09-06 17:07:38Z" end-time="2026-09-06 17:07:38Z" duration="0.215146" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1147" name="Frame_center_art_and_mana_gem_are_three_distinct_objects" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Frame_center_art_and_mana_gem_are_three_distinct_objects" methodname="Frame_center_art_and_mana_gem_are_three_distinct_objects" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1572241787" result="Passed" start-time="2026-09-06 17:07:38Z" end-time="2026-09-06 17:07:38Z" duration="0.207049" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1178" name="Hovering_a_choice_card_stays_in_its_slot_and_does_not_move_its_neighbours" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Hovering_a_choice_card_stays_in_its_slot_and_does_not_move_its_neighbours" methodname="Hovering_a_choice_card_stays_in_its_slot_and_does_not_move_its_neighbours" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1368230635" result="Passed" start-time="2026-09-06 17:07:38Z" end-time="2026-09-06 17:07:38Z" duration="0.250950" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1135" name="Hovering_shows_a_tooltip_naming_raise_and_its_cost" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Hovering_shows_a_tooltip_naming_raise_and_its_cost" methodname="Hovering_shows_a_tooltip_naming_raise_and_its_cost" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="91526492" result="Passed" start-time="2026-09-06 17:07:38Z" end-time="2026-09-06 17:07:38Z" duration="0.212610" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1125" name="It_is_available_on_its_owners_turn_with_mana" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.It_is_available_on_its_owners_turn_with_mana" methodname="It_is_available_on_its_owners_turn_with_mana" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="882583476" result="Passed" start-time="2026-09-06 17:07:38Z" end-time="2026-09-06 17:07:39Z" duration="0.209603" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1126" name="It_is_unavailable_on_the_opponents_turn" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.It_is_unavailable_on_the_opponents_turn" methodname="It_is_unavailable_on_the_opponents_turn" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="789623109" result="Passed" start-time="2026-09-06 17:07:39Z" end-time="2026-09-06 17:07:39Z" duration="0.417585" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1127" name="It_is_unavailable_once_it_has_been_used_this_turn" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.It_is_unavailable_once_it_has_been_used_this_turn" methodname="It_is_unavailable_once_it_has_been_used_this_turn" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1257784608" result="Passed" start-time="2026-09-06 17:07:39Z" end-time="2026-09-06 17:07:39Z" duration="0.236220" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1155" name="No_prototype_option_panels_remain_in_the_hierarchy" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.No_prototype_option_panels_remain_in_the_hierarchy" methodname="No_prototype_option_panels_remain_in_the_hierarchy" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="977205008" result="Passed" start-time="2026-09-06 17:07:39Z" end-time="2026-09-06 17:07:40Z" duration="0.231269" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1128" name="Opening_and_closing_the_menu_spends_nothing" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Opening_and_closing_the_menu_spends_nothing" methodname="Opening_and_closing_the_menu_spends_nothing" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="30346354" result="Passed" start-time="2026-09-06 17:07:40Z" end-time="2026-09-06 17:07:40Z" duration="0.220154" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1150" name="Opening_raise_shows_exactly_four_active_card_views" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Opening_raise_shows_exactly_four_active_card_views" methodname="Opening_raise_shows_exactly_four_active_card_views" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="878264876" result="Passed" start-time="2026-09-06 17:07:40Z" end-time="2026-09-06 17:07:40Z" duration="0.204107" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1136" name="Opening_the_choices_hides_the_tooltip" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Opening_the_choices_hides_the_tooltip" methodname="Opening_the_choices_hides_the_tooltip" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1517756556" result="Passed" start-time="2026-09-06 17:07:40Z" end-time="2026-09-06 17:07:40Z" duration="0.208887" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1121" name="Player_one_is_a_necromancer_without_any_manual_setup" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Player_one_is_a_necromancer_without_any_manual_setup" methodname="Player_one_is_a_necromancer_without_any_manual_setup" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="454416279" result="Passed" start-time="2026-09-06 17:07:40Z" end-time="2026-09-06 17:07:40Z" duration="0.205676" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1172" name="Raise_medallion_is_hidden_while_the_choice_menu_is_open" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Raise_medallion_is_hidden_while_the_choice_menu_is_open" methodname="Raise_medallion_is_hidden_while_the_choice_menu_is_open" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="160252299" result="Passed" start-time="2026-09-06 17:07:40Z" end-time="2026-09-06 17:07:41Z" duration="0.222120" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1131" name="Refreshing_the_view_never_changes_the_game" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.Refreshing_the_view_never_changes_the_game" methodname="Refreshing_the_view_never_changes_the_game" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="886281117" result="Passed" start-time="2026-09-06 17:07:41Z" end-time="2026-09-06 17:07:41Z" duration="0.225334" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1137" name="The_authored_frame_is_used_not_the_generic_ring" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_authored_frame_is_used_not_the_generic_ring" methodname="The_authored_frame_is_used_not_the_generic_ring" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="615095950" result="Passed" start-time="2026-09-06 17:07:41Z" end-time="2026-09-06 17:07:41Z" duration="0.210011" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1146" name="The_cost_text_reads_one" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_cost_text_reads_one" methodname="The_cost_text_reads_one" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="259641904" result="Passed" start-time="2026-09-06 17:07:41Z" end-time="2026-09-06 17:07:41Z" duration="0.207852" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1122" name="The_default_comes_from_the_bootstrap_configuration" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_default_comes_from_the_bootstrap_configuration" methodname="The_default_comes_from_the_bootstrap_configuration" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="741089975" result="Passed" start-time="2026-09-06 17:07:41Z" end-time="2026-09-06 17:07:41Z" duration="0.209673" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1123" name="The_four_servants_are_in_the_matchs_catalog" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_four_servants_are_in_the_matchs_catalog" methodname="The_four_servants_are_in_the_matchs_catalog" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1882479993" result="Passed" start-time="2026-09-06 17:07:41Z" end-time="2026-09-06 17:07:42Z" duration="0.208787" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1138" name="The_frame_and_center_art_are_different_sprites" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_frame_and_center_art_are_different_sprites" methodname="The_frame_and_center_art_are_different_sprites" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1414221220" result="Passed" start-time="2026-09-06 17:07:42Z" end-time="2026-09-06 17:07:42Z" duration="0.207946" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1141" name="The_frame_is_not_a_child_of_the_center_art_mask" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_frame_is_not_a_child_of_the_center_art_mask" methodname="The_frame_is_not_a_child_of_the_center_art_mask" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="2009094619" result="Passed" start-time="2026-09-06 17:07:42Z" end-time="2026-09-06 17:07:42Z" duration="0.207110" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1140" name="The_frame_renders_above_the_center_art" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_frame_renders_above_the_center_art" methodname="The_frame_renders_above_the_center_art" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1455028255" result="Passed" start-time="2026-09-06 17:07:42Z" end-time="2026-09-06 17:07:42Z" duration="0.210999" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1124" name="The_hero_power_is_present_and_bound_to_player_one" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_hero_power_is_present_and_bound_to_player_one" methodname="The_hero_power_is_present_and_bound_to_player_one" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1927479072" result="Passed" start-time="2026-09-06 17:07:42Z" end-time="2026-09-06 17:07:42Z" duration="0.209558" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1145" name="The_mana_gem_uses_the_shared_catalog_asset_not_the_procedural_fallback" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_mana_gem_uses_the_shared_catalog_asset_not_the_procedural_fallback" methodname="The_mana_gem_uses_the_shared_catalog_asset_not_the_procedural_fallback" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="415613774" result="Passed" start-time="2026-09-06 17:07:43Z" end-time="2026-09-06 17:07:43Z" duration="0.204035" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1132" name="The_medallion_is_named_raise" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_medallion_is_named_raise" methodname="The_medallion_is_named_raise" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1894684005" result="Passed" start-time="2026-09-06 17:07:43Z" end-time="2026-09-06 17:07:43Z" duration="0.203641" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1142" name="The_medallion_is_not_the_vertical_hearthcards_card" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_medallion_is_not_the_vertical_hearthcards_card" methodname="The_medallion_is_not_the_vertical_hearthcards_card" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1373583186" result="Passed" start-time="2026-09-06 17:07:43Z" end-time="2026-09-06 17:07:43Z" duration="0.205851" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1143" name="The_medallion_root_is_larger_than_its_original_size" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_medallion_root_is_larger_than_its_original_size" methodname="The_medallion_root_is_larger_than_its_original_size" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="456623954" result="Passed" start-time="2026-09-06 17:07:43Z" end-time="2026-09-06 17:07:43Z" duration="0.207041" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1133" name="The_medallion_sits_on_screen_to_the_right_of_the_hero" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_medallion_sits_on_screen_to_the_right_of_the_hero" methodname="The_medallion_sits_on_screen_to_the_right_of_the_hero" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1030990737" result="Passed" start-time="2026-09-06 17:07:43Z" end-time="2026-09-06 17:07:44Z" duration="0.207016" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1130" name="The_summoned_servant_gets_a_view_on_the_board" fullname="CoH.Tests.PlayMode.NecromancerBoardTests.The_summoned_servant_gets_a_view_on_the_board" methodname="The_summoned_servant_gets_a_view_on_the_board" classname="CoH.Tests.PlayMode.NecromancerBoardTests" runstate="Runnable" seed="1281642469" result="Passed" start-time="2026-09-06 17:07:44Z" end-time="2026-09-06 17:07:44Z" duration="0.218287" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1179" name="NonMinionCardTests" fullname="CoH.Tests.PlayMode.NonMinionCardTests" classname="CoH.Tests.PlayMode.NonMinionCardTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-06 17:07:44Z" end-time="2026-09-06 17:07:45Z" duration="1.303334" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1180" name="A_spell_can_be_read_in_hand" fullname="CoH.Tests.PlayMode.NonMinionCardTests.A_spell_can_be_read_in_hand" methodname="A_spell_can_be_read_in_hand" classname="CoH.Tests.PlayMode.NonMinionCardTests" runstate="Runnable" seed="1478490030" result="Passed" start-time="2026-09-06 17:07:44Z" end-time="2026-09-06 17:07:44Z" duration="0.213838" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1182" name="A_spell_goes_to_the_graveyard_rather_than_the_board" fullname="CoH.Tests.PlayMode.NonMinionCardTests.A_spell_goes_to_the_graveyard_rather_than_the_board" methodname="A_spell_goes_to_the_graveyard_rather_than_the_board" classname="CoH.Tests.PlayMode.NonMinionCardTests" runstate="Runnable" seed="314085951" result="Passed" start-time="2026-09-06 17:07:44Z" end-time="2026-09-06 17:07:44Z" duration="0.435695" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1183" name="An_unaffordable_card_can_still_be_hovered" fullname="CoH.Tests.PlayMode.NonMinionCardTests.An_unaffordable_card_can_still_be_hovered" methodname="An_unaffordable_card_can_still_be_hovered" classname="CoH.Tests.PlayMode.NonMinionCardTests" runstate="Runnable" seed="984090860" result="Passed" start-time="2026-09-06 17:07:44Z" end-time="2026-09-06 17:07:45Z" duration="0.207253" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1181" name="The_coin_is_played_by_dragging_it_and_grants_a_temporary_mana" fullname="CoH.Tests.PlayMode.NonMinionCardTests.The_coin_is_played_by_dragging_it_and_grants_a_temporary_mana" methodname="The_coin_is_played_by_dragging_it_and_grants_a_temporary_mana" classname="CoH.Tests.PlayMode.NonMinionCardTests" runstate="Runnable" seed="1652549361" result="Passed" start-time="2026-09-06 17:07:45Z" end-time="2026-09-06 17:07:45Z" duration="0.444822" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1184" name="OverlappingHandTests" fullname="CoH.Tests.PlayMode.OverlappingHandTests" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-09-06 17:07:45Z" end-time="2026-09-06 17:07:47Z" duration="2.038423" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1188" name="A_card_returns_to_exactly_where_it_was_when_the_pointer_leaves" fullname="CoH.Tests.PlayMode.OverlappingHandTests.A_card_returns_to_exactly_where_it_was_when_the_pointer_leaves" methodname="A_card_returns_to_exactly_where_it_was_when_the_pointer_leaves" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="1475396118" result="Passed" start-time="2026-09-06 17:07:45Z" end-time="2026-09-06 17:07:45Z" duration="0.207748" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1191" name="A_card_takes_its_place_back_in_the_order_when_the_pointer_leaves" fullname="CoH.Tests.PlayMode.OverlappingHandTests.A_card_takes_its_place_back_in_the_order_when_the_pointer_leaves" methodname="A_card_takes_its_place_back_in_the_order_when_the_pointer_leaves" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="95901408" result="Passed" start-time="2026-09-06 17:07:45Z" end-time="2026-09-06 17:07:45Z" duration="0.206948" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1192" name="A_carried_card_draws_in_front_of_the_hand_it_came_from" fullname="CoH.Tests.PlayMode.OverlappingHandTests.A_carried_card_draws_in_front_of_the_hand_it_came_from" methodname="A_carried_card_draws_in_front_of_the_hand_it_came_from" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="686886843" result="Passed" start-time="2026-09-06 17:07:45Z" end-time="2026-09-06 17:07:46Z" duration="0.250584" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1190" name="A_hovered_card_draws_in_front_of_every_other_card" fullname="CoH.Tests.PlayMode.OverlappingHandTests.A_hovered_card_draws_in_front_of_every_other_card" methodname="A_hovered_card_draws_in_front_of_every_other_card" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="16905929" result="Passed" start-time="2026-09-06 17:07:46Z" end-time="2026-09-06 17:07:46Z" duration="0.214666" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1189" name="Cards_draw_in_the_order_they_sit_in_the_hand" fullname="CoH.Tests.PlayMode.OverlappingHandTests.Cards_draw_in_the_order_they_sit_in_the_hand" methodname="Cards_draw_in_the_order_they_sit_in_the_hand" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="2023003029" result="Passed" start-time="2026-09-06 17:07:46Z" end-time="2026-09-06 17:07:46Z" duration="0.216758" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1185" name="Every_card_in_an_overlapping_hand_can_be_pointed_at" fullname="CoH.Tests.PlayMode.OverlappingHandTests.Every_card_in_an_overlapping_hand_can_be_pointed_at" methodname="Every_card_in_an_overlapping_hand_can_be_pointed_at" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="456500381" result="Passed" start-time="2026-09-06 17:07:46Z" end-time="2026-09-06 17:07:46Z" duration="0.226630" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1187" name="Hovering_lifts_a_card_clear_of_the_hand_and_brings_it_forward" fullname="CoH.Tests.PlayMode.OverlappingHandTests.Hovering_lifts_a_card_clear_of_the_hand_and_brings_it_forward" methodname="Hovering_lifts_a_card_clear_of_the_hand_and_brings_it_forward" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="581610306" result="Passed" start-time="2026-09-06 17:07:46Z" end-time="2026-09-06 17:07:47Z" duration="0.215027" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1186" name="Pressing_a_card_picks_up_that_card_and_not_its_neighbour" fullname="CoH.Tests.PlayMode.OverlappingHandTests.Pressing_a_card_picks_up_that_card_and_not_its_neighbour" methodname="Pressing_a_card_picks_up_that_card_and_not_its_neighbour" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="1322526210" result="Passed" start-time="2026-09-06 17:07:47Z" end-time="2026-09-06 17:07:47Z" duration="0.260296" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1193" name="The_second_seat_gets_the_same_hand_as_the_first" fullname="CoH.Tests.PlayMode.OverlappingHandTests.The_second_seat_gets_the_same_hand_as_the_first" methodname="The_second_seat_gets_the_same_hand_as_the_first" classname="CoH.Tests.PlayMode.OverlappingHandTests" runstate="Runnable" seed="1281819634" result="Passed" start-time="2026-09-06 17:07:47Z" end-time="2026-09-06 17:07:47Z" duration="0.237299" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1194" name="PresentationSequenceTests" fullname="CoH.Tests.PlayMode.PresentationSequenceTests" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-06 17:07:47Z" end-time="2026-09-06 17:07:50Z" duration="2.438902" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1195" name="A_drawn_card_is_staged_and_joins_the_hand" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.A_drawn_card_is_staged_and_joins_the_hand" methodname="A_drawn_card_is_staged_and_joins_the_hand" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="1504374233" result="Passed" start-time="2026-09-06 17:07:47Z" end-time="2026-09-06 17:07:47Z" duration="0.231989" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1198" name="A_trade_that_kills_both_minions_stages_both_deaths" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.A_trade_that_kills_both_minions_stages_both_deaths" methodname="A_trade_that_kills_both_minions_stages_both_deaths" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="242656569" result="Passed" start-time="2026-09-06 17:07:47Z" end-time="2026-09-06 17:07:48Z" duration="0.370789" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1200" name="A_turn_change_locks_input_through_its_animation_and_releases_it_after" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.A_turn_change_locks_input_through_its_animation_and_releases_it_after" methodname="A_turn_change_locks_input_through_its_animation_and_releases_it_after" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="1703801540" result="Passed" start-time="2026-09-06 17:07:48Z" end-time="2026-09-06 17:07:48Z" duration="0.434244" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1197" name="An_attack_stages_the_declaration_before_its_damage" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.An_attack_stages_the_declaration_before_its_damage" methodname="An_attack_stages_the_declaration_before_its_damage" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="33802" result="Passed" start-time="2026-09-06 17:07:48Z" end-time="2026-09-06 17:07:48Z" duration="0.318460" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1199" name="Lethal_stages_the_damage_then_the_end_and_input_stays_locked" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.Lethal_stages_the_damage_then_the_end_and_input_stays_locked" methodname="Lethal_stages_the_damage_then_the_end_and_input_stays_locked" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="1363386811" result="Passed" start-time="2026-09-06 17:07:48Z" end-time="2026-09-06 17:07:49Z" duration="0.802685" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1196" name="Playing_a_card_stages_the_card_then_the_summon" fullname="CoH.Tests.PlayMode.PresentationSequenceTests.Playing_a_card_stages_the_card_then_the_summon" methodname="Playing_a_card_stages_the_card_then_the_summon" classname="CoH.Tests.PlayMode.PresentationSequenceTests" runstate="Runnable" seed="8200950" result="Passed" start-time="2026-09-06 17:07:49Z" end-time="2026-09-06 17:07:50Z" duration="0.278487" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1201" name="SpellDamageDisplayTests" fullname="CoH.Tests.PlayMode.SpellDamageDisplayTests" classname="CoH.Tests.PlayMode.SpellDamageDisplayTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-06 17:07:50Z" end-time="2026-09-06 17:07:51Z" duration="1.330589" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1204" name="Ending_the_turn_reverts_the_display_to_the_printed_amount" fullname="CoH.Tests.PlayMode.SpellDamageDisplayTests.Ending_the_turn_reverts_the_display_to_the_printed_amount" methodname="Ending_the_turn_reverts_the_display_to_the_printed_amount" classname="CoH.Tests.PlayMode.SpellDamageDisplayTests" runstate="Runnable" seed="697062885" result="Passed" start-time="2026-09-06 17:07:50Z" end-time="2026-09-06 17:07:50Z" duration="0.631644" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1205" name="The_cards_own_authored_text_is_never_mutated" fullname="CoH.Tests.PlayMode.SpellDamageDisplayTests.The_cards_own_authored_text_is_never_mutated" methodname="The_cards_own_authored_text_is_never_mutated" classname="CoH.Tests.PlayMode.SpellDamageDisplayTests" runstate="Runnable" seed="375398413" result="Passed" start-time="2026-09-06 17:07:50Z" end-time="2026-09-06 17:07:50Z" duration="0.245612" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1203" name="Using_lunar_phase_immediately_shows_the_boosted_damage_in_green" fullname="CoH.Tests.PlayMode.SpellDamageDisplayTests.Using_lunar_phase_immediately_shows_the_boosted_damage_in_green" methodname="Using_lunar_phase_immediately_shows_the_boosted_damage_in_green" classname="CoH.Tests.PlayMode.SpellDamageDisplayTests" runstate="Runnable" seed="59044811" result="Passed" start-time="2026-09-06 17:07:50Z" end-time="2026-09-06 17:07:51Z" duration="0.227597" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1202" name="Without_spell_damage_the_hand_card_shows_its_printed_amount" fullname="CoH.Tests.PlayMode.SpellDamageDisplayTests.Without_spell_damage_the_hand_card_shows_its_printed_amount" methodname="Without_spell_damage_the_hand_card_shows_its_printed_amount" classname="CoH.Tests.PlayMode.SpellDamageDisplayTests" runstate="Runnable" seed="1093545510" result="Passed" start-time="2026-09-06 17:07:51Z" end-time="2026-09-06 17:07:51Z" duration="0.224159" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1206" name="StarcallerBoardTests" fullname="CoH.Tests.PlayMode.StarcallerBoardTests" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-09-06 17:07:51Z" end-time="2026-09-06 17:07:56Z" duration="4.768144" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1213" name="Clicking_lunar_phase_activates_it_immediately_with_no_choice_screen" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Clicking_lunar_phase_activates_it_immediately_with_no_choice_screen" methodname="Clicking_lunar_phase_activates_it_immediately_with_no_choice_screen" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="1079911417" result="Passed" start-time="2026-09-06 17:07:51Z" end-time="2026-09-06 17:07:52Z" duration="0.832185" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1214" name="Lunar_phase_becomes_disabled_for_the_rest_of_the_turn_after_use" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Lunar_phase_becomes_disabled_for_the_rest_of_the_turn_after_use" methodname="Lunar_phase_becomes_disabled_for_the_rest_of_the_turn_after_use" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="690163222" result="Passed" start-time="2026-09-06 17:07:52Z" end-time="2026-09-06 17:07:53Z" duration="0.840019" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1215" name="Lunar_phase_is_usable_again_on_player_twos_next_turn" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Lunar_phase_is_usable_again_on_player_twos_next_turn" methodname="Lunar_phase_is_usable_again_on_player_twos_next_turn" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="1753418770" result="Passed" start-time="2026-09-06 17:07:53Z" end-time="2026-09-06 17:07:54Z" duration="1.242277" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1207" name="Player_one_is_a_necromancer_without_any_manual_setup" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Player_one_is_a_necromancer_without_any_manual_setup" methodname="Player_one_is_a_necromancer_without_any_manual_setup" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="1169065549" result="Passed" start-time="2026-09-06 17:07:54Z" end-time="2026-09-06 17:07:54Z" duration="0.231312" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1210" name="Player_ones_class_still_resolves_as_necromancer" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Player_ones_class_still_resolves_as_necromancer" methodname="Player_ones_class_still_resolves_as_necromancer" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="87319821" result="Passed" start-time="2026-09-06 17:07:54Z" end-time="2026-09-06 17:07:54Z" duration="0.235625" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1208" name="Player_two_is_a_starcaller_without_any_manual_setup" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Player_two_is_a_starcaller_without_any_manual_setup" methodname="Player_two_is_a_starcaller_without_any_manual_setup" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="1292059899" result="Passed" start-time="2026-09-06 17:07:54Z" end-time="2026-09-06 17:07:55Z" duration="0.275603" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1209" name="Player_twos_class_resolves_as_starcaller_from_authoritative_state" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.Player_twos_class_resolves_as_starcaller_from_authoritative_state" methodname="Player_twos_class_resolves_as_starcaller_from_authoritative_state" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="749434935" result="Passed" start-time="2026-09-06 17:07:55Z" end-time="2026-09-06 17:07:55Z" duration="0.263794" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1212" name="The_medallion_binds_lunar_phases_own_center_art" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.The_medallion_binds_lunar_phases_own_center_art" methodname="The_medallion_binds_lunar_phases_own_center_art" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="1345360965" result="Passed" start-time="2026-09-06 17:07:55Z" end-time="2026-09-06 17:07:55Z" duration="0.431790" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1211" name="The_medallion_shows_lunar_phase_when_player_two_is_near" fullname="CoH.Tests.PlayMode.StarcallerBoardTests.The_medallion_shows_lunar_phase_when_player_two_is_near" methodname="The_medallion_shows_lunar_phase_when_player_two_is_near" classname="CoH.Tests.PlayMode.StarcallerBoardTests" runstate="Runnable" seed="953666134" result="Passed" start-time="2026-09-06 17:07:55Z" end-time="2026-09-06 17:07:56Z" duration="0.412160" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1216" name="TargetedPlayInteractionTests" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-09-06 17:07:56Z" end-time="2026-09-06 17:08:00Z" duration="4.086764" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1219" name="A_battlecry_clicked_onto_an_enemy_minion_deals_its_damage" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.A_battlecry_clicked_onto_an_enemy_minion_deals_its_damage" methodname="A_battlecry_clicked_onto_an_enemy_minion_deals_its_damage" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="761984183" result="Passed" start-time="2026-09-06 17:07:56Z" end-time="2026-09-06 17:07:56Z" duration="0.351168" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1220" name="A_battlecry_clicked_onto_the_enemy_hero_deals_its_damage" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.A_battlecry_clicked_onto_the_enemy_hero_deals_its_damage" methodname="A_battlecry_clicked_onto_the_enemy_hero_deals_its_damage" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="22095681" result="Passed" start-time="2026-09-06 17:07:56Z" end-time="2026-09-06 17:07:56Z" duration="0.347852" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1221" name="A_buff_clicked_onto_a_friendly_minion_changes_only_what_it_should" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.A_buff_clicked_onto_a_friendly_minion_changes_only_what_it_should" methodname="A_buff_clicked_onto_a_friendly_minion_changes_only_what_it_should" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="2022505506" result="Passed" start-time="2026-09-06 17:07:56Z" end-time="2026-09-06 17:07:57Z" duration="0.367691" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1228" name="A_play_aimed_with_the_mouse_replays_identically" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.A_play_aimed_with_the_mouse_replays_identically" methodname="A_play_aimed_with_the_mouse_replays_identically" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="368234858" result="Passed" start-time="2026-09-06 17:07:57Z" end-time="2026-09-06 17:07:57Z" duration="0.364309" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1224" name="A_targeted_battlecry_with_nothing_to_aim_at_is_played_without_asking" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.A_targeted_battlecry_with_nothing_to_aim_at_is_played_without_asking" methodname="A_targeted_battlecry_with_nothing_to_aim_at_is_played_without_asking" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="1652881573" result="Passed" start-time="2026-09-06 17:07:57Z" end-time="2026-09-06 17:07:57Z" duration="0.342931" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1226" name="Aiming_still_works_after_several_changes_of_perspective" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Aiming_still_works_after_several_changes_of_perspective" methodname="Aiming_still_works_after_several_changes_of_perspective" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="488022563" result="Passed" start-time="2026-09-06 17:07:57Z" end-time="2026-09-06 17:07:58Z" duration="0.358281" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1225" name="Both_seats_can_aim_a_battlecry_with_the_same_code" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Both_seats_can_aim_a_battlecry_with_the_same_code" methodname="Both_seats_can_aim_a_battlecry_with_the_same_code" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="88507214" result="Passed" start-time="2026-09-06 17:07:58Z" end-time="2026-09-06 17:07:58Z" duration="0.332948" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1223" name="Clicking_a_character_the_filter_forbids_cancels" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Clicking_a_character_the_filter_forbids_cancels" methodname="Clicking_a_character_the_filter_forbids_cancels" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="718831922" result="Passed" start-time="2026-09-06 17:07:58Z" end-time="2026-09-06 17:07:58Z" duration="0.305630" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1217" name="Clicking_a_targeted_card_down_asks_for_a_target_and_the_same_click_does_not_answer" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Clicking_a_targeted_card_down_asks_for_a_target_and_the_same_click_does_not_answer" methodname="Clicking_a_targeted_card_down_asks_for_a_target_and_the_same_click_does_not_answer" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="906043105" result="Passed" start-time="2026-09-06 17:07:58Z" end-time="2026-09-06 17:07:59Z" duration="0.323870" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1222" name="Clicking_somewhere_illegal_cancels_and_spends_nothing" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Clicking_somewhere_illegal_cancels_and_spends_nothing" methodname="Clicking_somewhere_illegal_cancels_and_spends_nothing" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="97152798" result="Passed" start-time="2026-09-06 17:07:59Z" end-time="2026-09-06 17:07:59Z" duration="0.331740" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1218" name="Dragging_a_targeted_card_onto_the_board_asks_the_same_question" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.Dragging_a_targeted_card_onto_the_board_asks_the_same_question" methodname="Dragging_a_targeted_card_onto_the_board_asks_the_same_question" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="1710781067" result="Passed" start-time="2026-09-06 17:07:59Z" end-time="2026-09-06 17:07:59Z" duration="0.331706" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1227" name="No_aiming_starts_while_the_queue_is_playing" fullname="CoH.Tests.PlayMode.TargetedPlayInteractionTests.No_aiming_starts_while_the_queue_is_playing" methodname="No_aiming_starts_while_the_queue_is_playing" classname="CoH.Tests.PlayMode.TargetedPlayInteractionTests" runstate="Runnable" seed="78057872" result="Passed" start-time="2026-09-06 17:07:59Z" end-time="2026-09-06 17:08:00Z" duration="0.325026" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1229" name="TitleParityTests" fullname="CoH.Tests.PlayMode.TitleParityTests" classname="CoH.Tests.PlayMode.TitleParityTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:00Z" duration="0.739926" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1231" name="A_card_in_hand_is_composed_exactly_as_the_preview_composes_it" fullname="CoH.Tests.PlayMode.TitleParityTests.A_card_in_hand_is_composed_exactly_as_the_preview_composes_it" methodname="A_card_in_hand_is_composed_exactly_as_the_preview_composes_it" classname="CoH.Tests.PlayMode.TitleParityTests" runstate="Runnable" seed="930814617" result="Passed" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:00Z" duration="0.233690" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Composition matches for 4 card(s):
+"Ice Barrage"
+  layer      NameText (spell) vs NameText (spell)
+  slot       (x:154.00, y:600.00, width:510.00, height:100.00) vs (x:154.00, y:600.00, width:510.00, height:100.00)
+  font size  11..0,55 vs 11..0,55
+  style      SpellTitle/CurvedPath vs SpellTitle/CurvedPath
+  condense   0,895 vs 0,895
+  card scale (1.56, 1.56, 1.56)
+"Test Sharpshooter"
+  layer      NameText (other) vs NameText (other)
+  slot       (x:106.00, y:586.00, width:601.00, height:132.00) vs (x:106.00, y:586.00, width:601.00, height:132.00)
+  font size  0,685..0,55 vs 0,685..0,55
+  style      AllyTitle/WarpedBanner vs AllyTitle/WarpedBanner
+  condense   0,895 vs 0,895
+  card scale (1.56, 1.56, 1.56)
+"Test Scribe"
+  layer      NameText (other) vs NameText (other)
+  slot       (x:106.00, y:586.00, width:601.00, height:132.00) vs (x:106.00, y:586.00, width:601.00, height:132.00)
+  font size  0,685..0,55 vs 0,685..0,55
+  style      AllyTitle/WarpedBanner vs AllyTitle/WarpedBanner
+  condense   0,895 vs 0,895
+  card scale (1.56, 1.56, 1.56)
+"Test Sharpshooter"
+  layer      NameText (other) vs NameText (other)
+  slot       (x:106.00, y:586.00, width:601.00, height:132.00) vs (x:106.00, y:586.00, width:601.00, height:132.00)
+  font size  0,685..0,55 vs 0,685..0,55
+  style      AllyTitle/WarpedBanner vs AllyTitle/WarpedBanner
+  condense   0,895 vs 0,895
+  card scale (1.56, 1.56, 1.56)
+
+]]></output>
+              </test-case>
+              <test-case id="1232" name="A_card_in_hand_is_painted_exactly_as_the_preview_paints_it" fullname="CoH.Tests.PlayMode.TitleParityTests.A_card_in_hand_is_painted_exactly_as_the_preview_paints_it" methodname="A_card_in_hand_is_painted_exactly_as_the_preview_paints_it" classname="CoH.Tests.PlayMode.TitleParityTests" runstate="Runnable" seed="1000064125" result="Passed" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:00Z" duration="0.275025" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Painting matches for 4 card(s):
+"Ice Barrage"
+  card scale  (1.56, 1.56, 1.56)  vs (1.00, 1.00, 1.00)
+  title font  Belwe_en SDF vs Belwe_en SDF
+  label scale (1.00, 1.00, 1.00) vs (1.00, 1.00, 1.00)
+  box         (0.71, 0.13) vs (0.71, 0.13)
+  point size  1 vs 1   (range 0,55..11)
+  ink         (x:-0.24, y:-0.02, width:0.47, height:0.11) vs (x:-0.24, y:-0.02, width:0.47, height:0.11)
+"Test Sharpshooter"
+  card scale  (1.56, 1.56, 1.56)  vs (1.00, 1.00, 1.00)
+  title font  Belwe_en SDF vs Belwe_en SDF
+  label scale (1.00, 1.00, 1.00) vs (1.00, 1.00, 1.00)
+  box         (0.84, 0.17) vs (0.84, 0.17)
+  point size  0,685 vs 0,685   (range 0,55..0,685)
+  ink         (x:-0.35, y:-0.04, width:0.70, height:0.14) vs (x:-0.35, y:-0.04, width:0.70, height:0.14)
+"Test Scribe"
+  card scale  (1.56, 1.56, 1.56)  vs (1.00, 1.00, 1.00)
+  title font  Belwe_en SDF vs Belwe_en SDF
+  label scale (1.00, 1.00, 1.00) vs (1.00, 1.00, 1.00)
+  box         (0.84, 0.17) vs (0.84, 0.17)
+  point size  0,685 vs 0,685   (range 0,55..0,685)
+  ink         (x:-0.22, y:-0.03, width:0.44, height:0.13) vs (x:-0.22, y:-0.03, width:0.44, height:0.13)
+"Test Sharpshooter"
+  card scale  (1.56, 1.56, 1.56)  vs (1.00, 1.00, 1.00)
+  title font  Belwe_en SDF vs Belwe_en SDF
+  label scale (1.00, 1.00, 1.00) vs (1.00, 1.00, 1.00)
+  box         (0.84, 0.17) vs (0.84, 0.17)
+  point size  0,685 vs 0,685   (range 0,55..0,685)
+  ink         (x:-0.35, y:-0.04, width:0.70, height:0.14) vs (x:-0.35, y:-0.04, width:0.70, height:0.14)
+
+]]></output>
+              </test-case>
+              <test-case id="1230" name="Report_the_title_as_the_game_draws_it" fullname="CoH.Tests.PlayMode.TitleParityTests.Report_the_title_as_the_game_draws_it" methodname="Report_the_title_as_the_game_draws_it" classname="CoH.Tests.PlayMode.TitleParityTests" runstate="Runnable" seed="1927145054" result="Passed" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:00Z" duration="0.229373" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[=== the title, as the game draws it ===
+
+--- "Ice Barrage" ---
+  slot           (x:154.00, y:600.00, width:510.00, height:100.00)
+  size range     11 .. 0,55
+  style          SpellTitle / CurvedPath
+  outline        0,384
+  tracking       -17
+  condense floor 0,895
+  stretch/taper  0,97 / 0
+  curve          A (0.00, -0.11) B (1.00, -0.13) end (2.00, 0.01)
+  font           Belwe_en SDF
+  material       Belwe_en Atlas Material (Instance)  outline 0,384
+  point size     1   (auto True)
+  alignment      Center
+  box            (0.71, 0.13)
+  label position (0.01, -0.13, -0.08)
+  label scale    (1.00, 1.00, 1.00)
+  colour         RGBA(0.740, 0.740, 0.745, 1.000)
+  card scale     (1.56, 1.56, 1.56)
+  ink            (x:-0.24, y:-0.02, width:0.47, height:0.11)   (in canvas px: w 379, h 87)
+
+--- "Test Sharpshooter" ---
+  slot           (x:106.00, y:586.00, width:601.00, height:132.00)
+  size range     0,685 .. 0,55
+  style          AllyTitle / WarpedBanner
+  outline        0,43
+  tracking       0
+  condense floor 0,895
+  stretch/taper  1,46 / 0,24
+  curve          A (0.33, 0.00) B (0.67, -0.18) end (1.00, -0.01)
+  font           Belwe_en SDF
+  material       Belwe_en Atlas Material (Instance)  outline 0,43
+  point size     0,685   (auto True)
+  alignment      Center
+  box            (0.84, 0.17)
+  label position (0.01, -0.13, -0.08)
+  label scale    (1.00, 1.00, 1.00)
+  colour         RGBA(0.740, 0.740, 0.745, 1.000)
+  card scale     (1.56, 1.56, 1.56)
+  ink            (x:-0.35, y:-0.04, width:0.70, height:0.14)   (in canvas px: w 558, h 114)
+
+--- "Test Scribe" ---
+  slot           (x:106.00, y:586.00, width:601.00, height:132.00)
+  size range     0,685 .. 0,55
+  style          AllyTitle / WarpedBanner
+  outline        0,43
+  tracking       0
+  condense floor 0,895
+  stretch/taper  1,46 / 0,24
+  curve          A (0.33, 0.00) B (0.67, -0.18) end (1.00, -0.01)
+  font           Belwe_en SDF
+  material       Belwe_en Atlas Material (Instance)  outline 0,43
+  point size     0,685   (auto True)
+  alignment      Center
+  box            (0.84, 0.17)
+  label position (0.01, -0.13, -0.08)
+  label scale    (1.00, 1.00, 1.00)
+  colour         RGBA(0.740, 0.740, 0.745, 1.000)
+  card scale     (1.56, 1.56, 1.56)
+  ink            (x:-0.22, y:-0.03, width:0.44, height:0.13)   (in canvas px: w 349, h 103)
+
+--- "Test Sharpshooter" ---
+  slot           (x:106.00, y:586.00, width:601.00, height:132.00)
+  size range     0,685 .. 0,55
+  style          AllyTitle / WarpedBanner
+  outline        0,43
+  tracking       0
+  condense floor 0,895
+  stretch/taper  1,46 / 0,24
+  curve          A (0.33, 0.00) B (0.67, -0.18) end (1.00, -0.01)
+  font           Belwe_en SDF
+  material       Belwe_en Atlas Material (Instance)  outline 0,43
+  point size     0,685   (auto True)
+  alignment      Center
+  box            (0.84, 0.17)
+  label position (0.01, -0.13, -0.08)
+  label scale    (1.00, 1.00, 1.00)
+  colour         RGBA(0.740, 0.740, 0.745, 1.000)
+  card scale     (1.56, 1.56, 1.56)
+  ink            (x:-0.35, y:-0.04, width:0.70, height:0.14)   (in canvas px: w 558, h 114)
+
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1233" name="TitleWarpTests" fullname="CoH.Tests.PlayMode.TitleWarpTests" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:01Z" duration="0.659290" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1236" name="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" methodname="A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="1987187234" result="Failed" start-time="2026-09-06 17:08:00Z" end-time="2026-09-06 17:08:01Z" duration="0.218921" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  The title "Ice Barrage" was not set at the size its recipe chose: 1 against a ceiling of 11.
+  Expected: greater than or equal to 10.4499998f
+  But was:  1.0f
+]]></message>
+                  <stack-trace><![CDATA[at CoH.Tests.PlayMode.TitleWarpTests+<A_short_name_is_set_larger_than_a_long_one_and_neither_is_tiny>d__6.MoveNext () [0x00120] in D:\Unity\ConquestOfHearthstone\Assets\Tests\PlayMode\TitleWarpTests.cs:290
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@dfdbd02f5918\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1235" name="A_title_stays_curved_when_its_card_is_dimmed" fullname="CoH.Tests.PlayMode.TitleWarpTests.A_title_stays_curved_when_its_card_is_dimmed" methodname="A_title_stays_curved_when_its_card_is_dimmed" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="2092415148" result="Passed" start-time="2026-09-06 17:08:01Z" end-time="2026-09-06 17:08:01Z" duration="0.217903" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1234" name="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" fullname="CoH.Tests.PlayMode.TitleWarpTests.Every_title_in_hand_is_still_curved_once_the_cards_have_settled" methodname="Every_title_in_hand_is_still_curved_once_the_cards_have_settled" classname="CoH.Tests.PlayMode.TitleWarpTests" runstate="Runnable" seed="381345556" result="Passed" start-time="2026-09-06 17:08:01Z" end-time="2026-09-06 17:08:01Z" duration="0.220722" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Titles curved on the table:
+  "Ice Barrage" on table 0,0302 vs flat 0,0141
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+  "Test Scribe" on table 0,0455 vs flat 0,0074
+  "Test Sharpshooter" on table 0,0675 vs flat 0,0126
+
+Saving results to: C:/Users/Utilisateur/AppData/LocalLow/Icelios/Conquest of Hearthstone\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

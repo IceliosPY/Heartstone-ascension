@@ -202,6 +202,22 @@ namespace CoH.Core.State
         /// </summary>
         public bool IsSummoningSick(int currentTurnNumber) => SummonedOnTurn >= currentTurnNumber;
 
+        /// <summary>
+        /// The controller's turn during which this minion must lose its next
+        /// attack opportunity, or null when it is not Frozen. Set and read by
+        /// <see cref="CoH.Core.Rules.FreezeRules"/> only; nothing else may
+        /// assign it. Removed explicitly at the end of that turn rather than
+        /// computed away, so a diverging replay would show the state, not
+        /// just its momentary effect.
+        /// </summary>
+        public int? FrozenUntilTurn { get; internal set; }
+
+        /// <summary>
+        /// Whether this minion is currently Frozen. A minion cannot attack
+        /// while Frozen; nothing else about it changes.
+        /// </summary>
+        public bool IsFrozen => FrozenUntilTurn.HasValue;
+
         public override string ToString() =>
             "Minion " + CardId + " (" + Id + ", " + Attack + "/" + CurrentHealth + ")";
     }

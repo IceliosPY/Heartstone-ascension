@@ -85,6 +85,9 @@ namespace CoH.Core.Commands
         /// target that has died, both when explaining a refusal to a player and
         /// when reading a server log.
         /// </summary>
-        InvalidHeroPowerOption = 19
+        InvalidHeroPowerOption = 19,
+
+        /// <summary>The attacker is Frozen and has not yet reached its next attack opportunity.</summary>
+        Frozen = 20
     }
 }

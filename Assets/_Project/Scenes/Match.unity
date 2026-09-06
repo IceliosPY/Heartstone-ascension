@@ -8685,7 +8685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   catalog: {fileID: 11400000, guid: c0a10002000000000000000000000001, type: 2}
-  playerOneDeck: {fileID: 11400000, guid: 620641f6f212fd8479925de545a92210, type: 2}
+  playerOneDeck: {fileID: 11400000, guid: d95e4a1cb2f74e0d9c8b6a3f1e05d7c2, type: 2}
   playerTwoDeck: {fileID: 11400000, guid: 2944482d976777a439e59df798006ff1, type: 2}
   matchSeed: 1
   randomizeSeed: 0

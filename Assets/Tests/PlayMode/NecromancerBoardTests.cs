@@ -991,16 +991,36 @@ namespace CoH.Tests.PlayMode
             yield return ReachPlayerOnesTurn();
         }
 
-        /// <summary>The one real hand card already on the board, for comparison.</summary>
+        /// <summary>
+        /// A real hand card already on the board, for comparison against a
+        /// choice card - specifically a minion, since every choice card is
+        /// one of the four servants and a spell in hand (Ice Barrage, for
+        /// one) composes a different number of text layers by having no
+        /// attack or health to show, which would compare two different
+        /// recipes rather than the same one twice.
+        /// </summary>
         private CardView FindAnyHandCard()
         {
             foreach (CardView view in Object.FindObjectsByType<CardView>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
-                if (!view.EntityId.IsNone)
+                if (view.EntityId.IsNone)
                 {
-                    return view;
+                    continue;
                 }
+
+                if (!Session.State.TryGetEntity(view.EntityId, out Entity entity) ||
+                    !(entity is CardInstance card))
+                {
+                    continue;
+                }
+
+                if (Session.State.Catalog.Get(card.CardId).Type != CardType.Minion)
+                {
+                    continue;
+                }
+
+                return view;
             }
 
             return null;

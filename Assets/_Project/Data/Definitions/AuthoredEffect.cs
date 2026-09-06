@@ -212,6 +212,11 @@ namespace CoH.Data
                     }
 
                     break;
+
+                case EffectActionKind.Freeze:
+                    // Needs nothing beyond a trigger and a selector, both
+                    // already checked above: Freeze itself takes no amount.
+                    break;
             }
         }
 

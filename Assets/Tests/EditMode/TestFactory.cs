@@ -97,6 +97,7 @@ namespace CoH.Tests.EditMode
             CryptFiendDefinition(),
             AbominationDefinition(),
             ChooseYourWeaponsDefinition(),
+            IceBarrageDefinition(),
             LunarPhaseDefinition(),
             HeroPowerDamageDefinition(),
             HuntressShotDefinition()
@@ -204,6 +205,35 @@ namespace CoH.Tests.EditMode
         /// <summary>Uses the active player's hero power, choosing one option by index.</summary>
         public static CommandResult UseHeroPower(GameEngine engine, int optionIndex) =>
             engine.Execute(new UseHeroPowerCommand(engine.State.CurrentPlayer, optionIndex));
+
+        public const string IceBarrageCardId = "necromancer_ice_barrage";
+
+        /// <summary>
+        /// Necromancer's second collectible spell: 1 damage to a chosen
+        /// enemy minion, then Freeze it. Two OnPlay rows in written order,
+        /// both <see cref="SelectorKind.ChosenTarget"/> over the same
+        /// <see cref="TargetFilter.EnemyMinion"/> filter, resolving to the
+        /// same player-chosen target - see <see cref="SelectorResolver"/>.
+        /// Damage scales with Spell Damage through the same generic path
+        /// Huntress Shot's own DealDamage row does; Freeze takes no amount
+        /// and is not affected by it.
+        /// </summary>
+        public static CardDefinition IceBarrageDefinition() =>
+            new CardDefinition(
+                new CardId(IceBarrageCardId), "Ice Barrage", CardType.Spell,
+                manaCost: 2, collectible: true, cardClass: CardClass.Necromancer,
+                text: "Deal 1 damage to an enemy minion and Freeze it.",
+                effects: new[]
+                {
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.EnemyMinion),
+                        new EffectActionDefinition(EffectActionKind.DealDamage, amount: 1)),
+                    new EffectDefinition(
+                        EffectTrigger.OnPlay,
+                        new SelectorDefinition(SelectorKind.ChosenTarget, TargetFilter.EnemyMinion),
+                        new EffectActionDefinition(EffectActionKind.Freeze))
+                });
 
         // ------------------------------------------------------------------
         //  Starcaller
@@ -575,6 +605,10 @@ namespace CoH.Tests.EditMode
         /// <summary>Runs damage against one target through the pipeline.</summary>
         public static IReadOnlyList<GameEvent> Damage(GameEngine engine, EntityId target, int amount) =>
             engine.Resolve(new DealDamageAction(EntityId.None, target, amount));
+
+        /// <summary>Freezes one target through the pipeline, exactly as an effect would.</summary>
+        public static IReadOnlyList<GameEvent> Freeze(GameEngine engine, EntityId target) =>
+            engine.Resolve(new FreezeAction(EntityId.None, target));
 
         /// <summary>Destroys targets outright, all in the same death phase.</summary>
         public static IReadOnlyList<GameEvent> Destroy(GameEngine engine, params EntityId[] targets) =>

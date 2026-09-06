@@ -91,6 +91,10 @@ namespace CoH.Core.Rules.Actions
                 case EffectActionKind.RestoreMana:
                     RestoreMana(context, amount);
                     break;
+
+                case EffectActionKind.Freeze:
+                    Freeze(context);
+                    break;
             }
         }
 
@@ -252,5 +256,18 @@ namespace CoH.Core.Rules.Actions
         /// </summary>
         private void RestoreMana(ResolutionContext context, int amount) =>
             ManaSystem.Restore(context, context.State.GetPlayer(_context.Controller), amount);
+
+        /// <summary>
+        /// Freezes every resolved target, exactly like <see cref="DealDamage"/>
+        /// hits every one of them - an entity-level effect over the selector,
+        /// not a player-level grant.
+        /// </summary>
+        private void Freeze(ResolutionContext context)
+        {
+            for (int index = 0; index < _targets.Count; index++)
+            {
+                FreezeRules.Apply(context, _context.SourceEntityId, _targets[index]);
+            }
+        }
     }
 }

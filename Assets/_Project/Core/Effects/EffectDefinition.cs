@@ -122,7 +122,17 @@ namespace CoH.Core.Effects
         /// exactly like <see cref="GrantSpellDamage"/>, for the same reason:
         /// there is no target, only a controller.
         /// </summary>
-        RestoreMana = 7
+        RestoreMana = 7,
+
+        /// <summary>
+        /// Freezes the resolved targets: each loses its next attack
+        /// opportunity (see <see cref="CoH.Core.Rules.FreezeRules"/>). An
+        /// entity-level effect over the resolved selector, exactly like
+        /// <see cref="DealDamage"/>, rather than a player-level one - Frost
+        /// Nova style "freeze everything" is just this action under a
+        /// wider selector, not a different action.
+        /// </summary>
+        Freeze = 8
     }
 
     /// <summary>
@@ -274,6 +284,7 @@ namespace CoH.Core.Effects
             EffectActionKind.Summon => "Summon(" + SummonCardId.Value + " x" + SummonCount + ", " + Placement + ")",
             EffectActionKind.GrantSpellDamage => "GrantSpellDamage(" + Sign(Amount) + ")",
             EffectActionKind.RestoreMana => "RestoreMana(" + DescribeAmount() + ")",
+            EffectActionKind.Freeze => "Freeze()",
             _ => "None"
         };
 
